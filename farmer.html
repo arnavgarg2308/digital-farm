@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Farmer Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="page-header">
+    <h2 data-lang="farmerDash">👨‍🌾 Farmer Dashboard</h2>
+    <div>
+      <button class="small" onclick="openProfile()" data-lang="Profile">Profile</button>
+      <button class="small" onclick="openSupport()"data-lang="sup" >Support</button>
+      <select id="langSelectorFarmer" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+      <button class="small danger" onclick="logout()"data-lang="log">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card" onclick="openFeature('risk')">
+        <h3 data-lang="risk">Risk Assessment</h3>
+        <p id="lastScore">—</p>
+        <button class="mini" onclick="openFeature('risk'); event.stopPropagation()" ><a href="risk.html" target="_blank" data-lang="take">Take assessment</a></button>
+      </div>
+      <div class="card" onclick="openFeature('history')">
+        <h3 data-lang="history">Assessment History</h3>
+        <ul id="historyList"></ul>
+      </div>
+
+      <div class="card" onclick="openFeature('training')">
+        <h3 data-lang="training">Training & Guides</h3>
+        <p data-lang="trainingHint">Short videos & tips</p>
+      </div>
+
+      <div class="card" onclick="openFeature('schemes')">
+        <h3 data-lang="schemes">Government Schemes</h3>
+        <p id="schemesList">No schemes yet (demo)</p>
+      </div>
+
+      <div class="card" onclick="openFeature('loan')">
+        <h3 data-lang="loan">Apply Loan</h3>
+        <p data-lang="loanHint">Apply for small farm loan</p>
+      </div>
+
+      <div class="card" onclick="openFeature('session')">
+        <h3 data-lang="session">Book Session</h3>
+        <p data-lang="sessionHint">Book paid learning sessions</p>
+      </div>
+
+      <div class="card" onclick="openFeature('vaccine')">
+        <h3 data-lang="vaccine">Vaccination Schedule</h3>
+        <p id="vaccineChart" data-lang="vaccineChart">25 Sept — Bird Flu</p>
+      </div>
+
+      <div class="card" onclick="openFeature('feed')">
+        <h3 data-lang="feed">Breeding & Feeding</h3>
+        <p data-lang="feedHint">Feeding schedule and charts</p>
+        <button ><a href="feeding.html" target="_blank" data-lang="feedpig"> View Chart</a></button>
+      </div>
+
+      <div class="card" onclick="openFeature('sales')">
+        <h3 data-lang="sales">Sales / Products</h3>
+        <p data-lang="salesHint">Update product listings</p>
+      </div>
+
+      <div class="card" id="alertsCard">
+        <h3 data-lang="alerts">Alerts</h3>
+        <ul id="alertsList"></ul>
+      </div>
+
+      <!-- ==== AI Chatbox ==== -->
+<div class="card">
+        <h3 data-lang="support">AI Chat + Support</h3>
+        <p data-lang="ask">Ask questions & get voice replies</p>
+        <button class="cta" onclick="openAIChat()"><a href="ai.html" target="_blank" data-lang="open1"> Open Chat</a></button>
+      </div>
+    </section>
+  </main>
+  <!-- Profile / Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close" onclick="closeModal()">✖</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+</body>
+</html>

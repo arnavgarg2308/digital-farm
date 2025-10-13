@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Farm Solution - Role</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="center-page">
+    <h1 data-lang="title">Welcome to Smart Farm Solution</h1>
+    <p data-lang="subtitle">Choose your role to continue</p>
+
+    <div class="role-row">
+      <a href="login.html?role=farmer" class="role-btn">👨‍🌾 <span data-lang="farmer">Farmer</span></a>
+      <a href="login.html?role=admin" class="role-btn">🛠️ <span data-lang="admin">Admin</span></a>
+      <a href="login.html?role=buyer" class="role-btn">🛒 <span data-lang="buyer">Buyer/Wholesaler</span></a>
+    </div>
+
+    <div class="lang-row">
+      <label for="language" class="globe">🌐</label>
+      <select id="language" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+    </div>
+    <p class="hint" data-lang="hintLaunch">Tip: Click role → Signup (one time) → Login → Dashboard</p>
+  </div>
+</body>
+</html>

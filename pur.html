@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Purchase Menu</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background-color: #545151;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #FBEAEA;
+      margin-bottom: 20px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .product-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+    .product-img {
+      height: 180px;
+      object-fit: cover;
+      width: 100%;
+    }
+    .product-info {
+      padding: 15px;
+      flex: 1;
+    }
+    .product-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #081c15;
+      margin-bottom: 5px;
+    }
+    .product-author, .product-pub {
+      font-size: 0.9rem;
+      color: #344e41;
+      margin-bottom: 4px;
+    }
+    .product-price {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #0077b6;
+      margin-top: 8px;
+    }
+    .add-to-cart {
+      background-color: #40916c;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .add-to-cart:hover {
+      background-color: #1b4332;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 Purchase Products</h1>
+  <div class="product-grid">
+    <!-- Product 1 -->
+    <div class="product-card">
+      <img src=https://cdn.pixabay.com/photo/2015/07/06/19/03/egg-833631_1280.jpg class="product-img" alt="EGG" />
+      <div class="product-info">
+        <div class="product-title">Eggs</div>
+        <div class="product-price">$40.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card">
+      <img src=https://tse2.mm.bing.net/th/id/OIP.dzU0_EI9hFlCvItkTGBR8wHaE7?w=760&h=506&rs=1&pid=ImgDetMain&o=7&rm=3 class="product-img" alt="Pig" />
+      <div class="product-info">
+        <div class="product-title">Pig</div>
+        <div class="product-price">$63</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card">
+      <img src=https://images.squarespace-cdn.com/content/v1/57cf08d6bebafbc9907bae3a/1568132660685-8JJEUU8JF7LUTI7S8S1Y/SquarespaceImage19-poultry-maturechickens.jpg class="product-img" alt="Poultry" />
+      <div class="product-info">
+        <div class="product-title">Poultry</div>
+        <div class="product-price">$35.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+
+    <!-- Product 4 -->
+    <div class="product-card">
+      <img src=https://media.istockphoto.com/photos/pig-skin-picture-id171579437?k=6&m=171579437&s=612x612&w=0&h=9ii5Pq2oJY0sdXCRclgT4Wp-f_ERbiqqI2mc7Gwq2BQ= class="product-img" alt="Pig Skin" />
+      <div class="product-info">
+        <div class="product-title">Pig Skin</div>
+        <div class="product-price">$50</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+<!-- Product 5 -->
+    <div class="product-card">
+      <img src=https://tse4.mm.bing.net/th/id/OIP.Jjumq2gg7GptgFmI-_eDSQHaE8?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Pig Manure" />
+      <div class="product-info">
+        <div class="product-title">Pig Mnaure</div>
+        <div class="product-price">$85.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+<!-- Product 6 -->
+    <div class="product-card">
+      <img src=https://tse4.mm.bing.net/th/id/OIP.UrBv4cONuObrg4_8JPAKQgHaER?rs=1&pid=ImgDetMain&o=7&rm=3 alt="Pork Meat" />
+      <div class="product-info">
+        <div class="product-title">Pork Meat</div>
+        <div class="product-price">$315.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+<!-- Product 7 -->
+    <div class="product-card">
+      <img src=https://s-media-cache-ak0.pinimg.com/originals/18/39/e9/1839e9d30fed6d4468069d5c41d3f8e0.jpg alt="Bones (for bone meal production)" />
+      <div class="product-info">
+        <div class="product-title">Bones (for bone meal production)</div>
+        <div class="product-price">$915.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+<!-- Product  8 -->
+    <div class="product-card">
+      <img src=https://featherenthusiast.files.wordpress.com/2021/07/3220700301365236530_img_2178.jpg?w=768 alt="Feathers" />
+      <div class="product-info">
+        <div class="product-title">Feathers</div>
+        <div class="product-price">$35.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+<!-- Product  9 -->
+    <div class="product-card">
+      <img src=https://tse2.mm.bing.net/th/id/OIP.g6jefeoCa5iUKYl3TKURXAHaFO?rs=1&pid=ImgDetMain&o=7&rm=3 alt="Blood & offal" />
+      <div class="product-info">
+        <div class="product-title">Blood & offal</div>
+        <div class="product-price">$115.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+<!-- Product  10 -->
+    <div class="product-card">
+      <img src=https://i.pinimg.com/originals/e0/f7/5d/e0f75d57a92633c4ad3785ba64e880d1.jpg alt="Fertile hatching eggs" />
+      <div class="product-info">
+        <div class="product-title">Fertile hatching eggs</div>
+        <div class="product-price">$75.5</div>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+    </div>
+
+  </div>
+</body>
+</html>

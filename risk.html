@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Farm Risk Assessment - Demo</title>
+<style>
+  :root {
+    --bg: #0b0b0c;
+    --panel: #141416;
+    --muted: #bfbfbf;
+    --accent: #00e676;
+    --danger: #ff6b6b;
+    --card: #1a1a1c;
+  }
+  body{
+    margin:0; font-family: Inter, system-ui, Arial; background: linear-gradient(180deg,#070708,#0d0d0e);
+    color:#eee; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:980px; margin:28px auto; padding:20px; }
+  header{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+  h1{ margin:0; color:var(--accent); font-size:1.4rem; }
+  p.lead{ margin:6px 0 0; color:var(--muted); }
+
+  .grid{ display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
+  @media (max-width:900px){ .grid{ grid-template-columns: 1fr; } }
+
+  /* left - questions */
+  .card{ background:var(--card); border-radius:12px; padding:14px; border:1px solid #222; }
+  form .q{ margin-bottom:12px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.01); }
+  .q h4{ margin:0 0 6px; font-size:0.95rem; color:#fff; }
+  .q .opts{ display:flex; gap:10px; flex-wrap:wrap; }
+  label.opt{ background:#111; padding:8px 10px; border-radius:8px; cursor:pointer; border:1px solid #222; color:var(--muted); }
+  input[type="radio"], input[type="checkbox"]{ margin-right:6px; }
+
+  .actions{ display:flex; gap:10px; margin-top:10px; }
+  .btn{ background:var(--accent); color:#000; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+  .btn.secondary{ background:#2a2a2a; color:#fff; border:1px solid #333; }
+  .result{ margin-top:14px; padding:12px; border-radius:10px; background:#0f0f10; border:1px solid #222; color:var(--muted); }
+
+  /* right - profile + history */
+  .side{ display:flex; flex-direction:column; gap:14px; }
+  .profile { text-align:center; padding:12px; border-radius:10px; background:rgba(255,255,255,0.01); border:1px solid #222; }
+  .profile img{ width:140px; height:140px; object-fit:cover; border-radius:12px; display:block; margin:8px auto; border:2px solid #222; }
+  .profile input[type="file"]{ display:block; margin:10px auto; }
+
+  .history{ padding:12px; border-radius:10px; background:rgba(255,255,255,0.01); border:1px solid #222; max-height:420px; overflow:auto; }
+  .history h4{ margin:0 0 8px; color:var(--accent); }
+  .history .item{ padding:8px; border-radius:8px; margin-bottom:8px; background:#090909; border:1px solid #1b1b1b; }
+  .pill{ display:inline-block; padding:6px 8px; border-radius:999px; font-weight:700; font-size:0.85rem; }
+  .low{ background:rgba(0,255,136,0.12); color:var(--accent); border:1px solid rgba(0,255,136,0.08); }
+  .med{ background:rgba(255,200,0,0.08); color:#ffd54d; border:1px solid rgba(255,200,0,0.06); }
+  .high{ background:rgba(255,80,80,0.08); color:var(--danger); border:1px solid rgba(255,80,80,0.06); }
+
+  .smallmuted{ color:var(--muted); font-size:0.9rem; margin-top:6px; }
+
+  footer { margin-top:18px; text-align:center; color:var(--muted); font-size:0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Risk Assessment</h1>
+      <p class="lead">Answer short questions and upload a photo — system returns a risk score for your farm (demo).</p>
+    </div>
+    <div>
+      <button class="btn" onclick="saveAndClose()">Save & Close</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: Questions -->
+    <div>
+      <div class="card">
+        <form id="riskForm">
+          <!-- Question 1 -->
+          <div class="q" data-q="1">
+            <h4>1. Do you disinfect footwear/footbaths at entry?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q1" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q1" value="0">No</label>
+            </div>
+            <div class="smallmuted">Footbaths reduce pathogen entry — important for biosecurity.</div>
+          </div>
+
+          <!-- Question 2 -->
+          <div class="q" data-q="2">
+            <h4>2. Is feed stored in a sealed/rodent-proof container?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q2" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q2" value="0">No</label>
+            </div>
+          </div>
+
+          <!-- Question 3 -->
+          <div class="q" data-q="3">
+            <h4>3. Do you isolate new animals for 2+ weeks before mixing?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q3" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q3" value="0">No</label>
+            </div>
+          </div>
+
+          <!-- Question 4 -->
+          <div class="q" data-q="4">
+            <h4>4. Are sick animals separated & treated promptly?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q4" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q4" value="0">No</label>
+            </div>
+          </div>
+
+          <!-- Question 5 -->
+          <div class="q" data-q="5">
+            <h4>5. Is there a written vaccination schedule and records?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q5" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q5" value="0">No</label>
+            </div>
+          </div>
+
+          <!-- Question 6 -->
+          <div class="q" data-q="6">
+            <h4>6. Do you limit visitor access and maintain visitor logs?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q6" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q6" value="0">No</label>
+            </div>
+          </div>
+
+          <!-- Question 7 -->
+          <div class="q" data-q="7">
+            <h4>7. Do you use dedicated clothing/boots for farm work?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q7" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q7" value="0">No</label>
+            </div>
+          </div>
+
+          <!-- Question 8 -->
+          <div class="q" data-q="8">
+            <h4>8. Do you have regular pest control (rodents, insects)?</h4>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="q8" value="1">Yes</label>
+              <label class="opt"><input type="radio" name="q8" value="0">No</label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn" onclick="calculateRisk()">Calculate Risk</button>
+            <button type="button" class="btn secondary" onclick="clearForm()">Reset</button>
+          </div>
+
+          <div id="resultBox" class="result hidden" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <div style="margin-top:12px;" class="card">
+        <h4 style="margin-top:0;color:var(--accent)">Notes</h4>
+        <p class="smallmuted">This is a demo self-assessment tool for awareness. For official classification, consult a veterinarian / authority.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: Profile & history -->
+    <aside class="side">
+      <div class="profile card">
+        <h4 style="margin:0;color:var(--accent)">Farmer Photo</h4>
+        <img id="photoPreview" src="" alt="No photo" onerror="this.style.display='none'">
+        <input type="file" id="photoInput" accept="image/*">
+        <div class="smallmuted">Upload a photo of farm or animals (optional).</div>
+      </div>
+
+      <div class="history card">
+        <h4>Assessment History</h4>
+        <div id="historyList"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="mini btn secondary" onclick="exportHistory()">Export CSV</button>
+          <button class="mini btn secondary" onclick="clearHistory()">Clear History</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <small>Demo Risk Assessment • Data stored locally in your browser</small>
+  </footer>
+</div>
+
+<script>
+/* ======== Utilities & storage ======== */
+const HISTORY_KEY = 'sf_assessment_history_v1';
+
+function getHistory(){
+  try{
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  }catch(e){ return []; }
+}
+function saveHistory(arr){ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
+
+/* Photo handling */
+const photoInput = document.getElementById('photoInput');
+const photoPreview = document.getElementById('photoPreview');
+
+photoInput.addEventListener('change', function(){
+  const f = this.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    photoPreview.src = e.target.result;
+    photoPreview.style.display = 'block';
+    // We keep the image data in localStorage only when saving assessment
+  };
+  reader.readAsDataURL(f);
+});
+
+/* ======== Risk calculation logic ========
+ We'll score each 'Yes' as 1, 'No' as 0.
+ Score = sum(yes) / totalQuestions
+ Levels:
+  - Score >= 0.75 -> Low risk
+  - 0.4 <= Score < 0.75 -> Medium
+  - Score < 0.4 -> High
+=======================================*/
+function calculateRisk(){
+  const form = document.getElementById('riskForm');
+  const total = 8;
+  let yes = 0;
+  for(let i=1;i<=8;i++){
+    const v = form['q'+i] && form['q'+i].value;
+    if(v === undefined || v === '') {
+      // if unanswered, treat as 0
+    } else {
+      if(Number(v) === 1) yes++;
+    }
+  }
+  const score = yes / total;
+  const percentage = Math.round(score*100);
+  let level = 'High';
+  if(score >= 0.75) level='Low';
+  else if(score >= 0.4) level='Medium';
+
+  // Build result box
+  const box = document.getElementById('resultBox');
+  box.classList.remove('hidden');
+  box.innerHTML = `
+    <strong>Score: ${percentage}%</strong>
+    <div style="margin-top:8px;">
+      Risk level: 
+      <span class="pill ${level==='Low'?'low':(level==='Medium'?'med':'high')}">${level}</span>
+    </div>
+    <div style="margin-top:10px;color:var(--muted)">Yes answers: ${yes} / ${total}</div>
+  `;
+
+  // Save into history (with optional image)
+  const imgData = (photoPreview && photoPreview.src && photoPreview.src.startsWith('data:')) ? photoPreview.src : null;
+  const entry = {
+    id: Date.now(),
+    score: score,
+    percentage,
+    level,
+    yes,
+    total,
+    photo: imgData,
+    ts: new Date().toISOString()
+  };
+  const hist = getHistory();
+  hist.push(entry);
+  saveHistory(hist);
+  renderHistory();
+}
+
+/* Render history */
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  const hist = getHistory().slice().reverse(); // newest first
+  if(!hist.length){ list.innerHTML = '<div class="smallmuted">No assessments yet.</div>'; return; }
+  list.innerHTML = '';
+  hist.forEach(e=>{
+    const div = document.createElement('div'); div.className='item';
+    const d = new Date(e.ts);
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:700">${d.toLocaleString()}</div>
+          <div class="smallmuted">Score: ${e.percentage}% • ${e.yes}/${e.total}</div>
+        </div>
+        <div>
+          <span class="pill ${e.level==='Low'?'low':(e.level==='Medium'?'med':'high')}" style="margin-right:8px">${e.level}</span>
+        </div>
+      </div>
+    `;
+    if(e.photo){
+      const img = document.createElement('img');
+      img.src = e.photo; img.style.width='100%'; img.style.marginTop='8px'; img.style.borderRadius='8px';
+      div.appendChild(img);
+    }
+    // view / delete buttons
+    const btnRow = document.createElement('div'); btnRow.style.marginTop='8px'; btnRow.style.display='flex'; btnRow.style.gap='8px';
+    const viewBtn = document.createElement('button'); viewBtn.className='btn secondary'; viewBtn.textContent='View';
+    viewBtn.onclick = ()=> { alert(`Assessment on ${d.toLocaleString()}\nScore: ${e.percentage}%\nLevel: ${e.level}`); };
+    const delBtn = document.createElement('button'); delBtn.className='btn secondary'; delBtn.textContent='Delete';
+    delBtn.onclick = ()=>{
+      if(!confirm('Delete this record?')) return;
+      const all = getHistory().filter(x=> x.id !== e.id);
+      saveHistory(all);
+      renderHistory();
+    };
+    btnRow.appendChild(viewBtn); btnRow.appendChild(delBtn);
+    div.appendChild(btnRow);
+    list.appendChild(div);
+  });
+}
+
+/* Export CSV */
+function exportHistory(){
+  const hist = getHistory();
+  if(!hist.length){ alert('No history to export'); return; }
+  let csv = 'id,timestamp,score_pct,level,yes,total\n';
+  hist.forEach(h=> csv += `${h.id},${h.ts},${h.percentage},${h.level},${h.yes},${h.total}\n`);
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'assessments.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* Clear history */
+function clearHistory(){
+  if(!confirm('Clear assessment history?')) return;
+  saveHistory([]);
+  renderHistory();
+}
+
+/* Reset form */
+function clearForm(){
+  document.getElementById('riskForm').reset();
+  document.getElementById('resultBox').classList.add('hidden');
+}
+
+/* Save and Close (for modal or returning) */
+function saveAndClose(){
+  alert('Assessment saved locally (demo). Close this tab or go back to dashboard.');
+}
+
+/* Initialize on load */
+document.addEventListener('DOMContentLoaded', function(){
+  renderHistory();
+  // if existing saved image from last assessment show it?
+  const last = getHistory().slice(-1)[0];
+  if(last && last.photo){
+    photoPreview.src = last.photo; photoPreview.style.display='block';
+  } else {
+    photoPreview.style.display='none';
+  }
+});
+</script>
+</body>
+</html>

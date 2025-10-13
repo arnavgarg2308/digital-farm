@@ -1,0 +1,74 @@
+/* ---------- ADMIN ALERTS PANEL ---------- */
+.alert-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 500px;
+  margin: 20px auto;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.15);
+}
+
+.alert-title {
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+  color: #00ff88;
+  text-align: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+#alert_title, 
+#alert_message,
+#alert_mode {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1rem;
+  outline: none;
+}
+
+#alert_message {
+  resize: none;
+}
+
+#alert_mode {
+  cursor: pointer;
+}
+
+.alert-btn {
+  background: linear-gradient(90deg, #00ff88, #00c07a);
+  color: #00110b;
+  font-weight: bold;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.alert-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #00ff88;
+}
+
+.alert-status {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: #9aa0a6;
+  text-align: center;
+}

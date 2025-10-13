@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buyer Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="page-header">
+    <h2 data-lang="buyerDash">🛒 Buyer Dashboard</h2>
+    <div>
+      <button class="small" onclick="openProfile()" data-lang="Profile">Profile</button>
+      <button class="small" onclick="openSupport()" data-lang="sup">Support</button>
+      <select id="langSelectorBuyer" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+      <button class="small danger" onclick="logout()" data-lang="log">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card">
+        <h3 data-lang="purchase">Purchasing</h3>
+        <button class="mini" onclick="openFeature('purchase')" ><a href="pur.html" target="_blank" data-lang="browse">Browse Listings </a></button>
+      </div>
+
+      <div class="card">
+        <h3 data-lang="farmDetails">Farm Details</h3>
+        <p id="buyerFarmList" data-lang="ram">Ramesh Poultry — Moderate Risk (demo)</p>
+      </div>
+
+      <div class="card">
+        <h3 data-lang="booking">Booking</h3>
+        <button class="mini" data-lang="book">Book Order</button>
+      </div>
+
+      <div class="card">
+        <h3 data-lang="payment">Payment</h3>
+        <p data-lang="pendind">Pending: ₹0</p>
+        <button class="mini" data-lang="pay">Pay Now</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden"><div class="modal-content"><button class="close" onclick="closeModal()">✖</button><div id="modalBody"></div></div></div>
+</body>
+</html>

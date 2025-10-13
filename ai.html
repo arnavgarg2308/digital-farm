@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Chat Support</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; background:#0b0b0b; color:#fff; }
+    .chat-wrapper { height:100vh; display:flex; flex-direction:column; }
+    .chat-header { background:#111; padding:15px; text-align:center; font-size:18px; color:#00ff88; }
+    .chat-body { flex:1; overflow-y:auto; padding:15px; }
+    .msg { margin-bottom:12px; display:flex; }
+    .msg .bubble { max-width:70%; padding:10px; border-radius:10px; }
+    .msg.user { justify-content:flex-end; }
+    .msg.user .bubble { background:#00ff88; color:#001; }
+    .msg.ai .bubble { background:#222; color:#eee; }
+    .chat-footer { display:flex; padding:12px; gap:10px; background:#111; }
+    .chat-footer input { flex:1; padding:10px; border-radius:6px; border:none; outline:none; background:#222; color:#fff; }
+    .btn { padding:10px 14px; border:none; border-radius:6px; cursor:pointer; }
+    .btn-send { background:linear-gradient(90deg,#00ff88,#00c07a); font-weight:bold; }
+    .btn-mic { background:#333; color:#fff; }
+  </style>
+</head>
+<body>
+  <div class="chat-wrapper">
+    <div class="chat-header">🤖 AI Chat Support</div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-footer">
+      <input type="text" id="aiInput" placeholder="Type your question or press mic...">
+      <button class="btn btn-send" id="sendBtn">Send</button>
+      <button class="btn btn-mic" id="micBtn">🎙️</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

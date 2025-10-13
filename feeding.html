@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Management Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .button-group {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .dashboard-btn {
+            background-color: #3498db;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .dashboard-btn.pig-btn {
+            background-color: #e74c3c;
+        }
+        .dashboard-btn.pig-btn:hover {
+            background-color: #c0392b;
+        }
+        .dashboard-btn.poultry-btn {
+            background-color: #f1c40f;
+            color: #333;
+        }
+        .dashboard-btn.poultry-btn:hover {
+            background-color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Select a Feeding Schedule</h1>
+        <div class="button-group">
+            <a href="feedpig.html" class="dashboard-btn pig-btn">
+                🐖 Pig Feeding Schedule
+            </a>
+            <a href="poultryfeed.html" class="dashboard-btn poultry-btn">
+                🐓 Poultry Feeding Schedule
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

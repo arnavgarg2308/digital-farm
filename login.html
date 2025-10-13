@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login / Signup</title>
+  <style>
+    body {
+      background: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      width: 350px;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.6);
+    }
+    label { display:block; margin-top:10px; }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 6px;
+    }
+    input, select { background: #2c2c2c; color: #fff; }
+    button {
+      background: #4caf50;
+      color: #fff;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    button:hover { background: #45a049; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="form-title">Create Account</h2>
+    <form id="signupForm">
+      <label id="fullname-label">Full name</label>
+      <input type="text" id="fullname" required>
+
+      <label id="phone-label">Phone</label>
+      <input type="text" id="phone" required>
+
+      <label id="password-label">Password</label>
+      <input type="password" id="password" required>
+
+      <label id="pan-label">PAN Number</label>
+      <input type="text" id="pan" required>
+
+      <label id="aadhaar-label">Aadhaar Number</label>
+      <input type="text" id="aadhaar" required>
+
+      <label id="preferred-label">Preferred language</label>
+      <select id="lang">
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+      </select>
+
+      <button type="submit" id="create-btn">Create Account</button>
+    </form>
+  </div>
+
+  <script>
+    // Dictionary for language switch
+    const translations = {
+      en: {
+        title: "Create Account",
+        fullname: "Full name",
+        phone: "Phone",
+        password: "Password",
+        pan: "PAN Number",
+        aadhaar: "Aadhaar Number",
+        preferred: "Preferred language",
+        create: "Create Account"
+      },
+      hi: {
+        title: "खाता बनाएं",
+        fullname: "पूरा नाम",
+        phone: "फ़ोन",
+        password: "पासवर्ड",
+        pan: "पैन नंबर",
+        aadhaar: "आधार नंबर",
+        preferred: "पसंदीदा भाषा",
+        create: "खाता बनाएं"
+      }
+    };
+
+    // Language Change Event
+    document.getElementById("lang").addEventListener("change", function(){
+      const lang = this.value;
+      document.getElementById("form-title").innerText = translations[lang].title;
+      document.getElementById("fullname-label").innerText = translations[lang].fullname;
+      document.getElementById("phone-label").innerText = translations[lang].phone;
+      document.getElementById("password-label").innerText = translations[lang].password;
+      document.getElementById("pan-label").innerText = translations[lang].pan;
+      document.getElementById("aadhaar-label").innerText = translations[lang].aadhaar;
+      document.getElementById("preferred-label").innerText = translations[lang].preferred;
+      document.getElementById("create-btn").innerText = translations[lang].create;
+    });
+
+    // On Form Submit → Redirect to Dashboard
+    document.getElementById("signupForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const role = urlParams.get("role"); // farmer/admin/buyer
+
+      if(role === "farmer"){
+        window.location.href = "farmer.html";
+      } else if(role === "admin"){
+        window.location.href = "admin.html";
+      } else if(role === "buyer"){
+        window.location.href = "buyer.html";
+      } else {
+        alert("Role not found!");
+      }
+    });
+  </script>
+</body>
+</html>

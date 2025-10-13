@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="alerts.css">
+</head>
+
+<body>
+    <!-- Admin Alerts Panel -->
+<section class="alert-card">
+  <h3 class="alert-title">🚨 Send Alerts to Farmers</h3>
+
+  <div class="form-group">
+    <label for="alert_title">📌 Alert Title</label>
+    <input type="text" id="alert_title" placeholder="Enter alert title...">
+  </div>
+
+  <div class="form-group">
+    <label for="alert_message">📝 Message</label>
+    <textarea id="alert_message" rows="4" placeholder="Enter alert message..."></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="alert_mode">📡 Delivery Mode</label>
+    <select id="alert_mode">
+      <option value="inapp">In-App Notification</option>
+      <option value="sms">SMS Notification</option>
+      <option value="voice">Voice Call</option>
+      <option value="all">All (In-app + SMS + Voice)</option>
+    </select>
+  </div>
+
+  <button class="alert-btn" onclick="sendAdminAlert()">🚀 Send Alert</button>
+
+  <p id="alert_status" class="alert-status"></p>
+</section>
+</body>
+</html>

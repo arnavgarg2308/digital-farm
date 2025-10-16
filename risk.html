@@ -191,12 +191,21 @@
 /* ======== Utilities & storage ======== */
 const HISTORY_KEY = 'sf_assessment_history_v1';
 
-function getHistory(){
-  try{
-    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-  }catch(e){ return []; }
+function getHistory() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const userKey = currentUser ? `sf_assessment_history_${currentUser.id}` : HISTORY_KEY;
+  try {
+    return JSON.parse(localStorage.getItem(userKey) || '[]');
+  } catch (e) {
+    return [];
+  }
 }
-function saveHistory(arr){ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
+
+function saveHistory(arr) {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const userKey = currentUser ? `sf_assessment_history_${currentUser.id}` : HISTORY_KEY;
+  localStorage.setItem(userKey, JSON.stringify(arr));
+}
 
 /* Photo handling */
 const photoInput = document.getElementById('photoInput');
@@ -244,27 +253,29 @@ function calculateRisk(){
   const box = document.getElementById('resultBox');
   box.classList.remove('hidden');
   // === Save assessment to localStorage ===
+  // after calculating 'percentage' and 'level' (inside runAssessment / calculateRisk)
 try {
-  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const phoneOrId = user.id || user.phone || user.email;
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const userId = currentUser && currentUser.id ? currentUser.id : (currentUser && currentUser.phone) || currentUser && currentUser.email;
 
-  // Fetch existing assessments or create new array
+  // build assessments array
   const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
 
-  // Push the new record
+  // push record with reference to the user id
   assessments.push({
-    user: phoneOrId,
-    score: percentage,
-    level: level,
+    id: Date.now().toString(),
+    userId: userId,         // the key field
+    score: percentage,      // number or string like "82"
+    level: level,           // "Low"/"Medium"/"High"
     createdAt: new Date().toISOString()
   });
 
-  // Save back to localStorage
   localStorage.setItem('assessments', JSON.stringify(assessments));
-  console.log('Assessment saved for:', phoneOrId);
+  console.log('Assessment saved for userId:', userId);
 } catch (err) {
-  console.error('Error saving assessment:', err);
+  console.error('Save assessment error:', err);
 }
+
   box.innerHTML = `
     <strong>Score: ${percentage}%</strong>
     <div style="margin-top:8px;">
@@ -290,6 +301,76 @@ try {
   hist.push(entry);
   saveHistory(hist);
   renderHistory();
+  function loadFarmerAssessments() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  if (!currentUser) {
+    // if not logged in, redirect to login
+    window.location.href = 'farmer-login.html';
+    return;
+  }
+
+  const userId = currentUser.id || currentUser.phone || currentUser.email;
+  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+
+  // filter only those assessments for this user
+  const myAssessments = assessments.filter(a => (a.userId + '') === (userId + ''));
+
+  // Render into your UI container (example: <ul id="myAssessments"></ul>)
+  const ul = document.getElementById('myAssessments');
+  if (!ul) return;
+  ul.innerHTML = '';
+  if (myAssessments.length === 0) {
+    ul.innerHTML = '<li>No assessments yet</li>';
+    return;
+  }
+  myAssessments.reverse().forEach(a => {
+    const li = document.createElement('li');
+    li.textContent = `${new Date(a.createdAt).toLocaleString()} — ${a.score}% — ${a.level}`;
+    ul.appendChild(li);
+  });
+}
+
+// call on page load
+document.addEventListener('DOMContentLoaded', loadFarmerAssessments);
+/* ======================================
+   🔄 Data Migration Utility (One-time)
+   Converts old assessment.user → assessment.userId
+====================================== */
+function migrateAssessments() {
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  let assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+  let changed = false;
+
+  assessments = assessments.map(a => {
+    // skip if already in new structure
+    if (a.userId) return a;
+
+    // try to match assessment.user with user email / phone / id
+    const match = users.find(u =>
+      u.email === (a.user + '') ||
+      u.phone === (a.user + '') ||
+      u.id === (a.user + '')
+    );
+
+    // add new userId if match found
+    if (match) {
+      a.userId = match.id;
+      changed = true;
+    }
+    return a;
+  });
+
+  if (changed) {
+    localStorage.setItem('assessments', JSON.stringify(assessments));
+    console.log('✅ Assessments migrated successfully to new structure.');
+  } else {
+    console.log('ℹ️ No assessments needed migration.');
+  }
+}
+
+// Run this once after you update structure
+migrateAssessments();
+
 }
 
 /* Render history */

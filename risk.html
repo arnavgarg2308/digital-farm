@@ -243,6 +243,28 @@ function calculateRisk(){
   // Build result box
   const box = document.getElementById('resultBox');
   box.classList.remove('hidden');
+  // === Save assessment to localStorage ===
+try {
+  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const phoneOrId = user.id || user.phone || user.email;
+
+  // Fetch existing assessments or create new array
+  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+
+  // Push the new record
+  assessments.push({
+    user: phoneOrId,
+    score: percentage,
+    level: level,
+    createdAt: new Date().toISOString()
+  });
+
+  // Save back to localStorage
+  localStorage.setItem('assessments', JSON.stringify(assessments));
+  console.log('Assessment saved for:', phoneOrId);
+} catch (err) {
+  console.error('Error saving assessment:', err);
+}
   box.innerHTML = `
     <strong>Score: ${percentage}%</strong>
     <div style="margin-top:8px;">

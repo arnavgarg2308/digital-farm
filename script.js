@@ -251,11 +251,180 @@ document.addEventListener("DOMContentLoaded", function() {
     initHeatmap();
   }
 });
+ // ------- SIGNUP -------
+function signupUser(e, role) {
+  e.preventDefault();
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  if (users.find(u => u.email === email)) {
+    alert('Email already registered.');
+    return;
+  }
+  if (users.find(u => u.phone === phone)) {
+    alert('Email already registered.');
+    return;
+  }
 
+  const user = {
+    id: Date.now(),
+    name: document.getElementById('name').value,
+    email,
+    password: document.getElementById('password').value,
+    phone: document.getElementById('phone').value,
+    role,
+    createdAt: new Date().toISOString()
+  };
 
-// Load saved language on page load
-document.addEventListener("DOMContentLoaded", () => {
-  const savedLang = localStorage.getItem("lang") || "en";
-  document.getElementById("language").value = savedLang;
-  changeLanguage(savedLang);
-});
+  // For admin later
+  if (role === 'admin') {
+    const code = document.getElementById('adminCode')?.value?.trim();
+    if (code !== 'ADMIN2024') {
+      alert('Invalid Admin Code!');
+      return;
+    }
+    user.adminCode = code;
+  }
+
+  users.push(user);
+  localStorage.setItem('users', JSON.stringify(users));
+  alert('Account created successfully! Redirecting to login...');
+  setTimeout(() => {
+    window.location.href = `${role}-login.html`;
+  }, 1500);
+}
+
+// ------- LOGIN -------
+function loginUser(e, role) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPassword').value;
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const u = users.find(x => x.email === email && x.password === pass && x.role === role);
+  if (!u) return alert('Invalid credentials or wrong role.');
+
+  localStorage.setItem('currentUser', JSON.stringify(u));
+  alert('Login successful!');
+  if (role === 'farmer') location.href = 'farmer.html';
+  else if (role === 'buyer') location.href = 'buyer.html';
+  else location.href = 'admin.html';
+}
+/* ---------- FORGOT PASSWORD (demo OTP flow) ---------- */
+
+// Start: ask user for email OR phone
+function startForgotPassword() {
+  const identifier = prompt("Enter your registered Email or Phone number:");
+  if (!identifier) return;
+
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  const user = users.find(u => u.email === identifier.toLowerCase() || u.phone === identifier);
+  if (!user) {
+    alert("User not found with this email/phone.");
+    return;
+  }
+
+  // generate OTP (4-digit) and save in localStorage with expiry (5 min)
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  const otpObj = { otp, userId: user.id, expiresAt: Date.now() + 5 * 60 * 1000 };
+  localStorage.setItem("sf_pwd_otp", JSON.stringify(otpObj));
+
+  // In real app: send OTP via email/SMS. Demo: show OTP to user (or alert)
+  alert(`Demo OTP (for testing): ${otp}\n(OTP valid 5 minutes)`);
+
+  // prompt for OTP
+  const entered = prompt("Enter OTP you received:");
+  if (!entered) return alert("OTP entry cancelled.");
+
+  const stored = JSON.parse(localStorage.getItem("sf_pwd_otp") || "null");
+  if (!stored || stored.userId !== user.id) return alert("No OTP found. Try again.");
+  if (Date.now() > stored.expiresAt) { localStorage.removeItem("sf_pwd_otp"); return alert("OTP expired. Try again."); }
+  if (entered.trim() !== stored.otp) return alert("Invalid OTP.");
+
+  // OTP valid — prompt for new password
+  const newPass = prompt("Enter new password (min 8 characters, include upper, lower, number):");
+  if (!newPass) return alert("Password reset cancelled.");
+  if (!validatePassword(newPass)) return alert("Password does not meet strength requirements.");
+
+  // update user password
+  const allUsers = JSON.parse(localStorage.getItem("users") || "[]");
+  const idx = allUsers.findIndex(x => x.id === user.id);
+  if (idx === -1) return alert("User not found (unexpected).");
+  allUsers[idx].password = newPass;
+  localStorage.setItem("users", JSON.stringify(allUsers));
+  localStorage.removeItem("sf_pwd_otp");
+  showToast("✅ Password updated. You can now login.", "success");
+}
+/* ---------- ADMIN: render farmers list & view details ---------- */
+
+function renderFarmersOverview() {
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  const farmers = users.filter(u => u.role === "farmer");
+  const list = document.getElementById("farmerList");
+  if (!list) return; // if container not present on page
+  list.innerHTML = "";
+  if (farmers.length === 0) {
+    list.innerHTML = "<div style='color:#bbb'>No farmers registered.</div>";
+    return;
+  }
+
+  farmers.forEach((f) => {
+    const div = document.createElement("div");
+    div.style.background = "#0b0b0b";
+    div.style.border = "1px solid #222";
+    div.style.padding = "10px";
+    div.style.borderRadius = "8px";
+    div.style.display = "flex";
+    div.style.justifyContent = "space-between";
+    div.style.alignItems = "center";
+
+    const left = document.createElement("div");
+    left.innerHTML = `<strong>${escapeHtml(f.fullName || f.name || "—")}</strong><div style="font-size:0.9rem;color:#9aa0a6">${f.email} • ${f.phone || '—'}</div>`;
+
+    const right = document.createElement("div");
+    const viewBtn = document.createElement("button");
+    viewBtn.innerText = "View";
+    viewBtn.className = "mini";
+    viewBtn.onclick = () => showFarmerDetails(f.id);
+
+    right.appendChild(viewBtn);
+
+    div.appendChild(left);
+    div.appendChild(right);
+    list.appendChild(div);
+  });
+}
+
+function showFarmerDetails(userId) {
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  const u = users.find(x => x.id == userId);
+  if (!u) return alert("Farmer not found.");
+  // build detail HTML
+  let html = `<h3>${escapeHtml(u.fullName || u.name)}</h3>`;
+  html += `<p><strong>Email:</strong> ${escapeHtml(u.email)}</p>`;
+  html += `<p><strong>Phone:</strong> ${escapeHtml(u.phone || '—')}</p>`;
+  html += `<p><strong>Role:</strong> ${escapeHtml(u.role)}</p>`;
+  html += `<p><strong>Created:</strong> ${new Date(u.createdAt).toLocaleString()}</p>`;
+
+  // load assessments if available
+  const assessments = JSON.parse(localStorage.getItem("sf_assessments") || "[]").filter(a => a.user === u.phone || a.user === u.email || a.user === u.id);
+  if (assessments.length) {
+    html += `<h4>Assessments</h4><ul>`;
+    assessments.forEach(a => {
+      html += `<li>${new Date(a.createdAt).toLocaleString()} — ${Math.round(a.score*100)}% — ${a.level}</li>`;
+    });
+    html += `</ul>`;
+  } else html += `<p style="color:#aaa">No assessments recorded.</p>`;
+
+  document.getElementById("farmerModalBody").innerHTML = html;
+  document.getElementById("farmerModal").classList.remove("hidden");
+}
+
+function closeFarmerModal() {
+  const m = document.getElementById("farmerModal");
+  if (m) m.classList.add("hidden");
+}
+
+// small helper to avoid injection while rendering
+function escapeHtml(s) {
+  if (!s) return "";
+  return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}

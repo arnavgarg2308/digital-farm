@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- Replace or add to Admin page where Farmer Overview should be -->
+<div id="adminFarmersWrap" style="margin:18px 0;">
+  <h3>Farmer Overview</h3>
+<table id="farmerTable" border="1" style="width:100%; text-align:center; border-collapse:collapse; color:white; background:#111;">
+  <thead style="background:#00ff99; color:black;">
+    <tr>
+      <th>Farmer Name</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Farm Name</th>
+      <th>Area</th>
+      <th>Last Risk Score</th>
+      <th>Risk Level</th>
+      <th>Assessment Date</th>
+    </tr>
+  </thead>
+  <tbody id="farmerTableBody"></tbody>
+</table>
+
+  <div id="farmerList" style="display:flex;flex-direction:column;gap:8px;"></div>
+</div>
+
+<!-- Farmer details modal (simple) -->
+<!--<div id="farmerModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;">-->
+  
+    <div id="farmerModalBody"></div>
+  </div>
+</div>
+<script>
+// Load farmer data + assessments
+window.onload = function() {
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+  const body = document.getElementById('farmerTableBody');
+
+  body.innerHTML = ''; // clear old data
+
+  users
+    .filter(u => u.role === 'farmer')
+    .forEach(user => {
+      // find latest assessment
+      const userAssessments = assessments.filter(a => a.user === user.id || a.user === user.phone || a.user === user.email);
+      const last = userAssessments.length > 0 ? userAssessments[userAssessments.length - 1] : {};
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${user.name|| '-'}</td>
+        <td>${user.phone || '-'}</td>
+        <td>${user.email || '-'}</td>
+        <td>${user.farmName || '-'}</td>
+        <td>${user.farmArea || '-'}</td>
+        <td>${last.score ? last.score + '%' : 'N/A'}</td>
+        <td style="color:${last.level === 'High' ? 'red' : last.level === 'Medium' ? 'orange' : 'lightgreen'};">
+          ${last.level || 'No Data'}
+        </td>
+        <td>${last.createdAt ? new Date(last.createdAt).toLocaleString() : '-'}</td>
+      `;
+      body.appendChild(tr);
+    });
+
+  if (body.innerHTML.trim() === '') {
+    body.innerHTML = `<tr><td colspan="8">No farmer data found</td></tr>`;
+  }
+};
+</script>
+
+</body>
+</html>

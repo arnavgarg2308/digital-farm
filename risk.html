@@ -58,6 +58,7 @@
 </style>
 </head>
 <body>
+  
 <div class="wrap">
   <header>
     <div>
@@ -65,10 +66,15 @@
       <p class="lead">Answer short questions and upload a photo — system returns a risk score for your farm (demo).</p>
     </div>
     <div>
-      <button class="btn" onclick="saveAndClose()">Save & Close</button>
+      <button class="btn" onclick="saveAndClose()">Save</button>
     </div>
+    <button 
+    class="back-btn" 
+    onclick="goBackToDashboard()"
+  >
+    ⬅ Back to Dashboard
+  </button>
   </header>
-
   <div class="grid">
     <!-- LEFT: Questions -->
     <div>
@@ -188,6 +194,28 @@
 </div>
 
 <script>
+  function goBackToDashboard() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user) {
+      alert("No user found. Redirecting to login.");
+      window.location.href = "index.html"; // fallback
+      return;
+    }
+    switch(user.role) {
+      case 'admin':
+        window.location.href = "admin.html";
+        break;
+      case 'farmer':
+        window.location.href = "farmer.html";
+        break;
+      case 'buyer':
+        window.location.href = "buyer.html";
+        break;
+      default:
+        window.location.href = "index.html";
+    }
+  }
+
 /* ======== Utilities & storage ======== */
 const HISTORY_KEY = 'sf_assessment_history_v1';
 

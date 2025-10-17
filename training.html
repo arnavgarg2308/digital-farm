@@ -98,11 +98,15 @@
   let videos = JSON.parse(localStorage.getItem('trainingVideos') || '[]');
 
   function renderVideos() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const isAdmin = user && user.role === 'admin';
+
     list.innerHTML = ""; // clear old content
     if (videos.length === 0) {
       list.innerHTML = "<p>No admin videos uploaded yet.</p>";
       return;
     }
+
     videos.forEach((v, i) => {
       const wrapper = document.createElement('div');
       wrapper.style.marginBottom = "20px";
@@ -114,20 +118,23 @@
       vid.style.display = "block";
       vid.style.marginBottom = "5px";
 
-      // Delete button
-      const delBtn = document.createElement('button');
-      delBtn.textContent = "🗑 Delete";
-      delBtn.className = "small danger";
-      delBtn.onclick = () => {
-        if (confirm("Delete this video?")) {
-          videos.splice(i, 1); // remove from array
-          localStorage.setItem('trainingVideos', JSON.stringify(videos));
-          renderVideos(); // refresh
-        }
-      };
-
       wrapper.appendChild(vid);
-      wrapper.appendChild(delBtn);
+
+      // Only show delete button if logged in user is admin
+      if (isAdmin) {
+        const delBtn = document.createElement('button');
+        delBtn.textContent = "🗑 Delete";
+        delBtn.className = "small danger";
+        delBtn.onclick = () => {
+          if (confirm("Delete this video?")) {
+            videos.splice(i, 1); // remove from array
+            localStorage.setItem('trainingVideos', JSON.stringify(videos));
+            renderVideos(); // refresh
+          }
+        };
+        wrapper.appendChild(delBtn);
+      }
+
       list.appendChild(wrapper);
     });
   }

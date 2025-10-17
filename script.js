@@ -428,3 +428,27 @@ function escapeHtml(s) {
   if (!s) return "";
   return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
+// ==== ADMIN VIDEO UPLOAD ====
+function uploadVideo() {
+  const input = document.getElementById('videoUpload');
+  const files = input.files;
+
+  if (!files.length) {
+    alert("Please select video files to upload!");
+    return;
+  }
+
+  // Get previously uploaded videos
+  const stored = JSON.parse(localStorage.getItem('trainingVideos') || '[]');
+
+  // Add new uploads
+  Array.from(files).forEach(file => {
+    const url = URL.createObjectURL(file); // temporary local URL for preview
+    stored.push({ name: file.name, url });
+  });
+
+  // Save back to localStorage
+  localStorage.setItem('trainingVideos', JSON.stringify(stored));
+  alert("Videos uploaded successfully! They will appear on the Training & Guides page.");
+}
+

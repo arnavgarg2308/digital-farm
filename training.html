@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training & Guides</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="page-header">
+    <h2>🐖🐓 Training & Guides</h2>
+    <button class="small" onclick="history.back()">⬅ Back to Dashboard</button>
+  </header>
+
+  <main style="padding: 20px;">
+    <!-- Static Pig Farming Videos -->
+    <h3 style="color: var(--accent);">Pig Farming Training Videos</h3>
+    <div class="video-container">
+      <video controls>
+        <source src="videos/pig1.mp4" type="video/mp4" />
+      </video>
+      <video controls>
+        <source src="videos/pig2.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <!-- Static Poultry Farming Videos -->
+    <h3 style="color: var(--accent); margin-top: 30px;">Poultry Farming Training Videos</h3>
+    <div class="video-container">
+      <video controls>
+        <source src="videos/poultry3.mp4" type="video/mp4" />
+      </video>
+      <video controls>
+        <source src="videos/poultry4.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <!-- Admin Uploaded Videos will appear here -->
+    <section>
+      <h3 style="color: var(--accent); margin-top:30px;">Uploaded by Admin</h3>
+      <div id="videoList"></div>
+    </section>
+  </main>
+
+  <!-- Script to load admin uploaded videos from localStorage -->
+  <script>
+    const list = document.getElementById('videoList');
+    const videos = JSON.parse(localStorage.getItem('trainingVideos') || '[]');
+
+    if (videos.length === 0) {
+      list.innerHTML = "<p>No admin videos uploaded yet.</p>";
+    } else {
+      videos.forEach(v => {
+        const vid = document.createElement('video');
+        vid.controls = true;
+        vid.width = 300;
+        vid.src = v.url;
+        vid.style.marginRight = "10px";
+        vid.style.marginBottom = "10px";
+        list.appendChild(vid);
+      });
+    }
+  </script>
+</body>
+</html>

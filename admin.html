@@ -44,13 +44,26 @@
 
 
       <div class="card">
-        <h3 data-lang="alerts">Alerts</h3>
-        <button class="cta" onclick="sendDemoAlert()"><a href="trai.html" target="_blank" class="alt" data-lang="send">Send demo alert</a></button>
-      </div>
-      <div class="card">
-        <h3 data-lang="training">Training videos and guides</h3>
-        <p data-lang="add">Admin can add Training videos and guide</p>
-      </div>
+  <h3 data-lang="training">Training videos and guides</h3>
+  <p data-lang="add">Admin can add Training videos and guide</p>
+
+  <!-- File input for uploading videos -->
+  <input type="file" id="videoUpload" accept="video/mp4" multiple>
+
+  <!-- Upload button -->
+  <button class="cta" onclick="uploadVideo()">Upload Videos</button>
+
+  <!-- Link to view uploaded videos page -->
+  <button class="cta">
+    <a href="training.html" target="_blank" style="color:black; text-decoration:none;">View Uploaded Videos</a>
+  </button>
+
+  <p class="hint" style="font-size:0.85rem; color:var(--muted);">
+    Uploaded videos will appear in farmer's Training & Guides page (preview only)
+  </p>
+</div>
+
+
       <div class="card">
         <h3 data-lang="compliance">Compliance Tracker</h3>
         <p data-lang="not">[Shows who hasn't done assessment]</p>

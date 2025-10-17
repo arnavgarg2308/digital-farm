@@ -265,24 +265,44 @@ function signupUser(e, role) {
     return;
   }
 
+    // Create base user object
   const user = {
     id: Date.now(),
-    name: document.getElementById('name').value,
+    name: document.getElementById('name').value.trim(),
     email,
-    password: document.getElementById('password').value,
-    phone: document.getElementById('phone').value,
+    password: document.getElementById('password').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
     role,
     createdAt: new Date().toISOString()
   };
 
-  // For admin later
+  // ---- Role specific fields ----
+  if (role === 'farmer') {
+    user.farmName = document.getElementById('farmName')?.value.trim() || '';
+    user.farmArea = document.getElementById('farmArea')?.value.trim() || '';
+    user.district = document.getElementById('district')?.value.trim() || '';
+    user.state = document.getElementById('state')?.value.trim() || '';
+    user.village = document.getElementById('village')?.value.trim() || '';
+    user.productionType = document.getElementById('productionType')?.value || '';
+  }
+
   if (role === 'admin') {
-    const code = document.getElementById('adminCode')?.value?.trim();
-    if (code !== 'ADMIN2024') {
-      alert('Invalid Admin Code!');
+    user.designation = document.getElementById('designation')?.value.trim() || '';
+    user.organization = document.getElementById('organization')?.value.trim() || '';
+    user.officeAddress = document.getElementById('officeAddress')?.value.trim() || '';
+    user.adminCode = document.getElementById('adminCode')?.value.trim() || '';
+
+    if (user.adminCode !== 'ADMIN2024') {
+      alert('Invalid Admin Access Code!');
       return;
     }
-    user.adminCode = code;
+  }
+
+  if (role === 'buyer') {
+    user.company = document.getElementById('company')?.value.trim() || '';
+    user.companyAddress = document.getElementById('companyAddress')?.value.trim() || '';
+    user.gst = document.getElementById('gst')?.value.trim() || '';
+    user.businessType = document.getElementById('businessType')?.value || '';
   }
 
   users.push(user);

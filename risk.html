@@ -284,24 +284,28 @@ function calculateRisk(){
   // after calculating 'percentage' and 'level' (inside runAssessment / calculateRisk)
 try {
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  const userId = currentUser && currentUser.id ? currentUser.id : (currentUser && currentUser.phone) || currentUser && currentUser.email;
+  if (!currentUser) {
+    alert('User not logged in. Redirecting to login...');
+    window.location.href = 'farmer-login.html';
+    return;
+  }
 
-  // build assessments array
+  // always store with userId field
+  const userId = currentUser.id || currentUser.phone || currentUser.email;
   const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
 
-  // push record with reference to the user id
   assessments.push({
     id: Date.now().toString(),
-    userId: userId,         // the key field
-    score: percentage,      // number or string like "82"
-    level: level,           // "Low"/"Medium"/"High"
+    userId: userId,            // 🔑 linked to farmer
+    score: percentage,
+    level: level,
     createdAt: new Date().toISOString()
   });
 
   localStorage.setItem('assessments', JSON.stringify(assessments));
-  console.log('Assessment saved for userId:', userId);
+  console.log('✅ Assessment saved for:', userId);
 } catch (err) {
-  console.error('Save assessment error:', err);
+  console.error('Error saving assessment:', err);
 }
 
   box.innerHTML = `
@@ -317,6 +321,7 @@ try {
   const imgData = (photoPreview && photoPreview.src && photoPreview.src.startsWith('data:')) ? photoPreview.src : null;
   const entry = {
     id: Date.now(),
+    userId: currentUser.id || currentUser.phone || currentUser.email,
     score: score,
     percentage,
     level,
@@ -404,7 +409,13 @@ migrateAssessments();
 /* Render history */
 function renderHistory(){
   const list = document.getElementById('historyList');
-  const hist = getHistory().slice().reverse(); // newest first
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+let hist = getHistory().slice().reverse();
+if (currentUser) {
+  const userId = currentUser.id || currentUser.phone || currentUser.email;
+  hist = hist.filter(h => h.userId === userId);
+}
+
   if(!hist.length){ list.innerHTML = '<div class="smallmuted">No assessments yet.</div>'; return; }
   list.innerHTML = '';
   hist.forEach(e=>{

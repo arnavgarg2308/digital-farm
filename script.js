@@ -256,14 +256,17 @@ function signupUser(e, role) {
   e.preventDefault();
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const email = document.getElementById('email').value.trim().toLowerCase();
-  if (users.find(u => u.email === email)) {
-    alert('Email already registered.');
-    return;
-  }
-  if (users.find(u => u.phone === phone)) {
-    alert('Email already registered.');
-    return;
-  }
+  // Check duplicates
+const phone = document.getElementById('phone').value.trim();
+
+if (users.some(u => u.email === email)) {
+  alert('Email already registered.');
+  return;
+}
+if (users.some(u => u.phone === phone)) {
+  alert('Phone number already registered.');
+  return;
+}
 
     // Create base user object
   const user = {
@@ -276,6 +279,8 @@ function signupUser(e, role) {
    avatar: "",
     createdAt: new Date().toISOString()
   };
+user.avatar = "";
+localStorage.removeItem(`lastAvatar_${role}`);
 
   // ---- Role specific fields ----
   if (role === 'farmer') {
@@ -686,7 +691,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
 
   const headerAvatar = document.getElementById("headerAvatar");
+  
   const profileAvatar = document.getElementById("profileAvatar");
+  
 
   // ✅ Step 1: Load correct avatar when page opens
   if (currentUser && currentUser.avatar) {
@@ -701,17 +708,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // store session-based avatar for reload consistency
     localStorage.setItem(`lastAvatar_${role}`, imgSrc);
-  } else {
-    // fallback if no user avatar found
-    const fallback = localStorage.getItem(`lastAvatar_${role}`) || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+  }   else {
+    // ✅ Always use default avatar for new users (no photo)
+    const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
     if (headerAvatar) {
-      headerAvatar.src = fallback;
+      headerAvatar.src = defaultAvatar;
       headerAvatar.style.display = "inline-block";
     }
     if (profileAvatar) {
-      profileAvatar.src = fallback;
+      profileAvatar.src = defaultAvatar;
     }
+
+    // remove old saved avatar (fix old image showing for new user)
+    localStorage.removeItem(`lastAvatar_${role}`);
   }
+
 
   // ✅ Step 2: Before leaving / reload — persist last avatar safely
   window.addEventListener("beforeunload", () => {

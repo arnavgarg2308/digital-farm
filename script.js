@@ -273,6 +273,7 @@ function signupUser(e, role) {
     password: document.getElementById('password').value.trim(),
     phone: document.getElementById('phone').value.trim(),
     role,
+   avatar: "",
     createdAt: new Date().toISOString()
   };
 
@@ -322,8 +323,29 @@ function loginUser(e, role) {
   const u = users.find(x => x.email === email && x.password === pass && x.role === role);
   if (!u) return alert('Invalid credentials or wrong role.');
 
-  localStorage.setItem('currentUser', JSON.stringify(u));
+  localStorage.setItem(`currentUser_${role}`, JSON.stringify(u));
+localStorage.setItem('currentUserRole', role); // to remember which role logged in
+
+  // ✅ Save latest avatar for header
+if (u.avatar) {
+  localStorage.setItem("lastAvatar", u.avatar);
+} else {
+  localStorage.removeItem("lastAvatar");
+}
+
   alert('Login successful!');
+  // Show correct header photo immediately
+const headerAvatar = document.getElementById("headerAvatar");
+if (headerAvatar) {
+  if (u.avatar) {
+    headerAvatar.src = u.avatar;
+    headerAvatar.style.display = "inline-block";
+  } else {
+    headerAvatar.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    headerAvatar.style.display = "inline-block";
+  }
+}
+
   if (role === 'farmer') location.href = 'farmer.html';
   else if (role === 'buyer') location.href = 'buyer.html';
   else location.href = 'admin.html';
@@ -472,3 +494,237 @@ function uploadVideo() {
   alert("Videos uploaded successfully! They will appear on the Training & Guides page.");
 }
 
+/* ===== PROFILE BUTTON SECTION (appears in header) ===== */
+
+function openProfile() {
+  const role = localStorage.getItem("currentUserRole");
+const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+if (!currentUser) {
+    alert("No user logged in!");
+    return;
+  }
+
+  const container = document.getElementById("profileContainer");
+  if (!container) return;
+
+  // toggle visibility
+  const isVisible = container.style.display === "block";
+  if (isVisible) { container.style.display = "none"; return; }
+  container.style.display = "block";
+
+  // build HTML
+  const avatarSrc = currentUser.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  container.innerHTML = `
+    <div style="background:#141416;padding:20px;border-radius:12px;border:1px solid #222;">
+      <div style="text-align:center;">
+        <img src="${avatarSrc}" id="profileAvatar" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #333;">
+        <br>
+        <input type="file" id="avatarUpload" accept="image/*" style="display:none;">
+        <button onclick="document.getElementById('avatarUpload').click()">Change Photo</button>
+
+      </div>
+
+      <div id="profileDetails" style="margin-top:18px;text-align:left;"></div>
+
+      <div style="margin-top:12px;text-align:center;">
+        <button class="btn" onclick="editProfile()">Edit Profile</button>
+        <button class="btn secondary" onclick="closeProfile()">Close</button>
+      </div>
+    </div>
+  `;
+
+  renderProfileDetails(currentUser);
+}
+
+function renderProfileDetails(user) {
+  const details = document.getElementById("profileDetails");
+  if (!details) return;
+  let html = `
+    <p><strong>Name:</strong> ${user.fullName || user.name || "-"}</p>
+    <p><strong>Email:</strong> ${user.email}</p>
+    <p><strong>Phone:</strong> ${user.phone || "-"}</p>
+    <p><strong>Role:</strong> ${user.role}</p>
+  `;
+
+  if (user.role === "farmer") {
+    html += `
+      <p><strong>Farm Name:</strong> ${user.farmName || "-"}</p>
+      <p><strong>Area:</strong> ${user.farmArea || "-"}</p>
+      <p><strong>District:</strong> ${user.district || "-"}</p>
+    `;
+  } else if (user.role === "buyer") {
+    html += `<p><strong>Company:</strong> ${user.company || "-"}</p>`;
+  } else if (user.role === "admin") {
+    html += `<p><strong>Organization:</strong> ${user.organization || "-"}</p>`;
+  }
+  details.innerHTML = html;
+}
+
+/* ----- Edit mode ----- */
+function editProfile() {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  if (!currentUser) return;
+  
+  let html = `
+    <label>Full Name:</label><input id="edit_fullName" value="${currentUser.fullName || currentUser.name || ""}" />
+    <label>Phone:</label><input id="edit_phone" value="${currentUser.phone || ""}" />
+  `;
+
+  if (currentUser.role === "farmer") {
+    html += `
+      <label>Farm Name:</label><input id="edit_farmName" value="${currentUser.farmName || ""}" />
+      <label>Farm Area:</label><input id="edit_farmArea" value="${currentUser.farmArea || ""}" />
+      <label>District:</label><input id="edit_district" value="${currentUser.district || ""}" />
+    `;
+  } else if (currentUser.role === "buyer") {
+    html += `<label>Company:</label><input id="edit_company" value="${currentUser.company || ""}" />`;
+  } else if (currentUser.role === "admin") {
+    html += `<label>Organization:</label><input id="edit_organization" value="${currentUser.organization || ""}" />`;
+  }
+
+  html += `
+    <div style="margin-top:12px;text-align:center;">
+      <button class="btn" onclick="saveProfileChanges()">Save</button>
+      <button class="btn secondary" onclick="cancelProfileEdit()">Cancel</button>
+    </div>
+  `;
+  document.getElementById("profileDetails").innerHTML = html;
+}
+
+/* ----- Save edits ----- */
+function saveProfileChanges() {
+  const role = localStorage.getItem("currentUserRole");
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  let currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  if (!currentUser) return;
+
+  currentUser.fullName = document.getElementById("edit_fullName").value.trim();
+  currentUser.phone = document.getElementById("edit_phone").value.trim();
+
+  if (currentUser.role === "farmer") {
+    currentUser.farmName = document.getElementById("edit_farmName").value.trim();
+    currentUser.farmArea = document.getElementById("edit_farmArea").value.trim();
+    currentUser.district = document.getElementById("edit_district").value.trim();
+  } else if (currentUser.role === "buyer") {
+    currentUser.company = document.getElementById("edit_company").value.trim();
+  } else if (currentUser.role === "admin") {
+    currentUser.organization = document.getElementById("edit_organization").value.trim();
+  }
+
+  // update users list
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx !== -1) users[idx] = currentUser;
+
+  localStorage.setItem("users", JSON.stringify(users));
+  localStorage.setItem(`currentUser_${role}`, JSON.stringify(currentUser));
+
+  alert("✅ Profile updated!");
+  renderProfileDetails(currentUser);
+}
+
+/* ----- Cancel edit ----- */
+function cancelProfileEdit() {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  if (currentUser) renderProfileDetails(currentUser);
+}
+
+/* ----- Close profile section ----- */
+function closeProfile() {
+  const container = document.getElementById("profileContainer");
+  if (container) container.style.display = "none";
+}
+
+/* ----- Avatar upload ----- */
+function triggerAvatarUpload() {
+  document.getElementById("avatarUpload").click();
+}
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "avatarUpload") {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const imgData = event.target.result;
+
+      // ✅ show uploaded immediately
+      const avatarImg = document.getElementById("profileAvatar");
+      if (avatarImg) avatarImg.src = imgData;
+
+      // ✅ update the correct logged-in user
+      const role = localStorage.getItem("currentUserRole");
+      let currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "{}");
+      if (!currentUser.id) return;
+
+      currentUser.avatar = imgData;
+      localStorage.setItem(`currentUser_${role}`, JSON.stringify(currentUser));
+
+      // ✅ Update in the users array
+      const allUsers = JSON.parse(localStorage.getItem("users") || "[]");
+      const idx = allUsers.findIndex(u => u.id === currentUser.id);
+      if (idx !== -1) {
+        allUsers[idx].avatar = imgData;
+        localStorage.setItem("users", JSON.stringify(allUsers));
+      }
+
+      // ✅ Update header photo
+      const headerAvatar = document.getElementById("headerAvatar");
+      if (headerAvatar) {
+        headerAvatar.src = imgData;
+        headerAvatar.style.display = "inline-block";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+
+  const headerAvatar = document.getElementById("headerAvatar");
+  const profileAvatar = document.getElementById("profileAvatar");
+
+  // ✅ Step 1: Load correct avatar when page opens
+  if (currentUser && currentUser.avatar) {
+    const imgSrc = currentUser.avatar;
+    if (headerAvatar) {
+      headerAvatar.src = imgSrc;
+      headerAvatar.style.display = "inline-block";
+    }
+    if (profileAvatar) {
+      profileAvatar.src = imgSrc;
+    }
+
+    // store session-based avatar for reload consistency
+    localStorage.setItem(`lastAvatar_${role}`, imgSrc);
+  } else {
+    // fallback if no user avatar found
+    const fallback = localStorage.getItem(`lastAvatar_${role}`) || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    if (headerAvatar) {
+      headerAvatar.src = fallback;
+      headerAvatar.style.display = "inline-block";
+    }
+    if (profileAvatar) {
+      profileAvatar.src = fallback;
+    }
+  }
+
+  // ✅ Step 2: Before leaving / reload — persist last avatar safely
+  window.addEventListener("beforeunload", () => {
+    const role = localStorage.getItem("currentUserRole");
+    const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+    if (currentUser && currentUser.avatar) {
+      localStorage.setItem(`lastAvatar_${role}`, currentUser.avatar);
+    }
+  });
+});
+function logout() {
+  const role = localStorage.getItem("currentUserRole");
+  localStorage.removeItem(`currentUser_${role}`);
+  localStorage.removeItem("currentUserRole");
+  window.location.href = "index.html";
+}

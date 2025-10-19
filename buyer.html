@@ -11,6 +11,10 @@
   <header class="page-header">
     <h2 data-lang="buyerDash">🛒 Buyer Dashboard</h2>
     <div>
+      <img id="headerAvatar" 
+     src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+     style="width:32px;height:32px;border-radius:50%;object-fit:cover;display:none;margin-right:8px;">
+
       <button class="small" onclick="openProfile()" data-lang="Profile">Profile</button>
       <button class="small" onclick="openSupport()" data-lang="sup">Support</button>
       <select id="langSelectorBuyer" onchange="changeLanguage(this.value)">
@@ -20,6 +24,8 @@
       <button class="small danger" onclick="logout()" data-lang="log">Logout</button>
     </div>
   </header>
+<!-- Profile Container (hidden by default) -->
+  <div id="profileContainer" style="display:none; padding:20px;"></div>
 
   <main>
     <section class="grid">

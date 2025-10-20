@@ -739,18 +739,3 @@ function logout() {
   localStorage.removeItem("currentUserRole");
   window.location.href = "index.html";
 }
-// 🌍 Real-time translation helper
-async function translateText(text, targetLang) {
-  try {
-    const res = await fetch("http://localhost:3000/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q: text, target: targetLang })
-    });
-    const data = await res.json();
-    return data.translatedText || text;
-  } catch (err) {
-    console.error("Translation failed", err);
-    return text; // fallback
-  }
-}

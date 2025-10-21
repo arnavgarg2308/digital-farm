@@ -1,5 +1,3 @@
-// script.js
-
 const translations = {
   en: {
     title: "Welcome to Smart Farm Solution",
@@ -63,10 +61,7 @@ const translations = {
     book:"Book Order",
     pendind:"Pending: ₹0",
     pay:"Pay Now",
-    vaccineChart:"25 Sept — Bird Flu",
-    feedpig:"View Chat"
-
-
+    feedpig:"View Chart"
   },
   hi: {
     title: "स्मार्ट फार्म सॉल्यूशन में आपका स्वागत है",
@@ -130,14 +125,107 @@ const translations = {
     book:"पुस्तक आदेश",
     pendind:"लंबित:₹0",
     pay:"अब भुगतान करें",
-    vaccineChart:"25 सितंबर - बर्ड फ्लू",
     feedpig:"चार्ट देखें"
-
-
   }
 };
 
-// Change language function
+// ------------------- ADMIN: ADD SCHEME -------------------
+function showAddSchemeForm() {
+  document.getElementById('addSchemeForm').style.display = 'block';
+}
+
+function saveScheme() {
+  const title = document.getElementById('schemeTitle').value.trim();
+  const description = document.getElementById('schemeDescription').value.trim();
+  const eligibility = document.getElementById('schemeEligibility').value.trim();
+  const farmType = document.getElementById('schemeFarmType').value.trim();
+  const expiry = document.getElementById('schemeExpiry').value;
+
+  if (!title || !description) {
+    alert('Title and Description are required!');
+    return;
+  }
+
+  const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+  schemes.push({
+    id: Date.now(),
+    title,
+    description,
+    eligibility,
+    farmType,
+    expiry,
+    createdAt: new Date().toISOString()
+  });
+
+  localStorage.setItem('schemes', JSON.stringify(schemes));
+  alert('Scheme added successfully ✅');
+
+  // reset form
+  document.getElementById('schemeTitle').value = '';
+  document.getElementById('schemeDescription').value = '';
+  document.getElementById('schemeEligibility').value = '';
+  document.getElementById('schemeFarmType').value = '';
+  document.getElementById('schemeExpiry').value = '';
+
+  document.getElementById('addSchemeForm').style.display = 'none';
+}
+
+// ------------------- DISPLAY SCHEMES (FARMER / ADMIN) -------------------
+function displaySchemesForUser() {
+  const container = document.getElementById('schemesContainer');
+  if (!container) return;
+
+  const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+  container.innerHTML = '';
+
+  const today = new Date().toISOString().split('T')[0];
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+  if (schemes.length === 0) {
+    container.innerHTML = '<p>No schemes available.</p>';
+    return;
+  }
+
+  schemes.forEach((s, index) => {
+    const farmMatch = !s.farmType || (currentUser.farmType && s.farmType.toLowerCase() === currentUser.farmType.toLowerCase());
+    const notExpired = !s.expiry || s.expiry >= today;
+
+    // Show only valid schemes to farmers, all schemes to admin
+    if (currentUser.role === 'farmer' && !(farmMatch && notExpired)) return;
+
+    const div = document.createElement('div');
+    div.className = 'scheme-card';
+    div.innerHTML = `
+      <h4>${s.title}</h4>
+      <p>${s.description}</p>
+      <small>Eligibility: ${s.eligibility || 'N/A'}</small><br>
+      <small>Farm Type: ${s.farmType || 'All'}</small><br>
+      <small>Expires: ${s.expiry || 'N/A'}</small><br>
+    `;
+
+    if (currentUser.role === 'admin') {
+      const btn = document.createElement('button');
+      btn.textContent = 'Delete';
+      btn.className = 'delete-btn';
+      btn.onclick = () => deleteScheme(index);
+      div.appendChild(btn);
+    }
+
+    container.appendChild(div);
+  });
+}
+
+// ------------------- DELETE SCHEME -------------------
+function deleteScheme(index) {
+  if (!confirm("Are you sure you want to delete this scheme?")) return;
+  const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+  schemes.splice(index, 1);
+  localStorage.setItem('schemes', JSON.stringify(schemes));
+  displaySchemesForUser();
+  alert("Scheme deleted successfully!");
+}
+
+// ------------------- LANGUAGE SWITCH -------------------
 function changeLanguage(lang) {
   document.querySelectorAll("[data-lang]").forEach(el => {
     const key = el.getAttribute("data-lang");
@@ -145,110 +233,16 @@ function changeLanguage(lang) {
       el.textContent = translations[lang][key];
     }
   });
-  localStorage.setItem("lang", lang); // Save preference
-}
-function initHeatmap() {
-  // Map ko India ke center pe set karo
-  var map = L.map('map').setView([22.9734, 78.6569], 5);
-
-  // OpenStreetMap tiles load karo
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  // Example heat data (lat, lng, intensity)
-  var heat = L.heatLayer([
-    [28.6139, 77.2090, 0.8], // Delhi
-    [19.0760, 72.8777, 0.6], // Mumbai
-    [13.0827, 80.2707, 0.4], // Chennai
-    [22.5726, 88.3639, 0.9]  // Kolkata
-  ], {radius: 40}).addTo(map);
-}
-/* ==== Full Page AI Chat Support ==== */
-const chatBody = document.getElementById('chatBody');
-const aiInput = document.getElementById('aiInput');
-const sendBtn = document.getElementById('sendBtn');
-const micBtn = document.getElementById('micBtn');
-
-function appendMessage(who, text){
-  if(!chatBody) return;
-  const wrap = document.createElement('div');
-  wrap.className = 'msg ' + (who==='user'?'user':'ai');
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.innerText = text;
-  wrap.appendChild(bubble);
-  chatBody.appendChild(wrap);
-  chatBody.scrollTop = chatBody.scrollHeight;
+  localStorage.setItem("lang", lang);
 }
 
-function speakText(text){
-  if(!('speechSynthesis' in window)) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = (localStorage.getItem('sflang')==='hi') ? 'hi-IN' : 'en-US';
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
-}
-
-function simpleResponder(q){
-  const ql = q.toLowerCase();
-
-  // vaccine related
-  if(ql.includes('vaccine') || ql.includes('vaccination') || ql.includes('schedule')) {
-    return "Yes. Here is a sample vaccination schedule: \n- Day 1: Marek's disease \n- Week 2: Newcastle + IB \n- Week 4: Gumboro \n- Week 6: Booster (Newcastle) \n(Always confirm with your local vet)";
-  }
-
-  // sickness
-  if(ql.includes('sick') || ql.includes('ill') || ql.includes('disease') || ql.includes('symptom')) {
-    return "No. Sick animals should always be isolated and reported to a vet immediately.";
-  }
-
-  // feeding
-  if(ql.includes('feed') || ql.includes('feeding') || ql.includes('food') || ql.includes('ration')) {
-    return "Yes. Feed a balanced diet twice daily and provide clean water at all times.";
-  }
-
-  // antibiotics
-  if(ql.includes('antibiotic') || ql.includes('medicine') || ql.includes('drug')) {
-    return "No. Avoid antibiotics without veterinarian advice.";
-  }
-
-  // loans and schemes
-  if(ql.includes('loan') || ql.includes('scheme') || ql.includes('government')) {
-    return "Yes. You can apply under the Government Schemes → Loan section.";
-  }
-
-  return "Sorry, I don’t know that. Please consult a vet.";
-}
-
-
-function handleSend(text){
-  const query = text || aiInput.value.trim();
-  if(!query) return;
-  appendMessage('user', query);
-  aiInput.value = '';
-  const ans = simpleResponder(query);
-  appendMessage('ai', ans);
-  speakText(ans);
-}
-
-if(sendBtn) sendBtn.addEventListener('click', ()=> handleSend());
-if(aiInput) aiInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') handleSend(); });
-
-if(micBtn){
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(SpeechRecognition){
-    const recog = new SpeechRecognition();
-    recog.lang = (localStorage.getItem('sflang')==='hi') ? 'hi-IN' : 'en-US';
-    micBtn.addEventListener('click', ()=> recog.start());
-    recog.onresult = (e)=> handleSend(e.results[0][0].transcript);
-  }
-}
-
-// Sirf admin.html me heatmap load karna hai
+// ------------------- PAGE LOAD -------------------
 document.addEventListener("DOMContentLoaded", function() {
-  if (document.getElementById("map")) {
-    initHeatmap();
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+  // Load Government Schemes if schemesContainer exists
+  if (document.getElementById('schemesContainer')) {
+    displaySchemesForUser();
   }
 });
  // ------- SIGNUP -------

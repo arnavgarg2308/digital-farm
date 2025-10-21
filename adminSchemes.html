@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>All Government Schemes - Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      padding: 20px; 
+      background: #f0f2f5; 
+      margin: 0;
+      color: #333;
+    }
+
+    h2 { 
+      text-align: center; 
+      margin-bottom: 25px; 
+      color: #0678ea; 
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    a {
+      text-decoration: none; 
+      color: #3498db; 
+      font-weight: 500;
+      display: inline-block;
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #schemesContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .scheme-card {
+      background: #ffffff; 
+      padding: 20px; 
+      border-radius: 14px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+      border-left: 6px solid #0678ea;
+    }
+
+    .scheme-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .scheme-card h3 { 
+      margin: 0 0 12px; 
+      color: #1b1b1b;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .scheme-card p { 
+      margin: 6px 0; 
+      font-size: 15px;
+      color: #222;
+      line-height: 1.4;
+    }
+
+    .scheme-card p strong {
+      color: #000;
+      font-weight: 600;
+    }
+
+    .deleteBtn {
+      background-color: #e74c3c; 
+      color: #fff; 
+      border: none; 
+      padding: 8px 14px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 13px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      transition: background 0.25s ease;
+    }
+
+    .deleteBtn:hover { 
+      background-color: #c0392b; 
+    }
+
+    p#noSchemesMsg {
+      text-align: center;
+      font-size: 16px;
+      color: #555;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>All Government Schemes - Admin</h2>
+  <a href="admin.html">← Back to Admin Dashboard</a>
+
+  <div id="schemesContainer"></div>
+
+  <script>
+    const schemesContainer = document.getElementById('schemesContainer');
+
+    // Load and display schemes
+    function loadSchemes() {
+      const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+      schemesContainer.innerHTML = '';
+
+      if(schemes.length === 0){
+        schemesContainer.innerHTML = '<p id="noSchemesMsg">No schemes added yet.</p>';
+        return;
+      }
+
+      schemes.forEach((scheme, index) => {
+        const card = document.createElement('div');
+        card.className = 'scheme-card';
+        card.innerHTML = `
+          <h3>${scheme.title}</h3>
+          <p><strong>Description:</strong> ${scheme.description}</p>
+          <p><strong>Eligibility:</strong> ${scheme.eligibility}</p>
+          <p><strong>Farm Type:</strong> ${scheme.farmType}</p>
+          <p><strong>Expiry:</strong> ${scheme.expiry || 'N/A'}</p>
+          <button class="deleteBtn" onclick="deleteScheme(${index})">Delete</button>
+        `;
+        schemesContainer.appendChild(card);
+      });
+    }
+
+    // Delete a scheme
+    function deleteScheme(index) {
+      let schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+      if(confirm(`Are you sure you want to delete the scheme: "${schemes[index].title}"?`)){
+        schemes.splice(index, 1);
+        localStorage.setItem('schemes', JSON.stringify(schemes));
+        loadSchemes();
+      }
+    }
+
+    // Initial load
+    loadSchemes();
+  </script>
+</body>
+</html>

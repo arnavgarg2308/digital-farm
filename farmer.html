@@ -13,8 +13,8 @@
     <h2 data-lang="farmerDash">👨‍🌾 Farmer Dashboard</h2>
     <div>
       <img id="headerAvatar" 
-     src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-     style="width:32px;height:32px;border-radius:50%;object-fit:cover;display:none;margin-right:8px;">
+        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+        style="width:32px;height:32px;border-radius:50%;object-fit:cover;display:none;margin-right:8px;">
 
       <button class="small" onclick="openProfile()" data-lang="Profile">Profile</button>
       <button class="small" onclick="openSupport()" data-lang="sup">Support</button>
@@ -25,12 +25,9 @@
       <button class="small danger" onclick="logout()" data-lang="log">Logout</button>
     </div>
   </header>
- 
 
   <!-- Profile Container (hidden by default) -->
   <div id="profileContainer" style="display:none; padding:20px;"></div>
-
-
 
   <main>
     <section class="grid">
@@ -50,22 +47,16 @@
         <ul id="historyList"></ul>
       </div>
 
-     
-  <div class="card">
-  <h3 data-lang="training">🐖🐓 Training & Guides</h3>
-  <p data-lang="trainingHint">Watch short videos for pig & poultry farming</p>
+      <!-- Training & Guides -->
+      <div class="card">
+        <h3 data-lang="training">🐖🐓 Training & Guides</h3>
+        <p data-lang="trainingHint">Watch short videos for pig & poultry farming</p>
+        <button class="cta">
+          <a href="training.html" target="_blank" style="text-decoration:none; color:black;">Open Training</a>
+        </button>
+      </div>
 
-  <!-- Button to open training page -->
-  <button class="cta">
-    <a href="training.html" target="_blank" style="text-decoration:none; color:black;">Open Training</a>
-  </button>
-</div>
-
-
-
-
-
-      <!-- ✅ UPDATED GOVERNMENT SCHEMES SECTION -->
+      <!-- Government Schemes -->
       <div class="card" onclick="openFeature('schemes')">
         <h3 data-lang="schemes">Government Schemes</h3>
         <p data-lang="govDesc">View latest schemes available for your farm type.</p>
@@ -97,6 +88,15 @@
         <button><a href="feeding.html" target="_blank" data-lang="feedpig">View Chart</a></button>
       </div>
 
+      <!-- 🩺 Medical Consultation & Supplies -->
+      <div class="card">
+        <h3 data-lang="medical">🩺 Medical Help</h3>
+        <p data-lang="medicalHint">Consult a vet or order medicines & vaccines</p>
+        <button class="cta">
+          <a href="medical.html" target="_blank" style="text-decoration:none; color:black;" data-lang="openMedical">Open Medical</a>
+        </button>
+      </div>
+
       <!-- Sales / Products -->
       <div class="card" onclick="openFeature('sales')">
         <h3 data-lang="sales">Sales / Products</h3>
@@ -121,7 +121,7 @@
     </section>
   </main>
 
-  <!-- Profile / Modal -->
+  <!-- Modal -->
   <div id="modal" class="modal hidden">
     <div class="modal-content">
       <button class="close" onclick="closeModal()">✖</button>
@@ -130,3 +130,4 @@
   </div>
 </body>
 </html>
+

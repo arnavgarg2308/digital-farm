@@ -6,14 +6,15 @@
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
-  <!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<!-- Heat plugin -->
-<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Leaflet JS --> 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Heat plugin -->
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 </head>
+
 <body>
   <header class="page-header">
     <h2 data-lang="adminDash">🛠️ Admin Dashboard</h2>
@@ -30,45 +31,63 @@
 
   <main>
     <section class="grid">
+
+      <!-- Farm Overview -->
       <div class="card">
         <h3 data-lang="overview">Farm Overview</h3>
         <p id="totalFarms" data-lang="total">Total: 0</p>
         <p id="riskCounts" data-lang="low">Low: 0 | Medium: 0 | High: 0</p>
       </div>
 
+      <!-- Heatmap -->
       <div class="card">
-  <h3 data-lang="heat">Heatmap</h3>
-  <a href="heatmap.html" target="_blank" class="btn" data-lang="open">Open Heatmap</a>
-</div>
+        <h3 data-lang="heat">Heatmap</h3>
+        <a href="heatmap.html" target="_blank" class="btn" data-lang="open">Open Heatmap</a>
+      </div>
 
-
-
+      <!-- Alerts -->
       <div class="card">
         <h3 data-lang="alerts">Alerts</h3>
-        <button class="cta" onclick="sendDemoAlert()"><a href="trai.html" target="_blank" class="alt" data-lang="send">Send demo alert</a></button>
+        <button class="cta" onclick="sendDemoAlert()">
+          <a href="trai.html" target="_blank" class="alt" data-lang="send">Send demo alert</a>
+        </button>
       </div>
+
+      <!-- Training -->
       <div class="card">
         <h3 data-lang="training">Training videos and guides</h3>
         <p data-lang="add">Admin can add Training videos and guide</p>
       </div>
+
+      <!-- Compliance -->
       <div class="card">
         <h3 data-lang="compliance">Compliance Tracker</h3>
         <p data-lang="not">[Shows who hasn't done assessment]</p>
       </div>
 
-
+      <!-- Reports -->
       <div class="card">
         <h3 data-lang="reports">Reports</h3>
         <button class="mini" onclick="downloadDemoReport()" data-lang="csv">Generate CSV</button>
       </div>
 
+      <!-- Government Schemes Section -->
       <div class="card">
-        <h3 data-lang="schemes">Govt Schemes Setup</h3>
-        <p data-lang="adsc">Admin can add schemes (demo)</p>
+        <h3 data-lang="schemes">Government Schemes Setup</h3>
+        <p data-lang="adsc">Admin can add and manage schemes</p>
+
+        <!-- Add New Scheme -->
+        <p style="margin-top:10px;">
+          <a href="addScheme.html" class="btn" target="_blank">➕ Add New Scheme</a>
+        </p>
+
+        <!-- View All Schemes -->
+        <p style="margin-top:10px;">
+          <a href="allSchemes.html" class="btn" target="_blank">View All Schemes</a>
+        </p>
       </div>
+
     </section>
   </main>
-
-  <div id="modal" class="modal hidden"><div class="modal-content"><button class="close" onclick="closeModal()">✖</button><div id="modalBody"></div></div></div>
 </body>
 </html>

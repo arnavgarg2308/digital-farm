@@ -156,3 +156,18 @@ ul { padding-left:16px; margin:0; color:var(--muted); }
   margin-top: 6px;
   font-size: 0.9rem;
 }
+.bubble::after {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #00ff88;
+  animation: dots 1s infinite;
+}
+@keyframes dots {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}

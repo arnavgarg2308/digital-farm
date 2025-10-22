@@ -733,3 +733,127 @@ function logout() {
   localStorage.removeItem("currentUserRole");
   window.location.href = "index.html";
 }
+// ================== BASE URL ==================
+const BASE_URL = "http://localhost:3000";
+
+// ================== MEDICAL - FARMER SIDE ==================
+async function bookVetAppointment(vet) {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser_farmer') || '{}');
+  if (!currentUser?.name) return alert('Please login as Farmer.');
+
+  await fetch(`${BASE_URL}/api/bookings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      petOwner: currentUser.name,
+      petName: "Farm Animal",
+      vetName: vet.name,
+      date: new Date().toLocaleString(),
+      status: 'pending'
+    })
+  });
+  alert(`✅ Appointment booked with ${vet.name}`);
+}
+
+async function placeMedicineOrder(name, qty, address) {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser_farmer') || '{}');
+  if (!currentUser?.name) return alert('Please login as Farmer.');
+
+  await fetch(`${BASE_URL}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      petOwner: currentUser.name,
+      medicineName: name,
+      quantity: qty,
+      deliveryAddress: address,
+      orderDate: new Date().toLocaleString(),
+      status: 'pending'
+    })
+  });
+  alert(`🧾 Order placed for "${name}" (${qty})`);
+}
+
+// ================== MEDICAL - ADMIN SIDE ==================
+async function fetchMedicalData() {
+  const bookingStatus = document.getElementById("bookingStatus")?.value || "all";
+  const orderStatus = document.getElementById("orderStatus")?.value || "all";
+  const searchTerm = document.getElementById("searchInput")?.value.toLowerCase() || "";
+
+  // Vet Bookings
+  const bookingTableBody = document.getElementById("bookingsTable")?.querySelector("tbody");
+  if (bookingTableBody) {
+    let bookings = await fetch(`${BASE_URL}/api/bookings`).then(res => res.json()).catch(()=>[]);
+    bookings = bookings.filter(b => 
+      (bookingStatus==="all" || b.status===bookingStatus) &&
+      (b.petOwner.toLowerCase().includes(searchTerm) || b.petName.toLowerCase().includes(searchTerm) || b.vetName.toLowerCase().includes(searchTerm))
+    );
+    bookingTableBody.innerHTML = bookings.map(b => `<tr>
+      <td>${b.petOwner}</td>
+      <td>${b.petName}</td>
+      <td>${b.vetName}</td>
+      <td>${b.date}</td>
+      <td>${b.status}</td>
+      <td>
+        ${b.status==="pending"?`<button onclick="updateBookingStatus('${b._id}','approved')">Approve</button>`:""}
+        ${b.status!=="completed"?`<button onclick="updateBookingStatus('${b._id}','completed')">Complete</button>`:""}
+      </td>
+    </tr>`).join("");
+  }
+
+  // Medicine Orders
+  const orderTableBody = document.getElementById("ordersTable")?.querySelector("tbody");
+  if (orderTableBody) {
+    let orders = await fetch(`${BASE_URL}/api/orders`).then(res => res.json()).catch(()=>[]);
+    orders = orders.filter(o => 
+      (orderStatus==="all" || o.status===orderStatus) &&
+      (o.petOwner.toLowerCase().includes(searchTerm) || o.medicineName.toLowerCase().includes(searchTerm))
+    );
+    orderTableBody.innerHTML = orders.map(o => `<tr>
+      <td>${o.petOwner}</td>
+      <td>${o.medicineName}</td>
+      <td>${o.quantity}</td>
+      <td>${o.deliveryAddress}</td>
+      <td>${o.orderDate}</td>
+      <td>${o.status}</td>
+      <td>
+        ${o.status==="pending"?`<button onclick="updateOrderStatus('${o._id}','shipped')">Ship</button>`:""}
+        ${o.status!=="delivered"?`<button onclick="updateOrderStatus('${o._id}','delivered')">Deliver</button>`:""}
+      </td>
+    </tr>`).join("");
+  }
+}
+
+async function updateBookingStatus(id, status) {
+  await fetch(`${BASE_URL}/api/bookings/${id}`, { 
+    method:"PUT", 
+    headers:{"Content-Type":"application/json"}, 
+    body:JSON.stringify({status}) 
+  });
+  fetchMedicalData();
+}
+
+async function updateOrderStatus(id, status) {
+  await fetch(`${BASE_URL}/api/orders/${id}`, { 
+    method:"PUT", 
+    headers:{"Content-Type":"application/json"}, 
+    body:JSON.stringify({status}) 
+  });
+  fetchMedicalData();
+}
+
+// ================== DOM CONTENT LOAD ==================
+document.addEventListener("DOMContentLoaded", () => {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  const headerAvatar = document.getElementById("headerAvatar");
+  const profileAvatar = document.getElementById("profileAvatar");
+
+  if (currentUser?.avatar) {
+    if (headerAvatar) { headerAvatar.src = currentUser.avatar; headerAvatar.style.display = "inline-block"; }
+    if (profileAvatar) profileAvatar.src = currentUser.avatar;
+  }
+
+  if (document.getElementById('bookingsTable')) fetchMedicalData();
+});
+

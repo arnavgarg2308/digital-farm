@@ -10,24 +10,41 @@ function appendMessage(sender, text) {
   chatBody.appendChild(msg);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
-
+function createThinkingBubble() {
+    const msg = document.createElement("div");
+    msg.className = "msg ai thinking"; // Added 'thinking' class for easy finding
+    msg.innerHTML = `<div class="bubble">... Thinking ...</div>`;
+    chatBody.appendChild(msg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return msg;
+}
 async function handleSend(text) {
   const query = text || aiInput.value.trim();
   if (!query) return;
   appendMessage("user", query);
   aiInput.value = "";
+sendBtn.disabled = true;
+  aiInput.disabled = true;
 
+  // 3. 'Thinking...' message dikhao aur uska reference save karo
+  const thinkingMsgElement = createThinkingBubble();
   try {
     const res = await fetch("http://localhost:3000/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
      body: JSON.stringify({ query }),
     });
+    thinkingMsgElement.remove();
     const data = await res.json();
     appendMessage("ai", data.reply);
     speakText(data.reply);
   } catch {
     appendMessage("ai", "⚠️ Error connecting to AI server");
+  }finally {
+    // 6. Finally: Button aur input ko wapas enable karo
+    sendBtn.disabled = false;
+    aiInput.disabled = false;
+    aiInput.focus(); // Wapas input field par focus lao
   }
 }
 

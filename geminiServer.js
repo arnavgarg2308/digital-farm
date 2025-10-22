@@ -11,54 +11,59 @@ app.use(express.json());
 app.post("/chat", async (req, res) => {
   try {
     const { query } = req.body;
-    if (!query) return res.status(400).json({ error: "Missing query" });
- const isHindi = /[\u0900-\u097F]/.test(query);
-    const apiKey = "AIzaSyCvc7-KaV6f8nedTIaapzeyk36UI2Fehlk"; // ✅ Use your key
-    const model = "models/gemini-2.5-pro"; // ✅ Verified working model name
+    if (!query) {
+      console.log("❌ No query received");
+      return res.status(400).json({ error: "Missing query" });
+    }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=AIzaSyCvc7-KaV6f8nedTIaapzeyk36UI2Fehlk`;
+    const isHindi = /[\u0900-\u097F]/.test(query);
+    const langInstruction = isHindi
+      ? `उत्तर हिंदी में दो: ${query}`
+      : `Answer in English: ${query}`;
 
-    const payload = {
-      contents: [{ role: "user", parts: [{ text: query }] }],
+    const apiKey = "AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A";
+    const model = "models/gemini-2.5-flash";
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A`;
+    console.log("🌍 Sending request to Gemini:", url);
+
+    const bodyData = {
+      contents: [{ role: "user", parts: [{ text: langInstruction }] }],
     };
+
+    console.log("📤 Payload being sent:", JSON.stringify(bodyData, null, 2));
 
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-     body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: isHindi
-                  ? `Answer this in Hindi: ${query}`
-                  : `Answer this in English: ${query}`
-              }
-            ]
-          }
-        ]
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyData),
     });
 
+    console.log("📥 Gemini API status:", response.status);
     const data = await response.json();
-
-    console.log("Gemini full response ↓↓↓");
+    console.log("🧠 Full Gemini response ↓↓↓");
     console.dir(data, { depth: null });
 
-    // ✅ Fix: look for text safely, even if wrapped differently
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      data?.candidates?.[0]?.output ||
-      data?.output ||
-      data?.promptFeedback?.output ||
-      "No valid reply from Gemini.";
+    let reply = "No valid reply from Gemini.";
+    if (data?.candidates?.length) {
+      const parts = data.candidates[0].content?.parts;
+      if (Array.isArray(parts)) {
+        reply = parts.map((p) => p.text || "").join(" ").trim();
+      }
+    }
+
+    if (!reply || reply.trim() === "") {
+      reply =
+        data?.candidates?.[0]?.output ||
+        data?.output ||
+        data?.promptFeedback?.output ||
+        "No valid reply from Gemini.";
+    }
 
     res.json({ reply });
   } catch (error) {
     console.error("❌ Server Error:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", details: error.message });
   }
 });
 

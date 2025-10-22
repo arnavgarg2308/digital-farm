@@ -2,127 +2,170 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>All Government Schemes</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
+    body { 
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+      padding: 20px; 
+      background: #eef1f5; 
       margin: 0;
-      padding: 20px;
-      color: #333;
+      color: #222;
     }
-    h2 {
-      text-align: center;
-      color: #2c3e50;
+
+    h2 { 
+      text-align: center; 
+      margin-bottom: 25px; 
+      color: #0a7def;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    a { 
+      text-decoration: none; 
+      color: #3498db; 
+      display: inline-block; 
       margin-bottom: 20px;
+      font-weight: 500;
+      font-size: 15px;
     }
-    a {
-      display: inline-block;
-      margin-bottom: 20px;
-      text-decoration: none;
-      color: #3498db;
-      font-weight: bold;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
+
+    a:hover { text-decoration: underline; }
+
     #schemesContainer {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
       gap: 20px;
     }
-    .scheme-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      position: relative;
+
+    .scheme-card { 
+      background: #fff; 
+      padding: 20px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      border-left: 6px solid #0a7def;
     }
-    .scheme-card h4 {
-      margin: 0 0 10px;
-      color: #2c3e50;
+
+    .scheme-card:hover { 
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
-    .scheme-card p, .scheme-card small {
-      margin: 0 0 8px;
-      font-size: 14px;
+
+    .scheme-card h3 { 
+      margin: 0 0 10px; 
+      color: #1c1c1c;
+      font-size: 20px;
+      font-weight: 600;
     }
+
+    .scheme-card p { 
+      margin: 6px 0; 
+      font-size: 15px;
+      color: #2d2d2d;
+      line-height: 1.5;
+    }
+
+    .scheme-card p strong {
+      color: #000;
+      font-weight: 600;
+    }
+
     .badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 8px;
-      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
       color: #fff;
-      margin-right: 5px;
+      margin-right: 8px;
+      margin-top: 8px;
+      font-weight: 500;
     }
-    .farm-type { background-color: #27ae60; }
-    .expiry-date { background-color: #e67e22; }
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #e63946;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
+
+    .farm-type {
+      background-color: #1abc9c;
     }
-    .delete-btn:hover { background: #c82333; }
+
+    .expiry-date {
+      background-color: #e67e22;
+    }
+
+    #schemesContainer p.no-schemes {
+      text-align: center;
+      color: #555;
+      font-size: 16px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .scheme-card {
+        padding: 15px;
+      }
+      .scheme-card h3 {
+        font-size: 18px;
+      }
+      .scheme-card p {
+        font-size: 14px;
+      }
+      .badge {
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
   </style>
 </head>
 <body>
+
   <h2>All Government Schemes</h2>
-  <a href="admin.html">← Back to Admin Dashboard</a>
+  <a href="farmer.html">← Back to Dashboard</a>
+
   <div id="schemesContainer"></div>
 
   <script>
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const schemesContainer = document.getElementById('schemesContainer');
 
-    function displayAllSchemes() {
-      const container = document.getElementById('schemesContainer');
-      container.innerHTML = '';
-
+    function loadSchemesForFarmer() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
       const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+      schemesContainer.innerHTML = '';
+
       if (schemes.length === 0) {
-        container.innerHTML = '<p>No schemes available.</p>';
+        schemesContainer.innerHTML = '<p class="no-schemes">No schemes available.</p>';
         return;
       }
 
-      schemes.forEach((s, index) => {
-        const div = document.createElement('div');
-        div.className = 'scheme-card';
-        div.innerHTML = `
-          <h4>${s.title}</h4>
-          <p>${s.description}</p>
-          <small>Eligibility: ${s.eligibility || 'N/A'}</small><br>
-          <small>Farm Type: ${s.farmType || 'All'}</small><br>
-          <small>Expires: ${s.expiry || 'N/A'}</small>
+      const today = new Date().toISOString().split('T')[0];
+
+      schemes.forEach(scheme => {
+        // Filter by farmType and expiry
+        if (scheme.farmType !== 'All' && scheme.farmType.toLowerCase() !== (currentUser.farmType || '').toLowerCase()) return;
+        if (scheme.expiry && scheme.expiry < today) return;
+
+        const card = document.createElement('div');
+        card.className = 'scheme-card';
+        card.innerHTML = `
+          <h3>${scheme.title}</h3>
+          <p><strong>Description:</strong> ${scheme.description}</p>
+          <p><strong>Eligibility:</strong> ${scheme.eligibility}</p>
+          <div>
+            <span class="badge farm-type">${scheme.farmType || 'All Farms'}</span>
+            <span class="badge expiry-date">Expires: ${scheme.expiry || 'N/A'}</span>
+          </div>
         `;
-
-        if(currentUser.role === 'admin') {
-          const btn = document.createElement('button');
-          btn.className = 'delete-btn';
-          btn.textContent = 'Delete';
-          btn.onclick = () => deleteScheme(index);
-          div.appendChild(btn);
-        }
-
-        container.appendChild(div);
+        schemesContainer.appendChild(card);
       });
+
+      if (schemesContainer.innerHTML === '') {
+        schemesContainer.innerHTML = '<p class="no-schemes">No schemes available for your farm type at the moment.</p>';
+      }
     }
 
-    function deleteScheme(index) {
-      if (!confirm("Are you sure you want to delete this scheme?")) return;
-      let schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
-      schemes.splice(index, 1);
-      localStorage.setItem('schemes', JSON.stringify(schemes));
-      displayAllSchemes();
-      alert("Scheme deleted successfully!");
-    }
-
-    // Load all schemes on page load
-    window.onload = displayAllSchemes;
+    // Initial load
+    loadSchemesForFarmer();
   </script>
+
 </body>
 </html>

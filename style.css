@@ -139,3 +139,35 @@ ul { padding-left:16px; margin:0; color:var(--muted); }
   .auth-card { width: 100%; }
   .page-header { flex-direction:column; gap:8px; align-items:flex-start; padding:12px; }
 }
+
+#profileContainer input {
+  width: 100%;
+  background: #111;
+  border: 1px solid #333;
+  color: #eee;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+#profileContainer label {
+  display: block;
+  color: #aaa;
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+.bubble::after {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #00ff88;
+  animation: dots 1s infinite;
+}
+@keyframes dots {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}

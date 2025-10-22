@@ -19,10 +19,23 @@
       <input type="email" id="email" placeholder="Email" required>
       <input type="password" id="password" placeholder="Password" required>
       <input type="tel" id="phone" placeholder="Phone" maxlength="10" required>
+      <input type="text" id="farmName" placeholder="Farm Name" required>
+<input type="text" id="farmArea" placeholder="Farm Area (in acres)" required>
+<input type="text" id="district" placeholder="District" required>
+<input type="text" id="state" placeholder="State" required>
+<input type="text" id="village" placeholder="Village (optional)">
+<select id="productionType" required>
+  <option value="">Select Production Type</option>
+  <option value="poultry">Poultry</option>
+  <option value="pig">Pig</option>
+  <option value="both">Both</option>
+</select>
+
       <button class="cta" type="submit">Sign Up</button>
       <p>Already have an account? <a href="farmer-login.html">Login</a></p>
     </form>
   </div>
   <script src="script.js"></script>
+  <script src="auth-extra.js"></script>
 </body>
 </html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Government Scheme</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #3498db;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .success {
+      text-align: center;
+      color: green;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Add New Government Scheme</h2>
+
+  <form id="schemeForm">
+    <label for="title">Scheme Title</label>
+    <input type="text" id="title" placeholder="Enter scheme title" required>
+
+    <label for="description">Description</label>
+    <textarea id="description" rows="4" placeholder="Describe the scheme" required></textarea>
+
+    <label for="eligibility">Eligibility</label>
+    <textarea id="eligibility" rows="2" placeholder="Eligibility criteria" required></textarea>
+
+    <label for="farmType">Applicable Farm Type</label>
+    <select id="farmType">
+      <option value="All">All Farms</option>
+      <option value="Pig">Pig</option>
+      <option value="Poultry">Poultry</option>
+    </select>
+
+    <label for="expiry">Expiry Date</label>
+    <input type="date" id="expiry">
+
+    <button type="submit">Add Scheme</button>
+  </form>
+
+  <div class="success" id="successMsg"></div>
+
+  <a href="adminSchemes.html">View All Schemes →</a>
+  <a href="admin.html">← Back to Admin Dashboard</a>
+
+  <script>
+    const form = document.getElementById('schemeForm');
+    const successMsg = document.getElementById('successMsg');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const eligibility = document.getElementById('eligibility').value.trim();
+      const farmType = document.getElementById('farmType').value;
+      const expiry = document.getElementById('expiry').value;
+
+      if (!title || !description || !eligibility) {
+        alert('Please fill all required fields.');
+        return;
+      }
+
+      // Get existing schemes from localStorage
+      const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+
+      // Create new scheme object
+      const newScheme = {
+        title,
+        description,
+        eligibility,
+        farmType,
+        expiry,
+        createdAt: new Date().toISOString()
+      };
+
+      // Add to array and save back
+      schemes.push(newScheme);
+      localStorage.setItem('schemes', JSON.stringify(schemes));
+
+      successMsg.textContent = '✅ Scheme added successfully!';
+      form.reset();
+
+      // Clear message after few seconds
+      setTimeout(() => successMsg.textContent = '', 2000);
+    });
+  </script>
+
+</body>
+</html>

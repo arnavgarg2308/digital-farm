@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training & Guides</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Back button style -->
+  <style>
+    .back-btn {
+      background-color: #4caf50; /* green */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .back-btn:hover {
+      background-color: #45a049;
+      transform: translateY(-2px);
+    }
+    .back-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+ <header class="page-header">
+  <h2>🐖🐓 Training & Guides</h2>
+  <button 
+    class="back-btn" 
+    onclick="goBackToDashboard()"
+  >
+    ⬅ Back to Dashboard
+  </button>
+</header>
+
+<main style="padding: 20px;">
+  <!-- Static Pig Farming Videos -->
+  <h3 style="color: var(--accent);">Pig Farming Training Videos</h3>
+  <div class="video-container">
+    <video controls>
+      <source src="videos/pig1.mp4" type="video/mp4" />
+    </video>
+    <video controls>
+      <source src="videos/pig2.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- Static Poultry Farming Videos -->
+  <h3 style="color: var(--accent); margin-top: 30px;">Poultry Farming Training Videos</h3>
+  <div class="video-container">
+    <video controls>
+      <source src="videos/poultry3.mp4" type="video/mp4" />
+    </video>
+    <video controls>
+      <source src="videos/poultry4.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- Admin Uploaded Videos -->
+  <section>
+    <h3 style="color: var(--accent); margin-top:30px;">Uploaded by Admin</h3>
+    <div id="videoList"></div>
+  </section>
+</main>
+
+<!-- Scripts -->
+<script>
+  // ✅ Dynamic Back to Dashboard
+  function goBackToDashboard() {
+    const role = localStorage.getItem('currentUserRole');
+const user = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+
+    if (!user) {
+      alert("No user found. Redirecting to login.");
+      window.location.href = "index.html"; // fallback
+      return;
+    }
+    switch(user.role) {
+      case 'admin':
+        window.location.href = "admin.html";
+        break;
+      case 'farmer':
+        window.location.href = "farmer.html";
+        break;
+      case 'buyer':
+        window.location.href = "buyer.html";
+        break;
+      default:
+        window.location.href = "index.html";
+    }
+  }
+
+  // ✅ Load admin uploaded videos
+  const list = document.getElementById('videoList');
+  let videos = JSON.parse(localStorage.getItem('trainingVideos') || '[]');
+
+  function renderVideos() {
+    const role = localStorage.getItem('currentUserRole');
+const user = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+
+    const isAdmin = user && user.role === 'admin';
+
+    list.innerHTML = ""; // clear old content
+    if (videos.length === 0) {
+      list.innerHTML = "<p>No admin videos uploaded yet.</p>";
+      return;
+    }
+
+    videos.forEach((v, i) => {
+      const wrapper = document.createElement('div');
+      wrapper.style.marginBottom = "20px";
+
+      const vid = document.createElement('video');
+      vid.controls = true;
+      vid.width = 300;
+      vid.src = v.url;
+      vid.style.display = "block";
+      vid.style.marginBottom = "5px";
+
+      wrapper.appendChild(vid);
+
+      // Only show delete button if logged in user is admin
+      if (isAdmin) {
+        const delBtn = document.createElement('button');
+        delBtn.textContent = "🗑 Delete";
+        delBtn.className = "small danger";
+        delBtn.onclick = () => {
+          if (confirm("Delete this video?")) {
+            videos.splice(i, 1); // remove from array
+            localStorage.setItem('trainingVideos', JSON.stringify(videos));
+            renderVideos(); // refresh
+          }
+        };
+        wrapper.appendChild(delBtn);
+      }
+
+      list.appendChild(wrapper);
+    });
+  }
+
+  renderVideos();
+</script>
+</body>
+</html>

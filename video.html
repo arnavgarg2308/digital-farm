@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Videos & Guides</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="page-header">
+    <h2>🐖🐓 Training & Guides</h2>
+    <button class="small" onclick="history.back()">⬅ Back</button>
+  </header>
+
+  <main style="padding: 20px;">
+    <div class="video-container" id="uploadedVideosContainer">
+      <!-- Uploaded videos will appear here dynamically -->
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const container = document.getElementById("uploadedVideosContainer");
+      const videos = JSON.parse(localStorage.getItem("trainingVideos") || "[]");
+
+      if (videos.length === 0) {
+        container.innerHTML = "<p style='color:#999;'>No videos uploaded yet.</p>";
+        return;
+      }
+
+      videos.forEach(v => {
+        const vid = document.createElement("video");
+        vid.controls = true;
+        vid.width = 400;
+        vid.src = v.url;
+        container.appendChild(vid);
+      });
+    });
+  </script>
+</body>
+</html>

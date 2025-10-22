@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>All Government Schemes</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { 
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+      padding: 20px; 
+      background: #eef1f5; 
+      margin: 0;
+      color: #222;
+    }
+
+    h2 { 
+      text-align: center; 
+      margin-bottom: 25px; 
+      color: #0a7def;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    a { 
+      text-decoration: none; 
+      color: #3498db; 
+      display: inline-block; 
+      margin-bottom: 20px;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    #schemesContainer {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .scheme-card { 
+      background: #fff; 
+      padding: 20px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      border-left: 6px solid #0a7def;
+    }
+
+    .scheme-card:hover { 
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .scheme-card h3 { 
+      margin: 0 0 10px; 
+      color: #1c1c1c;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .scheme-card p { 
+      margin: 6px 0; 
+      font-size: 15px;
+      color: #2d2d2d;
+      line-height: 1.5;
+    }
+
+    .scheme-card p strong {
+      color: #000;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #fff;
+      margin-right: 8px;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    .farm-type {
+      background-color: #1abc9c;
+    }
+
+    .expiry-date {
+      background-color: #e67e22;
+    }
+
+    #schemesContainer p.no-schemes {
+      text-align: center;
+      color: #555;
+      font-size: 16px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .scheme-card {
+        padding: 15px;
+      }
+      .scheme-card h3 {
+        font-size: 18px;
+      }
+      .scheme-card p {
+        font-size: 14px;
+      }
+      .badge {
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>All Government Schemes</h2>
+  <a href="farmer.html">← Back to Dashboard</a>
+
+  <div id="schemesContainer"></div>
+
+  <script>
+    const schemesContainer = document.getElementById('schemesContainer');
+
+    function loadSchemesForFarmer() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+      schemesContainer.innerHTML = '';
+
+      if (schemes.length === 0) {
+        schemesContainer.innerHTML = '<p class="no-schemes">No schemes available.</p>';
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
+      schemes.forEach(scheme => {
+        // Filter by farmType and expiry
+        if (scheme.farmType !== 'All' && scheme.farmType.toLowerCase() !== (currentUser.farmType || '').toLowerCase()) return;
+        if (scheme.expiry && scheme.expiry < today) return;
+
+        const card = document.createElement('div');
+        card.className = 'scheme-card';
+        card.innerHTML = `
+          <h3>${scheme.title}</h3>
+          <p><strong>Description:</strong> ${scheme.description}</p>
+          <p><strong>Eligibility:</strong> ${scheme.eligibility}</p>
+          <div>
+            <span class="badge farm-type">${scheme.farmType || 'All Farms'}</span>
+            <span class="badge expiry-date">Expires: ${scheme.expiry || 'N/A'}</span>
+          </div>
+        `;
+        schemesContainer.appendChild(card);
+      });
+
+      if (schemesContainer.innerHTML === '') {
+        schemesContainer.innerHTML = '<p class="no-schemes">No schemes available for your farm type at the moment.</p>';
+      }
+    }
+
+    // Initial load
+    loadSchemesForFarmer();
+  </script>
+
+</body>
+</html>

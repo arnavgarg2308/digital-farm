@@ -36,40 +36,45 @@
 </div>
 <script>
 // Load farmer data + assessments
-window.onload = function() {
+function renderFarmersOverview() {
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
-  const body = document.getElementById('farmerTableBody');
+  const tbody = document.getElementById('farmerTableBody');
+  tbody.innerHTML = '';
 
-  body.innerHTML = ''; // clear old data
+  users.filter(u => u.role === 'farmer').forEach(u => {
+    const userId = u.id || u.phone || u.email; // ensure consistency
+   const userAssessments = assessments.filter(a => 
+  (a.userId && (a.userId + '') === (userId + '')) ||
+  (a.user && (a.user + '') === (userId + '')) ||
+  (a.user && (a.user + '') === (u.phone + '')) ||
+  (a.user && (a.user + '') === (u.email + ''))
+);
+   const last = userAssessments.length ? userAssessments[userAssessments.length - 1] : null;
 
-  users
-    .filter(u => u.role === 'farmer')
-    .forEach(user => {
-      // find latest assessment
-      const userAssessments = assessments.filter(a => a.user === user.id || a.user === user.phone || a.user === user.email);
-      const last = userAssessments.length > 0 ? userAssessments[userAssessments.length - 1] : {};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${u.fullName || u.name || '-'}</td>
+      <td>${u.phone || '-'}</td>
+      <td>${u.email || '-'}</td>
+      <td>${u.farmName || '-'}</td>
+      <td>${u.farmArea || '-'}</td>
+      <td>${last ? last.score + '%' : 'N/A'}</td>
+      <td style="color:${last ? (last.level === 'High' ? 'red' : last.level === 'Medium' ? 'orange' : 'lightgreen') : 'gray'};">
+        ${last ? last.level : 'No Data'}
+      </td>
+      <td>${last ? new Date(last.createdAt).toLocaleString() : '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${user.name|| '-'}</td>
-        <td>${user.phone || '-'}</td>
-        <td>${user.email || '-'}</td>
-        <td>${user.farmName || '-'}</td>
-        <td>${user.farmArea || '-'}</td>
-        <td>${last.score ? last.score + '%' : 'N/A'}</td>
-        <td style="color:${last.level === 'High' ? 'red' : last.level === 'Medium' ? 'orange' : 'lightgreen'};">
-          ${last.level || 'No Data'}
-        </td>
-        <td>${last.createdAt ? new Date(last.createdAt).toLocaleString() : '-'}</td>
-      `;
-      body.appendChild(tr);
-    });
-
-  if (body.innerHTML.trim() === '') {
-    body.innerHTML = `<tr><td colspan="8">No farmer data found</td></tr>`;
+  if (!tbody.innerHTML.trim()) {
+    tbody.innerHTML = `<tr><td colspan="8">No farmer data found</td></tr>`;
   }
-};
+}
+
+document.addEventListener('DOMContentLoaded', renderFarmersOverview);
+
 </script>
 
 </body>

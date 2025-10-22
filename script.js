@@ -1,5 +1,3 @@
-// script.js
-
 const translations = {
   en: {
     title: "Welcome to Smart Farm Solution",
@@ -63,10 +61,7 @@ const translations = {
     book:"Book Order",
     pendind:"Pending: ₹0",
     pay:"Pay Now",
-    vaccineChart:"25 Sept — Bird Flu",
-    feedpig:"View Chat"
-
-
+    feedpig:"View Chart"
   },
   hi: {
     title: "स्मार्ट फार्म सॉल्यूशन में आपका स्वागत है",
@@ -130,14 +125,107 @@ const translations = {
     book:"पुस्तक आदेश",
     pendind:"लंबित:₹0",
     pay:"अब भुगतान करें",
-    vaccineChart:"25 सितंबर - बर्ड फ्लू",
     feedpig:"चार्ट देखें"
-
-
   }
 };
 
-// Change language function
+// ------------------- ADMIN: ADD SCHEME -------------------
+function showAddSchemeForm() {
+  document.getElementById('addSchemeForm').style.display = 'block';
+}
+
+function saveScheme() {
+  const title = document.getElementById('schemeTitle').value.trim();
+  const description = document.getElementById('schemeDescription').value.trim();
+  const eligibility = document.getElementById('schemeEligibility').value.trim();
+  const farmType = document.getElementById('schemeFarmType').value.trim();
+  const expiry = document.getElementById('schemeExpiry').value;
+
+  if (!title || !description) {
+    alert('Title and Description are required!');
+    return;
+  }
+
+  const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+  schemes.push({
+    id: Date.now(),
+    title,
+    description,
+    eligibility,
+    farmType,
+    expiry,
+    createdAt: new Date().toISOString()
+  });
+
+  localStorage.setItem('schemes', JSON.stringify(schemes));
+  alert('Scheme added successfully ✅');
+
+  // reset form
+  document.getElementById('schemeTitle').value = '';
+  document.getElementById('schemeDescription').value = '';
+  document.getElementById('schemeEligibility').value = '';
+  document.getElementById('schemeFarmType').value = '';
+  document.getElementById('schemeExpiry').value = '';
+
+  document.getElementById('addSchemeForm').style.display = 'none';
+}
+
+// ------------------- DISPLAY SCHEMES (FARMER / ADMIN) -------------------
+function displaySchemesForUser() {
+  const container = document.getElementById('schemesContainer');
+  if (!container) return;
+
+  const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+  container.innerHTML = '';
+
+  const today = new Date().toISOString().split('T')[0];
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+  if (schemes.length === 0) {
+    container.innerHTML = '<p>No schemes available.</p>';
+    return;
+  }
+
+  schemes.forEach((s, index) => {
+    const farmMatch = !s.farmType || (currentUser.farmType && s.farmType.toLowerCase() === currentUser.farmType.toLowerCase());
+    const notExpired = !s.expiry || s.expiry >= today;
+
+    // Show only valid schemes to farmers, all schemes to admin
+    if (currentUser.role === 'farmer' && !(farmMatch && notExpired)) return;
+
+    const div = document.createElement('div');
+    div.className = 'scheme-card';
+    div.innerHTML = `
+      <h4>${s.title}</h4>
+      <p>${s.description}</p>
+      <small>Eligibility: ${s.eligibility || 'N/A'}</small><br>
+      <small>Farm Type: ${s.farmType || 'All'}</small><br>
+      <small>Expires: ${s.expiry || 'N/A'}</small><br>
+    `;
+
+    if (currentUser.role === 'admin') {
+      const btn = document.createElement('button');
+      btn.textContent = 'Delete';
+      btn.className = 'delete-btn';
+      btn.onclick = () => deleteScheme(index);
+      div.appendChild(btn);
+    }
+
+    container.appendChild(div);
+  });
+}
+
+// ------------------- DELETE SCHEME -------------------
+function deleteScheme(index) {
+  if (!confirm("Are you sure you want to delete this scheme?")) return;
+  const schemes = JSON.parse(localStorage.getItem('schemes') || '[]');
+  schemes.splice(index, 1);
+  localStorage.setItem('schemes', JSON.stringify(schemes));
+  displaySchemesForUser();
+  alert("Scheme deleted successfully!");
+}
+
+// ------------------- LANGUAGE SWITCH -------------------
 function changeLanguage(lang) {
   document.querySelectorAll("[data-lang]").forEach(el => {
     const key = el.getAttribute("data-lang");
@@ -145,110 +233,16 @@ function changeLanguage(lang) {
       el.textContent = translations[lang][key];
     }
   });
-  localStorage.setItem("lang", lang); // Save preference
-}
-function initHeatmap() {
-  // Map ko India ke center pe set karo
-  var map = L.map('map').setView([22.9734, 78.6569], 5);
-
-  // OpenStreetMap tiles load karo
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  // Example heat data (lat, lng, intensity)
-  var heat = L.heatLayer([
-    [28.6139, 77.2090, 0.8], // Delhi
-    [19.0760, 72.8777, 0.6], // Mumbai
-    [13.0827, 80.2707, 0.4], // Chennai
-    [22.5726, 88.3639, 0.9]  // Kolkata
-  ], {radius: 40}).addTo(map);
-}
-/* ==== Full Page AI Chat Support ==== */
-const chatBody = document.getElementById('chatBody');
-const aiInput = document.getElementById('aiInput');
-const sendBtn = document.getElementById('sendBtn');
-const micBtn = document.getElementById('micBtn');
-
-function appendMessage(who, text){
-  if(!chatBody) return;
-  const wrap = document.createElement('div');
-  wrap.className = 'msg ' + (who==='user'?'user':'ai');
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.innerText = text;
-  wrap.appendChild(bubble);
-  chatBody.appendChild(wrap);
-  chatBody.scrollTop = chatBody.scrollHeight;
+  localStorage.setItem("lang", lang);
 }
 
-function speakText(text){
-  if(!('speechSynthesis' in window)) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = (localStorage.getItem('sflang')==='hi') ? 'hi-IN' : 'en-US';
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
-}
-
-function simpleResponder(q){
-  const ql = q.toLowerCase();
-
-  // vaccine related
-  if(ql.includes('vaccine') || ql.includes('vaccination') || ql.includes('schedule')) {
-    return "Yes. Here is a sample vaccination schedule: \n- Day 1: Marek's disease \n- Week 2: Newcastle + IB \n- Week 4: Gumboro \n- Week 6: Booster (Newcastle) \n(Always confirm with your local vet)";
-  }
-
-  // sickness
-  if(ql.includes('sick') || ql.includes('ill') || ql.includes('disease') || ql.includes('symptom')) {
-    return "No. Sick animals should always be isolated and reported to a vet immediately.";
-  }
-
-  // feeding
-  if(ql.includes('feed') || ql.includes('feeding') || ql.includes('food') || ql.includes('ration')) {
-    return "Yes. Feed a balanced diet twice daily and provide clean water at all times.";
-  }
-
-  // antibiotics
-  if(ql.includes('antibiotic') || ql.includes('medicine') || ql.includes('drug')) {
-    return "No. Avoid antibiotics without veterinarian advice.";
-  }
-
-  // loans and schemes
-  if(ql.includes('loan') || ql.includes('scheme') || ql.includes('government')) {
-    return "Yes. You can apply under the Government Schemes → Loan section.";
-  }
-
-  return "Sorry, I don’t know that. Please consult a vet.";
-}
-
-
-function handleSend(text){
-  const query = text || aiInput.value.trim();
-  if(!query) return;
-  appendMessage('user', query);
-  aiInput.value = '';
-  const ans = simpleResponder(query);
-  appendMessage('ai', ans);
-  speakText(ans);
-}
-
-if(sendBtn) sendBtn.addEventListener('click', ()=> handleSend());
-if(aiInput) aiInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') handleSend(); });
-
-if(micBtn){
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(SpeechRecognition){
-    const recog = new SpeechRecognition();
-    recog.lang = (localStorage.getItem('sflang')==='hi') ? 'hi-IN' : 'en-US';
-    micBtn.addEventListener('click', ()=> recog.start());
-    recog.onresult = (e)=> handleSend(e.results[0][0].transcript);
-  }
-}
-
-// Sirf admin.html me heatmap load karna hai
+// ------------------- PAGE LOAD -------------------
 document.addEventListener("DOMContentLoaded", function() {
-  if (document.getElementById("map")) {
-    initHeatmap();
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+  // Load Government Schemes if schemesContainer exists
+  if (document.getElementById('schemesContainer')) {
+    displaySchemesForUser();
   }
 });
  // ------- SIGNUP -------
@@ -256,33 +250,59 @@ function signupUser(e, role) {
   e.preventDefault();
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const email = document.getElementById('email').value.trim().toLowerCase();
-  if (users.find(u => u.email === email)) {
-    alert('Email already registered.');
-    return;
-  }
-  if (users.find(u => u.phone === phone)) {
-    alert('Email already registered.');
-    return;
-  }
+  // Check duplicates
+const phone = document.getElementById('phone').value.trim();
 
+if (users.some(u => u.email === email)) {
+  alert('Email already registered.');
+  return;
+}
+if (users.some(u => u.phone === phone)) {
+  alert('Phone number already registered.');
+  return;
+}
+
+    // Create base user object
   const user = {
     id: Date.now(),
-    name: document.getElementById('name').value,
+    name: document.getElementById('name').value.trim(),
     email,
-    password: document.getElementById('password').value,
-    phone: document.getElementById('phone').value,
+    password: document.getElementById('password').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
     role,
+   avatar: "",
     createdAt: new Date().toISOString()
   };
+user.avatar = "";
+localStorage.removeItem(`lastAvatar_${role}`);
 
-  // For admin later
+  // ---- Role specific fields ----
+  if (role === 'farmer') {
+    user.farmName = document.getElementById('farmName')?.value.trim() || '';
+    user.farmArea = document.getElementById('farmArea')?.value.trim() || '';
+    user.district = document.getElementById('district')?.value.trim() || '';
+    user.state = document.getElementById('state')?.value.trim() || '';
+    user.village = document.getElementById('village')?.value.trim() || '';
+    user.productionType = document.getElementById('productionType')?.value || '';
+  }
+
   if (role === 'admin') {
-    const code = document.getElementById('adminCode')?.value?.trim();
-    if (code !== 'ADMIN2024') {
-      alert('Invalid Admin Code!');
+    user.designation = document.getElementById('designation')?.value.trim() || '';
+    user.organization = document.getElementById('organization')?.value.trim() || '';
+    user.officeAddress = document.getElementById('officeAddress')?.value.trim() || '';
+    user.adminCode = document.getElementById('adminCode')?.value.trim() || '';
+
+    if (user.adminCode !== 'ADMIN2024') {
+      alert('Invalid Admin Access Code!');
       return;
     }
-    user.adminCode = code;
+  }
+
+  if (role === 'buyer') {
+    user.company = document.getElementById('company')?.value.trim() || '';
+    user.companyAddress = document.getElementById('companyAddress')?.value.trim() || '';
+    user.gst = document.getElementById('gst')?.value.trim() || '';
+    user.businessType = document.getElementById('businessType')?.value || '';
   }
 
   users.push(user);
@@ -302,8 +322,29 @@ function loginUser(e, role) {
   const u = users.find(x => x.email === email && x.password === pass && x.role === role);
   if (!u) return alert('Invalid credentials or wrong role.');
 
-  localStorage.setItem('currentUser', JSON.stringify(u));
+  localStorage.setItem(`currentUser_${role}`, JSON.stringify(u));
+localStorage.setItem('currentUserRole', role); // to remember which role logged in
+
+  // ✅ Save latest avatar for header
+if (u.avatar) {
+  localStorage.setItem("lastAvatar", u.avatar);
+} else {
+  localStorage.removeItem("lastAvatar");
+}
+
   alert('Login successful!');
+  // Show correct header photo immediately
+const headerAvatar = document.getElementById("headerAvatar");
+if (headerAvatar) {
+  if (u.avatar) {
+    headerAvatar.src = u.avatar;
+    headerAvatar.style.display = "inline-block";
+  } else {
+    headerAvatar.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    headerAvatar.style.display = "inline-block";
+  }
+}
+
   if (role === 'farmer') location.href = 'farmer.html';
   else if (role === 'buyer') location.href = 'buyer.html';
   else location.href = 'admin.html';
@@ -427,4 +468,268 @@ function closeFarmerModal() {
 function escapeHtml(s) {
   if (!s) return "";
   return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+// ==== ADMIN VIDEO UPLOAD ====
+function uploadVideo() {
+  const input = document.getElementById('videoUpload');
+  const files = input.files;
+
+  if (!files.length) {
+    alert("Please select video files to upload!");
+    return;
+  }
+
+  // Get previously uploaded videos
+  const stored = JSON.parse(localStorage.getItem('trainingVideos') || '[]');
+
+  // Add new uploads
+  Array.from(files).forEach(file => {
+    const url = URL.createObjectURL(file); // temporary local URL for preview
+    stored.push({ name: file.name, url });
+  });
+
+  // Save back to localStorage
+  localStorage.setItem('trainingVideos', JSON.stringify(stored));
+  alert("Videos uploaded successfully! They will appear on the Training & Guides page.");
+}
+
+/* ===== PROFILE BUTTON SECTION (appears in header) ===== */
+
+function openProfile() {
+  const role = localStorage.getItem("currentUserRole");
+const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+if (!currentUser) {
+    alert("No user logged in!");
+    return;
+  }
+
+  const container = document.getElementById("profileContainer");
+  if (!container) return;
+
+  // toggle visibility
+  const isVisible = container.style.display === "block";
+  if (isVisible) { container.style.display = "none"; return; }
+  container.style.display = "block";
+
+  // build HTML
+  const avatarSrc = currentUser.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  container.innerHTML = `
+    <div style="background:#141416;padding:20px;border-radius:12px;border:1px solid #222;">
+      <div style="text-align:center;">
+        <img src="${avatarSrc}" id="profileAvatar" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #333;">
+        <br>
+        <input type="file" id="avatarUpload" accept="image/*" style="display:none;">
+        <button onclick="document.getElementById('avatarUpload').click()">Change Photo</button>
+
+      </div>
+
+      <div id="profileDetails" style="margin-top:18px;text-align:left;"></div>
+
+      <div style="margin-top:12px;text-align:center;">
+        <button class="btn" onclick="editProfile()">Edit Profile</button>
+        <button class="btn secondary" onclick="closeProfile()">Close</button>
+      </div>
+    </div>
+  `;
+
+  renderProfileDetails(currentUser);
+}
+
+function renderProfileDetails(user) {
+  const details = document.getElementById("profileDetails");
+  if (!details) return;
+  let html = `
+    <p><strong>Name:</strong> ${user.fullName || user.name || "-"}</p>
+    <p><strong>Email:</strong> ${user.email}</p>
+    <p><strong>Phone:</strong> ${user.phone || "-"}</p>
+    <p><strong>Role:</strong> ${user.role}</p>
+  `;
+
+  if (user.role === "farmer") {
+    html += `
+      <p><strong>Farm Name:</strong> ${user.farmName || "-"}</p>
+      <p><strong>Area:</strong> ${user.farmArea || "-"}</p>
+      <p><strong>District:</strong> ${user.district || "-"}</p>
+    `;
+  } else if (user.role === "buyer") {
+    html += `<p><strong>Company:</strong> ${user.company || "-"}</p>`;
+  } else if (user.role === "admin") {
+    html += `<p><strong>Organization:</strong> ${user.organization || "-"}</p>`;
+  }
+  details.innerHTML = html;
+}
+
+/* ----- Edit mode ----- */
+function editProfile() {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  if (!currentUser) return;
+  
+  let html = `
+    <label>Full Name:</label><input id="edit_fullName" value="${currentUser.fullName || currentUser.name || ""}" />
+    <label>Phone:</label><input id="edit_phone" value="${currentUser.phone || ""}" />
+  `;
+
+  if (currentUser.role === "farmer") {
+    html += `
+      <label>Farm Name:</label><input id="edit_farmName" value="${currentUser.farmName || ""}" />
+      <label>Farm Area:</label><input id="edit_farmArea" value="${currentUser.farmArea || ""}" />
+      <label>District:</label><input id="edit_district" value="${currentUser.district || ""}" />
+    `;
+  } else if (currentUser.role === "buyer") {
+    html += `<label>Company:</label><input id="edit_company" value="${currentUser.company || ""}" />`;
+  } else if (currentUser.role === "admin") {
+    html += `<label>Organization:</label><input id="edit_organization" value="${currentUser.organization || ""}" />`;
+  }
+
+  html += `
+    <div style="margin-top:12px;text-align:center;">
+      <button class="btn" onclick="saveProfileChanges()">Save</button>
+      <button class="btn secondary" onclick="cancelProfileEdit()">Cancel</button>
+    </div>
+  `;
+  document.getElementById("profileDetails").innerHTML = html;
+}
+
+/* ----- Save edits ----- */
+function saveProfileChanges() {
+  const role = localStorage.getItem("currentUserRole");
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  let currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  if (!currentUser) return;
+
+  currentUser.fullName = document.getElementById("edit_fullName").value.trim();
+  currentUser.phone = document.getElementById("edit_phone").value.trim();
+
+  if (currentUser.role === "farmer") {
+    currentUser.farmName = document.getElementById("edit_farmName").value.trim();
+    currentUser.farmArea = document.getElementById("edit_farmArea").value.trim();
+    currentUser.district = document.getElementById("edit_district").value.trim();
+  } else if (currentUser.role === "buyer") {
+    currentUser.company = document.getElementById("edit_company").value.trim();
+  } else if (currentUser.role === "admin") {
+    currentUser.organization = document.getElementById("edit_organization").value.trim();
+  }
+
+  // update users list
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx !== -1) users[idx] = currentUser;
+
+  localStorage.setItem("users", JSON.stringify(users));
+  localStorage.setItem(`currentUser_${role}`, JSON.stringify(currentUser));
+
+  alert("✅ Profile updated!");
+  renderProfileDetails(currentUser);
+}
+
+/* ----- Cancel edit ----- */
+function cancelProfileEdit() {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+  if (currentUser) renderProfileDetails(currentUser);
+}
+
+/* ----- Close profile section ----- */
+function closeProfile() {
+  const container = document.getElementById("profileContainer");
+  if (container) container.style.display = "none";
+}
+
+/* ----- Avatar upload ----- */
+function triggerAvatarUpload() {
+  document.getElementById("avatarUpload").click();
+}
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "avatarUpload") {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const imgData = event.target.result;
+
+      // ✅ show uploaded immediately
+      const avatarImg = document.getElementById("profileAvatar");
+      if (avatarImg) avatarImg.src = imgData;
+
+      // ✅ update the correct logged-in user
+      const role = localStorage.getItem("currentUserRole");
+      let currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "{}");
+      if (!currentUser.id) return;
+
+      currentUser.avatar = imgData;
+      localStorage.setItem(`currentUser_${role}`, JSON.stringify(currentUser));
+
+      // ✅ Update in the users array
+      const allUsers = JSON.parse(localStorage.getItem("users") || "[]");
+      const idx = allUsers.findIndex(u => u.id === currentUser.id);
+      if (idx !== -1) {
+        allUsers[idx].avatar = imgData;
+        localStorage.setItem("users", JSON.stringify(allUsers));
+      }
+
+      // ✅ Update header photo
+      const headerAvatar = document.getElementById("headerAvatar");
+      if (headerAvatar) {
+        headerAvatar.src = imgData;
+        headerAvatar.style.display = "inline-block";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const role = localStorage.getItem("currentUserRole");
+  const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+
+  const headerAvatar = document.getElementById("headerAvatar");
+  
+  const profileAvatar = document.getElementById("profileAvatar");
+  
+
+  // ✅ Step 1: Load correct avatar when page opens
+  if (currentUser && currentUser.avatar) {
+    const imgSrc = currentUser.avatar;
+    if (headerAvatar) {
+      headerAvatar.src = imgSrc;
+      headerAvatar.style.display = "inline-block";
+    }
+    if (profileAvatar) {
+      profileAvatar.src = imgSrc;
+    }
+
+    // store session-based avatar for reload consistency
+    localStorage.setItem(`lastAvatar_${role}`, imgSrc);
+  }   else {
+    // ✅ Always use default avatar for new users (no photo)
+    const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    if (headerAvatar) {
+      headerAvatar.src = defaultAvatar;
+      headerAvatar.style.display = "inline-block";
+    }
+    if (profileAvatar) {
+      profileAvatar.src = defaultAvatar;
+    }
+
+    // remove old saved avatar (fix old image showing for new user)
+    localStorage.removeItem(`lastAvatar_${role}`);
+  }
+
+
+  // ✅ Step 2: Before leaving / reload — persist last avatar safely
+  window.addEventListener("beforeunload", () => {
+    const role = localStorage.getItem("currentUserRole");
+    const currentUser = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "null");
+    if (currentUser && currentUser.avatar) {
+      localStorage.setItem(`lastAvatar_${role}`, currentUser.avatar);
+    }
+  });
+});
+function logout() {
+  const role = localStorage.getItem("currentUserRole");
+  localStorage.removeItem(`currentUser_${role}`);
+  localStorage.removeItem("currentUserRole");
+  window.location.href = "index.html";
 }

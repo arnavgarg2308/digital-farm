@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Animal Health Analyzer</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #f0f5f2; font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+    h2 { color: #007a3d; }
+    #preview { width: 280px; border-radius: 8px; margin-top: 15px; display: none; }
+    #result { margin-top: 20px; font-size: 1rem; color: #222; white-space: pre-wrap; }
+    button { margin-top: 10px; padding: 10px 20px; background: #007a3d; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #00994d; }
+  </style>
+</head>
+<body>
+  <h2>🐮 Animal Health Analyzer</h2>
+  <input type="file" id="photoInput" accept="image/*">
+  <img id="preview" alt="Preview">
+  <button id="analyzeBtn">Analyze Health</button>
+
+  <div id="result"></div>
+
+  <script>
+    const input = document.getElementById("photoInput");
+    const preview = document.getElementById("preview");
+    const result = document.getElementById("result");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+
+    let base64Image = "";
+
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        base64Image = e.target.result.split(",")[1];
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      if (!base64Image) return alert("Please upload an image first!");
+      result.textContent = "Analyzing...";
+      try {
+        const res = await fetch("http://localhost:3000/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: base64Image })
+        });
+        const data = await res.json();
+        result.textContent = data.reply || "No analysis result.";
+      } catch (err) {
+        result.textContent = "⚠️ Error connecting to server.";
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

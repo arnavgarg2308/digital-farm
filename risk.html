@@ -58,7 +58,6 @@
 </style>
 </head>
 <body>
-  
 <div class="wrap">
   <header>
     <div>
@@ -66,15 +65,10 @@
       <p class="lead">Answer short questions and upload a photo — system returns a risk score for your farm (demo).</p>
     </div>
     <div>
-      <button class="btn" onclick="saveAndClose()">Save</button>
+      <button class="btn" onclick="saveAndClose()">Save & Close</button>
     </div>
-    <button 
-    class="back-btn" 
-    onclick="goBackToDashboard()"
-  >
-    ⬅ Back to Dashboard
-  </button>
   </header>
+
   <div class="grid">
     <!-- LEFT: Questions -->
     <div>
@@ -194,306 +188,159 @@
 </div>
 
 <script>
-  function goBackToDashboard() {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-    if (!user) {
-      alert("No user found. Redirecting to login.");
-      window.location.href = "index.html"; // fallback
-      return;
-    }
-    switch(user.role) {
-      case 'admin':
-        window.location.href = "admin.html";
-        break;
-      case 'farmer':
-        window.location.href = "farmer.html";
-        break;
-      case 'buyer':
-        window.location.href = "buyer.html";
-        break;
-      default:
-        window.location.href = "index.html";
-    }
+  (function ensureLogin() {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  if (!currentUser || currentUser.role !== "farmer") {
+    alert("Please login as a farmer first!");
+    window.location.href = "index.html"; // redirect to login page
   }
+})();
+// 🔹 Returns unique key per logged-in farmer
+function getUserKey() {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  return currentUser && currentUser.id ? `sf_assessment_history_${currentUser.id}` : null;
+}
 
-/* ======== Utilities & storage ======== */
-const HISTORY_KEY = 'sf_assessment_history_v1';
-
+// 🔹 Get / save history
 function getHistory() {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  const userKey = currentUser ? `sf_assessment_history_${currentUser.id}` : HISTORY_KEY;
-  try {
-    return JSON.parse(localStorage.getItem(userKey) || '[]');
-  } catch (e) {
-    return [];
-  }
+  const key = getUserKey();
+  return key ? JSON.parse(localStorage.getItem(key) || "[]") : [];
 }
-
 function saveHistory(arr) {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  const userKey = currentUser ? `sf_assessment_history_${currentUser.id}` : HISTORY_KEY;
-  localStorage.setItem(userKey, JSON.stringify(arr));
+  const key = getUserKey();
+  if (key) localStorage.setItem(key, JSON.stringify(arr));
 }
 
-/* Photo handling */
-const photoInput = document.getElementById('photoInput');
-const photoPreview = document.getElementById('photoPreview');
+/* ======== Photo handling ======== */
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
 
-photoInput.addEventListener('change', function(){
+photoInput.addEventListener("change", function () {
   const f = this.files[0];
-  if(!f) return;
+  if (!f) return;
   const reader = new FileReader();
-  reader.onload = function(e){
+  reader.onload = function (e) {
     photoPreview.src = e.target.result;
-    photoPreview.style.display = 'block';
-    // We keep the image data in localStorage only when saving assessment
+    photoPreview.style.display = "block";
   };
   reader.readAsDataURL(f);
 });
 
-/* ======== Risk calculation logic ========
- We'll score each 'Yes' as 1, 'No' as 0.
- Score = sum(yes) / totalQuestions
- Levels:
-  - Score >= 0.75 -> Low risk
-  - 0.4 <= Score < 0.75 -> Medium
-  - Score < 0.4 -> High
-=======================================*/
-function calculateRisk(){
-  const form = document.getElementById('riskForm');
+/* ======== Risk calculation ======== */
+function calculateRisk() {
+  const form = document.getElementById("riskForm");
   const total = 8;
   let yes = 0;
-  for(let i=1;i<=8;i++){
-    const v = form['q'+i] && form['q'+i].value;
-    if(v === undefined || v === '') {
-      // if unanswered, treat as 0
-    } else {
-      if(Number(v) === 1) yes++;
-    }
+  for (let i = 1; i <= total; i++) {
+    if (form["q" + i]?.value === "1") yes++;
   }
   const score = yes / total;
-  const percentage = Math.round(score*100);
-  let level = 'High';
-  if(score >= 0.75) level='Low';
-  else if(score >= 0.4) level='Medium';
+  const percentage = Math.round(score * 100);
+  const level = score >= 0.75 ? "Low" : score >= 0.4 ? "Medium" : "High";
 
-  // Build result box
-  const box = document.getElementById('resultBox');
-  box.classList.remove('hidden');
-  // === Save assessment to localStorage ===
-  // after calculating 'percentage' and 'level' (inside runAssessment / calculateRisk)
-try {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  if (!currentUser) {
-    alert('User not logged in. Redirecting to login...');
-    window.location.href = 'farmer-login.html';
-    return;
-  }
-
-  // always store with userId field
-  const userId = currentUser.id || currentUser.phone || currentUser.email;
-  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
-
-  assessments.push({
-    id: Date.now().toString(),
-    userId: userId,            // 🔑 linked to farmer
-    score: percentage,
-    level: level,
-    createdAt: new Date().toISOString()
-  });
-
-  localStorage.setItem('assessments', JSON.stringify(assessments));
-  console.log('✅ Assessment saved for:', userId);
-} catch (err) {
-  console.error('Error saving assessment:', err);
-}
-
+  // show result
+  const box = document.getElementById("resultBox");
+  box.classList.remove("hidden");
   box.innerHTML = `
     <strong>Score: ${percentage}%</strong>
-    <div style="margin-top:8px;">
-      Risk level: 
-      <span class="pill ${level==='Low'?'low':(level==='Medium'?'med':'high')}">${level}</span>
+    <div style="margin-top:8px;">Risk level:
+      <span class="pill ${level === "Low" ? "low" : level === "Medium" ? "med" : "high"}">${level}</span>
     </div>
-    <div style="margin-top:10px;color:var(--muted)">Yes answers: ${yes} / ${total}</div>
   `;
 
-  // Save into history (with optional image)
-  const imgData = (photoPreview && photoPreview.src && photoPreview.src.startsWith('data:')) ? photoPreview.src : null;
-  const entry = {
+  // save assessment record globally for admin overview
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  if (!currentUser) {
+    alert("Login required");
+    return;
+  }
+  const userId = currentUser.id;
+  const allAssessments = JSON.parse(localStorage.getItem("assessments") || "[]");
+  allAssessments.push({
     id: Date.now(),
-    userId: currentUser.id || currentUser.phone || currentUser.email,
-    score: score,
+    userId,
+    score: percentage,
+    level,
+    createdAt: new Date().toISOString(),
+  });
+  localStorage.setItem("assessments", JSON.stringify(allAssessments));
+
+  // save local private history (for this farmer only)
+  const imgData = photoPreview.src.startsWith("data:") ? photoPreview.src : null;
+  const hist = getHistory();
+  hist.push({
+    id: Date.now(),
+    userId,
     percentage,
     level,
     yes,
     total,
     photo: imgData,
-    ts: new Date().toISOString()
-  };
-  const hist = getHistory();
-  hist.push(entry);
+    ts: new Date().toISOString(),
+  });
   saveHistory(hist);
   renderHistory();
-  function loadFarmerAssessments() {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  if (!currentUser) {
-    // if not logged in, redirect to login
-    window.location.href = 'farmer-login.html';
+}
+
+/* ======== Render History (for logged-in farmer only) ======== */
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  const hist = getHistory().slice().reverse();
+  if (!hist.length) {
+    list.innerHTML = '<div class="smallmuted">No assessments yet.</div>';
     return;
   }
-
-  const userId = currentUser.id || currentUser.phone || currentUser.email;
-  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
-
-  // filter only those assessments for this user
-  const myAssessments = assessments.filter(a => (a.userId + '') === (userId + ''));
-
-  // Render into your UI container (example: <ul id="myAssessments"></ul>)
-  const ul = document.getElementById('myAssessments');
-  if (!ul) return;
-  ul.innerHTML = '';
-  if (myAssessments.length === 0) {
-    ul.innerHTML = '<li>No assessments yet</li>';
-    return;
-  }
-  myAssessments.reverse().forEach(a => {
-    const li = document.createElement('li');
-    li.textContent = `${new Date(a.createdAt).toLocaleString()} — ${a.score}% — ${a.level}`;
-    ul.appendChild(li);
-  });
-}
-
-// call on page load
-document.addEventListener('DOMContentLoaded', loadFarmerAssessments);
-/* ======================================
-   🔄 Data Migration Utility (One-time)
-   Converts old assessment.user → assessment.userId
-====================================== */
-function migrateAssessments() {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  let assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
-  let changed = false;
-
-  assessments = assessments.map(a => {
-    // skip if already in new structure
-    if (a.userId) return a;
-
-    // try to match assessment.user with user email / phone / id
-    const match = users.find(u =>
-      u.email === (a.user + '') ||
-      u.phone === (a.user + '') ||
-      u.id === (a.user + '')
-    );
-
-    // add new userId if match found
-    if (match) {
-      a.userId = match.id;
-      changed = true;
-    }
-    return a;
-  });
-
-  if (changed) {
-    localStorage.setItem('assessments', JSON.stringify(assessments));
-    console.log('✅ Assessments migrated successfully to new structure.');
-  } else {
-    console.log('ℹ️ No assessments needed migration.');
-  }
-}
-
-// Run this once after you update structure
-migrateAssessments();
-
-}
-
-/* Render history */
-function renderHistory(){
-  const list = document.getElementById('historyList');
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-let hist = getHistory().slice().reverse();
-if (currentUser) {
-  const userId = currentUser.id || currentUser.phone || currentUser.email;
-  hist = hist.filter(h => h.userId === userId);
-}
-
-  if(!hist.length){ list.innerHTML = '<div class="smallmuted">No assessments yet.</div>'; return; }
-  list.innerHTML = '';
-  hist.forEach(e=>{
-    const div = document.createElement('div'); div.className='item';
+  list.innerHTML = "";
+  hist.forEach((e) => {
     const d = new Date(e.ts);
+    const div = document.createElement("div");
+    div.className = "item";
     div.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:700">${d.toLocaleString()}</div>
-          <div class="smallmuted">Score: ${e.percentage}% • ${e.yes}/${e.total}</div>
-        </div>
-        <div>
-          <span class="pill ${e.level==='Low'?'low':(e.level==='Medium'?'med':'high')}" style="margin-right:8px">${e.level}</span>
-        </div>
-      </div>
+      <div><b>${d.toLocaleString()}</b> — ${e.percentage}% (${e.level})</div>
     `;
-    if(e.photo){
-      const img = document.createElement('img');
-      img.src = e.photo; img.style.width='100%'; img.style.marginTop='8px'; img.style.borderRadius='8px';
+    if (e.photo) {
+      const img = document.createElement("img");
+      img.src = e.photo;
+      img.style.width = "100%";
+      img.style.borderRadius = "8px";
+      img.style.marginTop = "8px";
       div.appendChild(img);
     }
-    // view / delete buttons
-    const btnRow = document.createElement('div'); btnRow.style.marginTop='8px'; btnRow.style.display='flex'; btnRow.style.gap='8px';
-    const viewBtn = document.createElement('button'); viewBtn.className='btn secondary'; viewBtn.textContent='View';
-    viewBtn.onclick = ()=> { alert(`Assessment on ${d.toLocaleString()}\nScore: ${e.percentage}%\nLevel: ${e.level}`); };
-    const delBtn = document.createElement('button'); delBtn.className='btn secondary'; delBtn.textContent='Delete';
-    delBtn.onclick = ()=>{
-      if(!confirm('Delete this record?')) return;
-      const all = getHistory().filter(x=> x.id !== e.id);
-      saveHistory(all);
-      renderHistory();
-    };
-    btnRow.appendChild(viewBtn); btnRow.appendChild(delBtn);
-    div.appendChild(btnRow);
     list.appendChild(div);
   });
 }
 
-/* Export CSV */
-function exportHistory(){
+/* ====== Export / Clear ====== */
+function exportHistory() {
   const hist = getHistory();
-  if(!hist.length){ alert('No history to export'); return; }
-  let csv = 'id,timestamp,score_pct,level,yes,total\n';
-  hist.forEach(h=> csv += `${h.id},${h.ts},${h.percentage},${h.level},${h.yes},${h.total}\n`);
-  const blob = new Blob([csv], {type: 'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'assessments.csv'; document.body.appendChild(a); a.click(); a.remove();
+  if (!hist.length) return alert("No data");
+  let csv = "id,timestamp,percentage,level\n";
+  hist.forEach((h) => (csv += `${h.id},${h.ts},${h.percentage},${h.level}\n`));
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "history.csv";
+  a.click();
 }
-
-/* Clear history */
-function clearHistory(){
-  if(!confirm('Clear assessment history?')) return;
-  saveHistory([]);
-  renderHistory();
-}
-
-/* Reset form */
-function clearForm(){
-  document.getElementById('riskForm').reset();
-  document.getElementById('resultBox').classList.add('hidden');
-}
-
-/* Save and Close (for modal or returning) */
-function saveAndClose(){
-  alert('Assessment saved locally (demo). Close this tab or go back to dashboard.');
-}
-
-/* Initialize on load */
-document.addEventListener('DOMContentLoaded', function(){
-  renderHistory();
-  // if existing saved image from last assessment show it?
-  const last = getHistory().slice(-1)[0];
-  if(last && last.photo){
-    photoPreview.src = last.photo; photoPreview.style.display='block';
-  } else {
-    photoPreview.style.display='none';
+function clearHistory() {
+  if (confirm("Clear your history?")) {
+    saveHistory([]);
+    renderHistory();
   }
-});
+}
+
+/* ====== Form Reset ====== */
+function clearForm() {
+  document.getElementById("riskForm").reset();
+  document.getElementById("resultBox").classList.add("hidden");
+}
+function saveAndClose() {
+  alert("Assessment saved successfully!");
+  window.location.href = "farmer.html";
+}
+
+/* ====== Init ====== */
+document.addEventListener("DOMContentLoaded", renderHistory);
 </script>
 </body>
 </html>

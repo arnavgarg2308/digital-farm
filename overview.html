@@ -35,46 +35,60 @@
   </div>
 </div>
 <script>
-// Load farmer data + assessments
 function renderFarmersOverview() {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
-  const tbody = document.getElementById('farmerTableBody');
-  tbody.innerHTML = '';
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  const allAssessments = [];
 
-  users.filter(u => u.role === 'farmer').forEach(u => {
-    const userId = u.id || u.phone || u.email; // ensure consistency
-   const userAssessments = assessments.filter(a => 
-  (a.userId && (a.userId + '') === (userId + '')) ||
-  (a.user && (a.user + '') === (userId + '')) ||
-  (a.user && (a.user + '') === (u.phone + '')) ||
-  (a.user && (a.user + '') === (u.email + ''))
-);
-   const last = userAssessments.length ? userAssessments[userAssessments.length - 1] : null;
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${u.fullName || u.name || '-'}</td>
-      <td>${u.phone || '-'}</td>
-      <td>${u.email || '-'}</td>
-      <td>${u.farmName || '-'}</td>
-      <td>${u.farmArea || '-'}</td>
-      <td>${last ? last.score + '%' : 'N/A'}</td>
-      <td style="color:${last ? (last.level === 'High' ? 'red' : last.level === 'Medium' ? 'orange' : 'lightgreen') : 'gray'};">
-        ${last ? last.level : 'No Data'}
-      </td>
-      <td>${last ? new Date(last.createdAt).toLocaleString() : '-'}</td>
-    `;
-    tbody.appendChild(tr);
+  // Collect all per-user histories
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith("sf_assessment_history_")) {
+      try {
+        const hist = JSON.parse(localStorage.getItem(key) || "[]");
+        if (hist.length) {
+          const last = hist[hist.length - 1];
+          allAssessments.push(last);
+        }
+      } catch {}
+    }
   });
 
+  const tbody = document.getElementById("farmerTableBody");
+  tbody.innerHTML = "";
+
+  users
+    .filter((u) => u.role === "farmer")
+    .forEach((u) => {
+      const userId = u.id;
+      const record = allAssessments.find((a) => a.userId === userId);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${u.name || "-"}</td>
+        <td>${u.phone || "-"}</td>
+        <td>${u.email || "-"}</td>
+        <td>${u.farmName || "-"}</td>
+        <td>${u.farmArea || "-"}</td>
+        <td>${record ? record.percentage + "%" : "N/A"}</td>
+        <td style="color:${
+          record
+            ? record.level === "High"
+              ? "red"
+              : record.level === "Medium"
+              ? "orange"
+              : "lightgreen"
+            : "gray"
+        };">${record ? record.level : "No Data"}</td>
+        <td>${record ? new Date(record.ts).toLocaleString() : "-"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
   if (!tbody.innerHTML.trim()) {
-    tbody.innerHTML = `<tr><td colspan="8">No farmer data found</td></tr>`;
+    tbody.innerHTML =
+      '<tr><td colspan="8">No farmer data found</td></tr>';
   }
 }
 
-document.addEventListener('DOMContentLoaded', renderFarmersOverview);
-
+document.addEventListener("DOMContentLoaded", renderFarmersOverview);
 </script>
 
 </body>

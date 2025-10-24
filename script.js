@@ -322,8 +322,9 @@ function loginUser(e, role) {
   const u = users.find(x => x.email === email && x.password === pass && x.role === role);
   if (!u) return alert('Invalid credentials or wrong role.');
 
+  localStorage.setItem("currentUser", JSON.stringify(u));
   localStorage.setItem(`currentUser_${role}`, JSON.stringify(u));
-localStorage.setItem('currentUserRole', role); // to remember which role logged in
+   localStorage.setItem('currentUserRole', role); // to remember which role logged in
 
   // ✅ Save latest avatar for header
 if (u.avatar) {
@@ -732,4 +733,9 @@ function logout() {
   localStorage.removeItem(`currentUser_${role}`);
   localStorage.removeItem("currentUserRole");
   window.location.href = "index.html";
+}
+function openFeature(feature) {
+  if (feature === "health") {
+    window.open("health.html", "_blank"); // open in new tab
+  }
 }

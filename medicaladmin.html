@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Medical Admin Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    color: #333;
+  }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e88e5;
+    color: white;
+    padding: 15px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .page-header h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+  .page-header button {
+    background: #ffffff33;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background 0.3s;
+  }
+  .page-header button:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  section.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px 30px;
+  }
+  @media(max-width: 900px) {
+    section.grid { grid-template-columns: 1fr; padding: 20px; }
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: transform 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+  }
+  .card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #1e88e5;
+    font-weight: 600;
+  }
+  label {
+    font-weight: bold;
+    margin-right: 5px;
+    display: inline-block;
+    margin-top: 10px;
+  }
+  select, input {
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border 0.2s;
+  }
+  select:focus, input:focus {
+    border-color: #1e88e5;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95rem;
+  }
+  table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  table th {
+    background: #1e88e5;
+    color: white;
+    font-weight: 600;
+  }
+  table tr:nth-child(even) {
+    background: #f4f6f8;
+  }
+  table tr:hover {
+    background: #e3f2fd;
+  }
+  button.action-btn {
+    background: #1e88e5;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+  }
+  button.action-btn:hover {
+    background: #1565c0;
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h2>🩺 Medical Admin Dashboard</h2>
+  <div>
+    <button onclick="logout()">Logout</button>
+    <img id="headerAvatar" src="" alt="Avatar" style="width:36px;height:36px;border-radius:50%;display:none;margin-left:10px;">
+  </div>
+</header>
+
+<main>
+<section class="grid">
+
+  <!-- Filters -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <h3>Filters</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+      <div>
+        <label for="bookingStatus">Booking Status:</label>
+        <select id="bookingStatus" onchange="fetchMedicalData()">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div>
+        <label for="orderStatus">Order Status:</label>
+        <select id="orderStatus" onchange="fetchMedicalData()">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+        </select>
+      </div>
+      <div style="flex-grow:1; min-width:200px;">
+        <label for="searchInput">Search:</label>
+        <input type="text" id="searchInput" placeholder="Search by Owner / Medicine" oninput="fetchMedicalData()" style="width:100%;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Vet Bookings -->
+  <div class="card">
+    <h3>Vet Bookings</h3>
+    <table id="bookingsTable">
+      <thead>
+        <tr>
+          <th>Pet Owner</th>
+          <th>Pet Name</th>
+          <th>Vet Name</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Medicine Orders -->
+  <div class="card">
+    <h3>Medicine Orders</h3>
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Pet Owner</th>
+          <th>Medicine</th>
+          <th>Quantity</th>
+          <th>Delivery Address</th>
+          <th>Order Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</section>
+</main>
+
+<script src="script.js"></script>
+<script>
+  // Optional: logout function
+  function logout() {
+    localStorage.removeItem("currentUserRole");
+    localStorage.removeItem("currentUser_admin");
+    window.location.href = "login.html"; // redirect to login page
+  }
+</script>
+
+</body>
+</html>

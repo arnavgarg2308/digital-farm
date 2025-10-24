@@ -1,160 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Medical Consultation & Supplies</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
-    header { background: #2d6a4f; color: #fff; padding: 15px; text-align: center; }
-    h1 { margin: 0; }
-    .container { padding: 20px; max-width: 900px; margin: auto; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Medical Consultation & Supplies</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; margin: 0; color: #333; }
+  header { background: #2d6a4f; color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; }
+  header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 1px; }
+  .container { padding: 20px; max-width: 1000px; margin: auto; }
 
-    .section {
-      background: #fff;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+  a.back-btn { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #2d6a4f; font-weight: bold; transition: 0.3s; }
+  a.back-btn:hover { color: #1b4332; }
 
-    h2 { color: #2d6a4f; margin-bottom: 10px; }
+  .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-    .vet-list, .medicine-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-    }
+  h2 { color: #2d6a4f; margin-bottom: 15px; }
 
-    .card {
-      background: #fdfdfd;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
+  .vet-list, .medicine-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
 
-    .card h3 { margin-top: 0; }
+  .card { background: #fdfdfd; padding: 15px; border: 1px solid #ddd; border-radius: 10px; transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+  .card h3 { margin-top: 0; color: #2d6a4f; }
 
-    button {
-      background: #2d6a4f;
-      color: #fff;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 8px;
-    }
+  button { background: #2d6a4f; color: #fff; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; margin-top: 8px; transition: 0.2s; }
+  button:hover { background: #1b4332; }
 
-    button:hover {
-      background: #1b4332;
-    }
+  input, select { padding: 10px; width: 100%; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; }
+  input:focus, select:focus { outline: none; border-color: #2d6a4f; box-shadow: 0 0 4px #2d6a4f44; }
 
-    input, select {
-      padding: 8px;
-      width: 100%;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+  form { display: flex; flex-direction: column; gap: 10px; }
 
-    .back-btn {
-      display: inline-block;
-      margin-bottom: 20px;
-      text-decoration: none;
-      color: #2d6a4f;
-      font-weight: bold;
-    }
-  </style>
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.2rem; }
+    .section { padding: 15px; }
+    button { padding: 10px; }
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>🩺 Medical Consultation & Supplies</h1>
-  </header>
+<header>
+  <h1>🩺 Medical Consultation & Supplies</h1>
+</header>
 
-  <div class="container">
-    <a href="farmer.html" class="back-btn">← Back to Dashboard</a>
+<div class="container">
+  <a href="farmer.html" class="back-btn">← Back to Dashboard</a>
 
-    <!-- Vet Consultation -->
-    <div class="section">
-      <h2>Consult a Vet</h2>
-      <div class="vet-list" id="vetList">
-        <!-- Vets will be loaded here -->
-      </div>
-    </div>
-
-    <!-- Order Medicines & Vaccines -->
-    <div class="section">
-      <h2>Order Medicines & Vaccines</h2>
-      <form id="medicineForm">
-        <label for="medicineName">Medicine / Vaccine Name:</label>
-        <input type="text" id="medicineName" placeholder="e.g. Swine Flu Vaccine" required>
-
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" min="1" required>
-
-        <label for="address">Delivery Address:</label>
-        <input type="text" id="address" placeholder="Farm address" required>
-
-        <button type="submit">Place Order</button>
-      </form>
-    </div>
+  <!-- Vet Consultation -->
+  <div class="section">
+    <h2>Consult a Vet</h2>
+    <div class="vet-list" id="vetList"></div>
   </div>
 
-  <script>
-    const vetList = [
-      { name: "Dr. Ramesh Kumar", specialty: "Pig & Poultry Expert", contact: "9876543210" },
-      { name: "Dr. Anita Sharma", specialty: "Poultry Specialist", contact: "9876501234" },
-      { name: "Dr. Ajay Singh", specialty: "Livestock & Vaccination", contact: "9998887770" }
-    ];
+  <!-- Order Medicines & Vaccines -->
+  <div class="section">
+    <h2>Order Medicines & Vaccines</h2>
+    <form id="medicineForm">
+      <label for="medicineName">Medicine / Vaccine Name:</label>
+      <input type="text" id="medicineName" placeholder="e.g. Swine Flu Vaccine" required>
 
-    const vetListContainer = document.getElementById('vetList');
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" min="1" required>
 
-    // Load vets
-    function loadVets() {
-      vetListContainer.innerHTML = '';
-      vetList.forEach((vet, index) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <h3>${vet.name}</h3>
-          <p><strong>Specialty:</strong> ${vet.specialty}</p>
-          <p><strong>Contact:</strong> ${vet.contact}</p>
-          <button onclick="bookVet(${index})">Book Appointment</button>
-        `;
-        vetListContainer.appendChild(card);
-      });
-    }
+      <label for="address">Delivery Address:</label>
+      <input type="text" id="address" placeholder="Farm address" required>
 
-    // Book vet appointment
-    function bookVet(index) {
-      const vet = vetList[index];
-      alert(`✅ Appointment booked with ${vet.name}\n📞 Contact: ${vet.contact}`);
-      let bookings = JSON.parse(localStorage.getItem('vetBookings') || '[]');
-      bookings.push({ name: vet.name, contact: vet.contact, date: new Date().toLocaleString() });
-      localStorage.setItem('vetBookings', JSON.stringify(bookings));
-    }
+      <button type="submit">Place Order</button>
+    </form>
+  </div>
+</div>
 
-    // Medicine order
-    const medicineForm = document.getElementById('medicineForm');
-    medicineForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('medicineName').value;
-      const qty = document.getElementById('quantity').value;
-      const address = document.getElementById('address').value;
+<script>
+// 🔹 Backend URL
+const BASE_URL = "http://localhost:3000";
 
-      const order = { name, qty, address, date: new Date().toLocaleString() };
-      let orders = JSON.parse(localStorage.getItem('medicineOrders') || '[]');
-      orders.push(order);
-      localStorage.setItem('medicineOrders', JSON.stringify(orders));
+// Replace this with real farmer login info if implemented
+const loggedInFarmer = "John Doe";
 
-      alert(`🧾 Order placed for "${name}" (${qty})\n🚚 Delivery to: ${address}`);
-      medicineForm.reset();
+const vetList = [
+  { name: "Dr. Ramesh Kumar", specialty: "Pig & Poultry Expert", contact: "9876543210" },
+  { name: "Dr. Anita Sharma", specialty: "Poultry Specialist", contact: "9876501234" },
+  { name: "Dr. Ajay Singh", specialty: "Livestock & Vaccination", contact: "9998887770" }
+];
+
+const vetListContainer = document.getElementById('vetList');
+
+// Load vets dynamically
+function loadVets() {
+  vetListContainer.innerHTML = '';
+  vetList.forEach((vet, index) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${vet.name}</h3>
+      <p><strong>Specialty:</strong> ${vet.specialty}</p>
+      <p><strong>Contact:</strong> ${vet.contact}</p>
+      <button onclick="bookVet(${index})">Book Appointment</button>
+    `;
+    vetListContainer.appendChild(card);
+  });
+}
+
+// 📅 Book vet appointment
+async function bookVet(index) {
+  const vet = vetList[index];
+  try {
+    const response = await fetch(`${BASE_URL}/api/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        petOwner: loggedInFarmer,
+        petName: "Your Pet",
+        vetName: vet.name,
+        date: new Date().toISOString().split('T')[0],
+        status: "pending"
+      })
     });
+    if (!response.ok) throw new Error('Failed to book');
+    alert(`✅ Appointment booked with ${vet.name}`);
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to book appointment. Check server connection.");
+  }
+}
 
-    loadVets();
-  </script>
+// 💊 Medicine order
+const medicineForm = document.getElementById('medicineForm');
+medicineForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('medicineName').value;
+  const qty = document.getElementById('quantity').value;
+  const address = document.getElementById('address').value;
+
+  try {
+    const response = await fetch(`${BASE_URL}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        petOwner: loggedInFarmer,
+        medicineName: name,
+        quantity: qty,
+        deliveryAddress: address,
+        orderDate: new Date().toISOString().split('T')[0],
+        status: "pending"
+      })
+    });
+    if (!response.ok) throw new Error('Failed to order');
+    alert(`🧾 Order placed for "${name}" (${qty})`);
+    medicineForm.reset();
+  } catch(err) {
+    console.error(err);
+    alert("❌ Failed to place order. Check server connection.");
+  }
+});
+
+loadVets();
+</script>
+
 </body>
 </html>

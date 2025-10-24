@@ -100,8 +100,44 @@
           <a href="adminSchemes.html" class="btn" target="_blank">View All Schemes</a>
         </p>
       </div>
+<!-- NEW Medical Admin Section -->
+      <div class="card">
+        <h3>Medical Management</h3>
+        <p>Manage Vet Bookings & Medicine Orders</p>
+        <p style="margin-top:10px;">
+          <a href="medicaladmin.html" class="btn" target="_blank">
+            Open Medical Admin
+          </a>
+        </p>
+      </div>
 
     </section>
   </main>
+  <!-- Script to update pending badge -->
+  <script>
+    async function updatePendingBadge() {
+      try {
+        const bookingsRes = await fetch('/api/bookings');
+        const ordersRes = await fetch('/api/orders');
+        const bookings = await bookingsRes.json();
+        const orders = await ordersRes.json();
+
+        const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+        const pendingOrders = orders.filter(o => o.status === 'pending').length;
+        const totalPending = pendingBookings + pendingOrders;
+
+        const badge = document.getElementById('pendingBadge');
+        badge.textContent = totalPending;
+        badge.style.display = totalPending > 0 ? 'inline-block' : 'none';
+      } catch(err) {
+        console.error('Error updating badge:', err);
+      }
+    }
+
+    // Refresh badge every 10 seconds
+    updatePendingBadge();
+    setInterval(updatePendingBadge, 10000);
+  </script>
+
 </body>
 </html>

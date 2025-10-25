@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pig Vaccination Schedule</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f7f8fa;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #bd15a16f;
+      color: #fff;
+      padding: 15px 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .navbar h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .navbar button {
+      background: #fff;
+      color: #dd4aba;
+      border: none;
+      padding: 8px 16px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+
+    .navbar button:hover {
+      background: #fdd;
+      transform: scale(1.05);
+    }
+
+    /* Page Header */
+    h1 {
+      text-align: center;
+      color: #943162;
+      margin: 20px 0;
+      font-size: 2rem;
+    }
+
+    .section {
+      margin: 20px auto;
+      max-width: 900px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: #d775b8;
+      color: #fff;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .section-header:hover {
+      background: #e86bd5;
+    }
+
+    .section-content {
+      display: none;
+      padding: 15px 20px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #cb219b;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin: 30px 0;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <h2>🐖 Pig Vaccination</h2>
+    <button onclick="window.location.href='vaccinationSelect.html'">⬅ Back to Dashboard</button>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span>🐖 Piglets (Birth to Weaning/Sale)</span>
+      <span>+</span>
+    </div>
+    <div class="section-content">
+      <p class="note">This phase is critical for building initial immunity.</p>
+      <table>
+        <tr>
+          <th>Age</th>
+          <th>Action</th>
+          <th>Purpose / Disease Prevented</th>
+          <th>Route</th>
+          <th>Key Notes</th>
+        </tr>
+        <tr>
+          <td>Day 3</td>
+          <td>Iron Injection</td>
+          <td>Prevents Piglet Anemia</td>
+          <td>IM</td>
+          <td>Sows' milk is very low in iron</td>
+        </tr>
+        <tr>
+          <td>Day 7-10</td>
+          <td>Mycoplasma Vaccine (1st Dose)</td>
+          <td>Prevents Mycoplasmal Pneumonia</td>
+          <td>IM</td>
+          <td>Common respiratory disease</td>
+        </tr>
+        <tr>
+          <td>Day 14-21 (Weaning)</td>
+          <td>Circovirus (PCV2) Vaccine</td>
+          <td>Prevents Porcine Circovirus Type 2</td>
+          <td>IM</td>
+          <td>Core vaccine for piglets</td>
+        </tr>
+        <tr>
+          <td>Day 21-28</td>
+          <td>Mycoplasma Vaccine (Booster)</td>
+          <td>Boosts immunity from first dose</td>
+          <td>IM</td>
+          <td>Long-lasting protection</td>
+        </tr>
+        <tr>
+          <td>6-8 Weeks</td>
+          <td>CSF</td>
+          <td>Prevents Hog Cholera</td>
+          <td>IM</td>
+          <td>Highly contagious and fatal</td>
+        </tr>
+        <tr>
+          <td>8-10 Weeks</td>
+          <td>FMD</td>
+          <td>Prevents Foot & Mouth Disease</td>
+          <td>IM</td>
+          <td>National control program</td>
+        </tr>
+        <tr>
+          <td>10 Weeks</td>
+          <td>Deworming</td>
+          <td>Removes internal parasites</td>
+          <td>Oral / Feed</td>
+          <td>Improves growth and vaccine efficacy</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span>🐖 Gilts (Replacement Breeding Females)</span>
+      <span>+</span>
+    </div>
+    <div class="section-content">
+      <p class="note">Prepare gilts for breeding with full immunity.</p>
+      <table>
+        <tr>
+          <th>Age / Timing</th>
+          <th>Action</th>
+          <th>Purpose / Disease Prevented</th>
+          <th>Route</th>
+          <th>Key Notes</th>
+        </tr>
+        <tr>
+          <td>6 Months</td>
+          <td>Deworming</td>
+          <td>Cleans out parasites</td>
+          <td>Oral / Feed</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>6 Months</td>
+          <td>FMD & CSF Boosters</td>
+          <td>Ensures robust immunity</td>
+          <td>IM</td>
+          <td>Check schedule with vet</td>
+        </tr>
+        <tr>
+          <td>4-5 Weeks Pre-Breeding</td>
+          <td>"5-Way" Vaccine (1st Dose)</td>
+          <td>Leptospirosis, Parvovirus, Erysipelas (LPE)</td>
+          <td>IM</td>
+          <td>Prevents reproductive failure, abortions, Diamond Skin Disease</td>
+        </tr>
+        <tr>
+          <td>2-3 Weeks Pre-Breeding</td>
+          <td>"5-Way" Vaccine (Booster)</td>
+          <td>Boosts immunity for LPE</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>4-5 Weeks Pre-Farrowing</td>
+          <td>Scours Vaccine (1st Dose)</td>
+          <td>Protects piglets via antibodies in colostrum</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>2-3 Weeks Pre-Farrowing</td>
+          <td>Scours Vaccine (Booster)</td>
+          <td>Maximizes antibodies in colostrum</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span>🐖 Sows (Active Breeding Females)</span>
+      <span>+</span>
+    </div>
+    <div class="section-content">
+      <p class="note">Maintain high immunity and pass protection to piglets.</p>
+      <table>
+        <tr>
+          <th>Age / Timing</th>
+          <th>Action</th>
+          <th>Purpose / Disease Prevented</th>
+          <th>Route</th>
+          <th>Key Notes</th>
+        </tr>
+        <tr>
+          <td>Every 6 Months</td>
+          <td>FMD Booster</td>
+          <td>Maintains herd immunity</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Annually</td>
+          <td>CSF Booster</td>
+          <td>Maintains herd immunity</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>2-3 Weeks Pre-Farrowing</td>
+          <td>Scours Vaccine (Booster)</td>
+          <td>Maintains antibodies in colostrum</td>
+          <td>IM</td>
+          <td>Example: LitterGuard</td>
+        </tr>
+        <tr>
+          <td>2-3 Weeks Pre-Farrowing</td>
+          <td>LPE Booster</td>
+          <td>Maintains reproductive health</td>
+          <td>IM</td>
+          <td>Example: FarrowSure</td>
+        </tr>
+        <tr>
+          <td>At Weaning</td>
+          <td>Deworming</td>
+          <td>Cleans out parasites</td>
+          <td>Oral / Feed</td>
+          <td>-</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span>🐖 Boars (Breeding Males)</span>
+      <span>+</span>
+    </div>
+    <div class="section-content">
+      <p class="note">Healthy boars protect the herd.</p>
+      <table>
+        <tr>
+          <th>Age / Timing</th>
+          <th>Action</th>
+          <th>Purpose / Disease Prevented</th>
+          <th>Route</th>
+          <th>Key Notes</th>
+        </tr>
+        <tr>
+          <td>Every 6 Months</td>
+          <td>LPE Booster</td>
+          <td>Prevents Leptospirosis, Parvovirus, Erysipelas</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Every 6 Months</td>
+          <td>FMD Booster</td>
+          <td>Maintains herd immunity</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Every 6 Months</td>
+          <td>Deworming</td>
+          <td>Prevents parasitic load</td>
+          <td>Oral / Feed</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Annually</td>
+          <td>CSF Booster</td>
+          <td>Maintains herd immunity</td>
+          <td>IM</td>
+          <td>-</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span>⚠️ Risk-Based / Optional Vaccines</span>
+      <span>+</span>
+    </div>
+    <div class="section-content">
+      <p class="note">Consult your vet for these optional vaccines.</p>
+      <table>
+        <tr>
+          <th>Vaccine</th>
+          <th>Disease Prevented</th>
+          <th>When to Use</th>
+        </tr>
+        <tr>
+          <td>PRRS</td>
+          <td>"Blue-Ear Pig Disease" – reproductive failure, respiratory illness</td>
+          <td>Only if disease is confirmed in herd or area</td>
+        </tr>
+        <tr>
+          <td>Atrophic Rhinitis (AR)</td>
+          <td>Destroys nasal passages, twisted snouts, poor growth</td>
+          <td>Vaccinate sows pre-farrowing and piglets if problem exists</td>
+        </tr>
+        <tr>
+          <td>Swine Influenza (SIV)</td>
+          <td>High fever, coughing, pneumonia</td>
+          <td>Use if known recurring flu problem</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <footer>©️ 2025 Pig Farm Management System</footer>
+
+  <script>
+    function toggleSection(header) {
+      const content = header.nextElementSibling;
+      const icon = header.querySelector('span:last-child');
+      if (content.style.display === "block") {
+        content.style.display = "none";
+        icon.textContent = "+";
+      } else {
+        content.style.display = "block";
+        icon.textContent = "-";
+      }
+    }
+  </script>
+</body>
+</html>

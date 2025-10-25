@@ -52,7 +52,7 @@
         <a href="heatmap.html" target="_blank" class="btn" data-lang="open">Open Heatmap</a>
       </div>
 
-      <!-- Alerts -->
+      <!-- training -->
       <div class="card">
   <h3 data-lang="training">Training videos and guides</h3>
   <p data-lang="add">Admin can add Training videos and guide</p>
@@ -61,11 +61,11 @@
   <input type="file" id="videoUpload" accept="video/mp4" multiple>
 
   <!-- Upload button -->
-  <button class="cta" onclick="uploadVideo()">Upload Videos</button>
+  <button class="btn" onclick="uploadVideo()">Upload Videos</button>
 
   <!-- Link to view uploaded videos page -->
   <button class="cta">
-    <a href="training.html" target="_blank" style="color:black; text-decoration:none;">View Uploaded Videos</a>
+    <a href="training.html" target="_blank" class="btn">View Uploaded Videos</a>
   </button>
 
   <p class="hint" style="font-size:0.85rem; color:var(--muted);">
@@ -85,8 +85,6 @@
   <p>View all farmer risk assessments</p>
   <button class="mini btn" onclick="window.location.href='reports.html'">Open Reports</button>
 </div>
-
-
       <!-- Government Schemes Section -->
       <div class="card">
         <h3 data-lang="schemes">Government Schemes Setup</h3>
@@ -102,6 +100,14 @@
           <a href="adminSchemes.html" class="btn" target="_blank">View All Schemes</a>
         </p>
       </div>
+      <!-- Vaccination Schedule -->
+<div class="card">
+  <h3 data-lang="vaccination">Vaccination Schedule</h3>
+  <p data-lang="vaccHint">View or manage vaccination schedules for farmers (Pig & Poultry)</p>
+  <a href="vaccination_admin.html" target="_blank" class="btn" style="text-decoration:none;" data-lang="openVacc">
+    Open Vaccination Schedule
+  </a>
+</div>
 <!-- NEW Medical Admin Section -->
       <div class="card">
         <h3>Medical Management</h3>
@@ -112,9 +118,22 @@
           </a>
         </p>
       </div>
+<!-- Disease Alert Management -->
+<div class="card">
+  <h3>Disease Alerts</h3>
+  <p>Send disease outbreak alerts to all farmers</p>
 
+  <p style="margin-top:10px;">
+    <a href="sendAlert.html" class="btn" target="_blank">🚨 Send New Alert</a>
+  </p>
+
+  <p style="font-size:0.85rem;color:var(--muted);">
+    
+  </p>
+</div>
     </section>
   </main>
+  
   <!-- Script to update pending badge -->
   <script>
     async function updatePendingBadge() {
@@ -140,6 +159,7 @@
     updatePendingBadge();
     setInterval(updatePendingBadge, 10000);
   </script>
+
 
 </body>
 </html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poultry Vaccination Schedule | Smart Farm Solution</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f6f9fc, #e3f2fd);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    /* Navigation Bar */
+    nav {
+      position: sticky;
+      top: 0;
+      background: #1976d2;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    nav h2 {
+      font-size: 1.3rem;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    nav a {
+      background: white;
+      color: #1976d2;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+
+    nav a:hover {
+      background: #1565c0;
+      color: white;
+    }
+
+    header {
+      text-align: center;
+      margin-top: 20px;
+      color: #1976d2;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+      background: #1976d2;
+      color: white;
+      padding: 15px 20px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header::after {
+      content: "▼";
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .card-header.active::after {
+      transform: rotate(-180deg);
+    }
+
+    .card-content {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: #64b5f6;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #e3f2fd;
+    }
+
+    .export-btn {
+      margin-top: 15px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .export-btn:hover {
+      background: #0d47a1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 0.9rem;
+      background: #f1f1f1;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <h2>🐔 Poultry Vaccination Guide</h2>
+    <a href="vaccinationSelect.html">← Back to Dashboard</a>
+  </nav>
+
+
+
+  <div class="container">
+
+    <!-- Broilers Section -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">Broilers (Meat Chickens)</div>
+      <div class="card-content">
+        <table>
+          <tr><th>Age</th><th>Vaccine</th><th>Purpose / Disease Prevented</th><th>Route</th><th>Notes</th></tr>
+          <tr><td>Day 1 (Hatchery)</td><td>Marek's Disease</td><td>Tumors, Paralysis, Immune Suppression</td><td>SC Injection</td><td>Mandatory. Given at hatchery.</td></tr>
+          <tr><td>Day 1 (Hatchery)</td><td>ND + IB (Live)</td><td>Newcastle + Bronchitis</td><td>Coarse Spray</td><td>Mandatory. Primes immunity.</td></tr>
+          <tr><td>Day 1</td><td>Coccidiosis Vaccine</td><td>Coccidiosis</td><td>Spray / Gel</td><td>Risk-Based. Used instead of medicated feed.</td></tr>
+          <tr><td>Day 5-7</td><td>ND + IB (Booster)</td><td>Booster</td><td>Eye Drop / DW</td><td>Mandatory. Eye drop preferred.</td></tr>
+          <tr><td>Day 12-14</td><td>IBD (Intermediate)</td><td>Infectious Bursal Disease</td><td>Eye Drop / DW</td><td>Mandatory. Core broiler vaccine.</td></tr>
+          <tr><td>Day 18-21</td><td>IBD (Booster)</td><td>Gumboro Booster</td><td>DW</td><td>Mandatory. Ensures full protection.</td></tr>
+          <tr><td>Day 24-28</td><td>ND (Lasota)</td><td>ND Booster</td><td>DW</td><td>Mandatory. Last vaccine before market.</td></tr>
+        </table>
+        
+      </div>
+    </div>
+
+    <!-- Layers Section -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">Layers (Egg-Laying Hens)</div>
+      <div class="card-content">
+        <table>
+          <tr><th>Age</th><th>Vaccine</th><th>Purpose / Disease Prevented</th><th>Route</th><th>Notes</th></tr>
+          <tr><td>Day 1</td><td>Marek's Disease</td><td>Tumors, Paralysis</td><td>SC Injection</td><td>Mandatory.</td></tr>
+          <tr><td>Day 5-7</td><td>ND + IB</td><td>Respiratory Immunity</td><td>Eye Drop</td><td>Mandatory.</td></tr>
+          <tr><td>Day 12-14</td><td>IBD (1st Dose)</td><td>Infectious Bursal Disease</td><td>DW</td><td>Mandatory.</td></tr>
+          <tr><td>Day 24-28</td><td>IBD (2nd Dose)</td><td>Booster</td><td>DW</td><td>Mandatory.</td></tr>
+          <tr><td>6-7 Weeks</td><td>Fowl Pox</td><td>Skin Disease</td><td>Wing Web</td><td>Mandatory.</td></tr>
+          <tr><td>8-9 Weeks</td><td>ND (R2B)</td><td>Strong ND Immunity</td><td>IM / SC</td><td>Mandatory.</td></tr>
+          <tr><td>10-11 Weeks</td><td>Coryza (1st)</td><td>Facial Swelling, Drop in Eggs</td><td>IM / SC</td><td>Mandatory.</td></tr>
+          <tr><td>13-14 Weeks</td><td>Coryza (2nd)</td><td>Booster</td><td>IM / SC</td><td>Mandatory.</td></tr>
+          <tr><td>16-18 Weeks</td><td>Killed Vaccine</td><td>ND + IB + EDS</td><td>IM / SC</td><td>Pre-Lay protection.</td></tr>
+          <tr><td>During Lay</td><td>ND (Lasota)</td><td>Newcastle Booster</td><td>DW</td><td>Risk-Based.</td></tr>
+        </table>
+        
+      </div>
+    </div>
+
+    <!-- Risk-Based Section -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">Risk-Based / Alert Vaccines</div>
+      <div class="card-content">
+        <table>
+          <tr><th>Alert-Based Vaccine</th><th>Alert / Risk Factor Trigger</th></tr>
+          <tr><td><b>Fowl Pox</b></td><td>Regional outbreak or mosquito-prone open housing.</td></tr>
+          <tr><td><b>Infectious Laryngotracheitis (ILT)</b></td><td>Emergency vaccine. Used only during confirmed local outbreaks.</td></tr>
+          <tr><td><b>Infectious Coryza</b></td><td>Farm with past infection or nearby cases must vaccinate all future flocks.</td></tr>
+          <tr><td><b>Avian Influenza (AI / Bird Flu)</b></td><td>Used only under government authorization during confirmed outbreaks (e.g., H5N1).</td></tr>
+          <tr><td><b>Salmonella</b></td><td>Used by commercial egg producers to reduce food-chain contamination.</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>©️ 2025 Smart Farm Solution | Poultry Health Management</footer>
+
+  <script>
+    function toggleCard(header) {
+      const content = header.nextElementSibling;
+      const isActive = header.classList.contains("active");
+
+      // Collapse all other cards
+      document.querySelectorAll(".card-header").forEach(h => {
+        h.classList.remove("active");
+        h.nextElementSibling.style.display = "none";
+      });
+
+      // Toggle selected one
+      if (!isActive) {
+        header.classList.add("active");
+        content.style.display = "block";
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -927,3 +927,169 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (document.getElementById('bookingsTable')) fetchMedicalData();
 });
+function updateAlertBadge() {
+    let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+    let unseen = alerts.filter(a => !a.seen).length;
+
+    const badge = document.getElementById('alertBadge');
+    if (badge) {
+        if (unseen > 0) {
+            badge.style.display = 'inline-block';
+            badge.textContent = unseen;
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// Initial call and refresh every 5 seconds
+updateAlertBadge();
+setInterval(updateAlertBadge, 5000);
+
+function sendAlert() {
+    const msg = document.getElementById('alertMessage').value.trim();
+    if (!msg) {
+        alert("Please enter a message!");
+        return;
+    }
+
+    // Get existing alerts from localStorage
+    let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+
+    // Add new alert
+    alerts.push({
+        message: msg,
+        timestamp: new Date().toLocaleString(),
+        seen: false
+    });
+
+    // Save back to localStorage
+    localStorage.setItem('alerts', JSON.stringify(alerts));
+
+    // Clear textarea
+    document.getElementById('alertMessage').value = "";
+
+    // Update badge immediately
+    updateAlertBadge();
+
+    // Show confirmation to admin
+    const statusMsg = document.getElementById('statusMsg');
+    if (statusMsg) statusMsg.textContent = "Alert sent successfully!";
+}
+// Function to display existing alerts
+function loadExistingAlerts() {
+    const container = document.getElementById('existingAlerts');
+    let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+    container.innerHTML = '';
+
+    if (alerts.length === 0) {
+        container.innerHTML = '<p style="color:#555;">No alerts sent yet.</p>';
+        return;
+    }
+
+    alerts.forEach((alert, index) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.background = '#f9f9f9';
+        div.style.padding = '8px 12px';
+        div.style.marginTop = '8px';
+        div.style.borderRadius = '8px';
+        div.style.boxShadow = '0 1px 5px rgba(0,0,0,0.05)';
+
+        div.innerHTML = `
+            <span>${alert.message} <small style="color:#999;">(${alert.timestamp})</small></span>
+            <button style="
+                background:#e53935; color:#fff; border:none; padding:4px 10px; border-radius:5px; cursor:pointer;
+            ">Delete</button>
+        `;
+
+        const deleteBtn = div.querySelector('button');
+        deleteBtn.onclick = () => {
+            alerts.splice(index, 1); // Remove alert from array
+            localStorage.setItem('alerts', JSON.stringify(alerts)); // Save updated alerts
+            loadExistingAlerts(); // Refresh list
+            updateAlertBadge(); // Update badge
+        };
+
+        container.appendChild(div);
+    });
+}
+
+// Run on page load
+loadExistingAlerts();
+// ------------------ ADD VACCINATION (ADMIN) ------------------
+function addVaccinationRecord() {
+  const farmerId = document.getElementById('farmerId').value.trim();
+  const animal = document.getElementById('animalType').value;
+  const ageStage = document.getElementById('ageStage').value.trim();
+  const vaccine = document.getElementById('vaccineName').value.trim();
+  const disease = document.getElementById('disease').value.trim();
+  const dosage = document.getElementById('dosage').value.trim();
+  const date = document.getElementById('vaccinationDate').value;
+  const nextDate = document.getElementById('nextDate').value;
+  const status = document.getElementById('status').value;
+  const remarks = document.getElementById('remarks').value.trim();
+
+  if (!farmerId) return alert("Please select a farmer!");
+
+  const newRecord = {
+    farmerId,
+    animal,
+    ageStage,
+    vaccine,
+    disease,
+    dosage,
+    date,
+    nextDate,
+    status,
+    remarks
+  };
+
+  allVaccinationData.push(newRecord);
+  localStorage.setItem('allVaccinationData', JSON.stringify(allVaccinationData));
+  alert('Vaccination record added successfully!');
+  document.getElementById('vaccinationForm').reset();
+}
+
+// ------------------ FETCH FARMER DATA (FARMER PAGE) ------------------
+function getFarmerRecords() {
+  const loggedInFarmerId = localStorage.getItem('loggedInFarmerId');
+  const allData = JSON.parse(localStorage.getItem('allVaccinationData')) || [];
+  return allData.filter(item => String(item.farmerId) === String(loggedInFarmerId));
+}
+
+// ------------------ RENDER FARMER TABLE ------------------
+function renderFarmerVaccinationTable() {
+  const data = getFarmerRecords();
+  const tbody = document.getElementById('vaccinationBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  data.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.animal}</td>
+      <td>${item.ageStage}</td>
+      <td>${item.vaccine}</td>
+      <td>${item.disease}</td>
+      <td>${item.dosage}</td>
+      <td>${item.date}</td>
+      <td>${item.nextDate}</td>
+      <td style="color:${item.status === 'Done' ? '#4CAF50' : 'orange'};">${item.status}</td>
+      <td>${item.remarks || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ------------------ INIT ON PAGE LOAD ------------------
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+
+  // Auto-render farmer data if on farmer page
+  if (path.includes('vaccination_farmer.html')) {
+    renderFarmerVaccinationTable();
+  }
+});

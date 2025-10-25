@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vaccination Schedule | Admin Dashboard</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+body { background-color: #121212; color: #fff; font-family:"Segoe UI", Arial, sans-serif; margin:0; padding:0; }
+.page-header { background:#1e1e1e; color:#fff; padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; }
+.card { background-color:#1c1c1c; color:#fff; border:1px solid #333; border-radius:10px; padding:1.2rem; box-shadow:0 0 10px rgba(255,255,255,0.05); margin-bottom:1rem; }
+input, select { background-color:#2b2b2b; color:#fff; border:1px solid #555; border-radius:6px; padding:0.6rem; width:100%; margin-top:0.2rem; }
+input::placeholder { color:#aaa; }
+label { margin-top:0.5rem; font-weight:600; color:#ddd; display:block; }
+.cta { background-color:#4CAF50; color:#fff; border:none; padding:0.7rem 1rem; border-radius:6px; cursor:pointer; margin-top:0.8rem; font-weight:600; }
+.cta:hover { background-color:#45a049; }
+table { width:100%; border-collapse:collapse; margin-top:1rem; }
+th, td { border:1px solid #444; padding:0.6rem; text-align:center; color:#fff; }
+thead { background:#2c2c2c; font-weight:700; }
+tbody tr:nth-child(even){ background-color:#222; }
+tbody tr:hover { background-color:#333; }
+strong { color:#4CAF50; }
+.small { background:#333; color:#fff; border:none; padding:0.5rem 1rem; border-radius:5px; cursor:pointer; }
+.small:hover { opacity:0.85; }
+</style>
+</head>
+<body>
+<header class="page-header">
+<h2>💉 Vaccination Schedule - Admin</h2>
+<div>
+<button class="small" onclick="goBack()">⬅ Back</button>
+</div>
+</header>
+
+<main style="padding:1rem;">
+
+<!-- OVERVIEW -->
+<div class="card">
+<h3>📋 Overview</h3>
+<p>Track all vaccination activities.</p>
+<div style="margin-top:1rem; line-height:1.8;">
+<p>🐖 Total Pig Vaccines: <strong id="pigCount">0</strong></p>
+<p>🐔 Total Poultry Vaccines: <strong id="poultryCount">0</strong></p>
+<p>⏳ Upcoming Vaccinations: <strong id="upcomingCount">0</strong></p>
+<p>✅ Completed Vaccinations: <strong id="completedCount">0</strong></p>
+</div>
+<div style="margin-top:1rem; padding:0.8rem 1rem; background:#2b2b2b; border-left:5px solid #4CAF50; border-radius:6px;">
+🕐 <strong>Next Due:</strong> <span id="nextVaccine">No upcoming schedule</span>
+</div>
+</div>
+
+<!-- ADD VACCINATION FORM -->
+<div class="card">
+<h3>➕ Add Vaccination Schedule</h3>
+<form id="vaccinationForm" onsubmit="event.preventDefault(); addVaccination();" style="display:flex; flex-direction:column; gap:0.6rem;">
+
+<label>Animal Type:</label>
+<select id="animalType">
+<option value="Pig">Pig</option>
+<option value="Poultry">Poultry</option>
+</select>
+
+<label>Age / Stage:</label>
+<input type="text" id="ageStage" placeholder="e.g., 3 weeks" />
+
+<label>Vaccine Name:</label>
+<input type="text" id="vaccineName" placeholder="e.g., Swine Fever Vaccine" />
+
+<label>Disease Prevented:</label>
+<input type="text" id="disease" placeholder="e.g., Swine Fever" />
+
+<label>Dosage:</label>
+<input type="text" id="dosage" placeholder="e.g., 2 ml IM" />
+
+<label>Date of Vaccination:</label>
+<input type="date" id="vaccinationDate" />
+
+<label>Next Due Date:</label>
+<input type="date" id="nextDate" />
+
+<label>Status:</label>
+<select id="status">
+<option value="Pending">Pending</option>
+<option value="Done">Done</option>
+</select>
+
+<label>Remarks (optional):</label>
+<input type="text" id="remarks" placeholder="Extra notes" />
+
+<button type="submit" class="cta">Add Schedule</button>
+</form>
+</div>
+
+<!-- RECORDS TABLE -->
+<div class="card">
+<h3>📄 Vaccination Records</h3>
+<table>
+<thead>
+<tr>
+<th>Animal</th>
+<th>Age/Stage</th>
+<th>Vaccine</th>
+<th>Disease</th>
+<th>Dosage</th>
+<th>Date</th>
+<th>Next Due</th>
+<th>Status</th>
+<th>Remarks</th>
+</tr>
+</thead>
+<tbody id="vaccinationBody"></tbody>
+</table>
+</div>
+
+</main>
+
+<script>
+const vaccinationBody = document.getElementById('vaccinationBody');
+
+function addVaccination() {
+const animal = document.getElementById('animalType').value;
+const ageStage = document.getElementById('ageStage').value.trim();
+const vaccine = document.getElementById('vaccineName').value.trim();
+const disease = document.getElementById('disease').value.trim();
+const dosage = document.getElementById('dosage').value.trim();
+const date = document.getElementById('vaccinationDate').value;
+const nextDate = document.getElementById('nextDate').value;
+const status = document.getElementById('status').value;
+const remarks = document.getElementById('remarks').value.trim();
+
+if(!animal || !ageStage || !vaccine || !disease || !dosage || !date){
+alert('Please fill all required fields!');
+return;
+}
+
+const allData = JSON.parse(localStorage.getItem('allVaccinationData')) || [];
+allData.push({animal, ageStage, vaccine, disease, dosage, date, nextDate, status, remarks});
+localStorage.setItem('allVaccinationData', JSON.stringify(allData));
+
+renderTable();
+document.getElementById('vaccinationForm').reset();
+}
+
+function updateStatus(index, newStatus){
+const allData = JSON.parse(localStorage.getItem('allVaccinationData')) || [];
+allData[index].status = newStatus;
+localStorage.setItem('allVaccinationData', JSON.stringify(allData));
+renderTable();
+}
+
+function renderTable(){
+const allData = JSON.parse(localStorage.getItem('allVaccinationData')) || [];
+vaccinationBody.innerHTML = '';
+let pigCount=0, poultryCount=0, upcoming=0, completed=0;
+let nextDue = null;
+
+allData.forEach((item,index)=>{
+const tr = document.createElement('tr');
+tr.innerHTML = `
+<td>${item.animal}</td>
+<td>${item.ageStage}</td>
+<td>${item.vaccine}</td>
+<td>${item.disease}</td>
+<td>${item.dosage}</td>
+<td>${item.date}</td>
+<td>${item.nextDate||'-'}</td>
+<td>
+<select onchange="updateStatus(${index}, this.value)">
+<option value="Pending" ${item.status==='Pending'?'selected':''}>Pending</option>
+<option value="Done" ${item.status==='Done'?'selected':''}>Done</option>
+</select>
+</td>
+<td>${item.remarks||'-'}</td>
+`;
+vaccinationBody.appendChild(tr);
+
+if(item.animal==='Pig') pigCount++;
+if(item.animal==='Poultry') poultryCount++;
+if(item.status==='Pending') upcoming++;
+if(item.status==='Done') completed++;
+if(item.nextDate && (!nextDue || new Date(item.nextDate) < new Date(nextDue))) nextDue=item.nextDate;
+});
+
+document.getElementById('pigCount').textContent=pigCount;
+document.getElementById('poultryCount').textContent=poultryCount;
+document.getElementById('upcomingCount').textContent=upcoming;
+document.getElementById('completedCount').textContent=completed;
+document.getElementById('nextVaccine').textContent=nextDue||'No upcoming schedule';
+}
+
+function goBack(){ window.history.back(); }
+
+// Initial render
+renderTable();
+setInterval(renderTable,5000);
+</script>
+</body>
+</html>

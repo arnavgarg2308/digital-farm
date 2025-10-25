@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Send Disease Alert</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f7f8fa;
+      color: #222;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .alert-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+      padding: 30px 25px;
+      text-align: center;
+      border-top: 6px solid #e53935;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.6rem;
+      color: #d32f2f;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 130px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      resize: none;
+      font-size: 1rem;
+      margin-top: 12px;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    textarea:focus {
+      border-color: #e53935;
+      box-shadow: 0 0 4px rgba(229, 57, 53, 0.4);
+      outline: none;
+    }
+
+    .btn {
+      background: #e53935;
+      color: #fff;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s, transform 0.2s;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: #c62828;
+      transform: translateY(-2px);
+    }
+
+    #alertStatus {
+      margin-top: 15px;
+      font-weight: 600;
+      color: green;
+      font-size: 0.95rem;
+    }
+
+    /* Existing alerts styles */
+    #existingAlerts {
+      margin-top: 25px;
+      text-align: left;
+    }
+
+    .alert-card {
+      background: #f9f9f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+
+    .alert-card span {
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .alert-card small {
+      color: #999;
+      font-size: 0.85rem;
+      margin-left: 6px;
+    }
+
+    .delete-btn {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: #c62828;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="alert-container">
+    <h2>🚨 Send Disease Alert</h2>
+    <p>Type your message below to send an urgent alert to all farmers.</p>
+
+    <textarea id="alertMessage" placeholder="Enter disease alert message..."></textarea>
+
+    <button class="btn" onclick="sendAlert()">Send Alert</button>
+
+    <p id="alertStatus"></p>
+
+    <h3 style="margin-top:25px; color:#d32f2f;">📋 Existing Alerts</h3>
+    <div id="existingAlerts"></div>
+  </div>
+
+  <script>
+    // Send alert function
+    function sendAlert() {
+      const messageInput = document.getElementById('alertMessage');
+      const status = document.getElementById('alertStatus');
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        status.textContent = 'Please enter a message before sending.';
+        status.style.color = 'red';
+        return;
+      }
+
+      const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+      const timestamp = new Date().toLocaleString();
+      alerts.push({ message, timestamp, seen: false });
+      localStorage.setItem('alerts', JSON.stringify(alerts));
+
+      messageInput.value = '';
+      status.textContent = 'Alert sent successfully!';
+      status.style.color = 'green';
+
+      loadExistingAlerts();
+      if (window.opener) window.opener.updateAlertBadge();
+    }
+
+    // Load existing alerts
+    function loadExistingAlerts() {
+      const container = document.getElementById('existingAlerts');
+      let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+      container.innerHTML = '';
+
+      if (alerts.length === 0) {
+        container.innerHTML = '<p style="color:#555;">No alerts sent yet.</p>';
+        return;
+      }
+
+      alerts.forEach((alert, index) => {
+        const div = document.createElement('div');
+        div.className = 'alert-card';
+
+        div.innerHTML = `
+          <span>${alert.message} <small>(${alert.timestamp})</small></span>
+          <button class="delete-btn">Delete</button>
+        `;
+
+        const deleteBtn = div.querySelector('.delete-btn');
+        deleteBtn.onclick = () => {
+          alerts.splice(index, 1);
+          localStorage.setItem('alerts', JSON.stringify(alerts));
+          loadExistingAlerts();
+          if (window.opener) window.opener.updateAlertBadge();
+        };
+
+        container.appendChild(div);
+      });
+    }
+
+    // Initialize page
+    loadExistingAlerts();
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View Disease Alerts</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+  <style>
+    body { 
+      font-family: "Segoe UI", Arial, sans-serif; 
+      padding: 30px; 
+      background: #f0f2f5; 
+      margin: 0;
+    }
+
+    h2 { 
+      color: #d32f2f; 
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+
+    #alertsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .alert-card {
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      border-left: 6px solid #e53935;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .alert-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .alert-card p {
+      margin: 8px 0;
+      font-size: 1rem;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .alert-card .date {
+      font-size: 0.85rem;
+      color: #666;
+      text-align: right;
+    }
+
+    /* No alerts message */
+    #alertsContainer p {
+      text-align: center;
+      font-size: 1rem;
+      color: #555;
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  <h2>📢 Disease Alerts</h2>
+  <div id="alertsContainer"></div>
+
+  <script>
+    function loadAlerts() {
+        let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+        const container = document.getElementById('alertsContainer');
+        container.innerHTML = '';
+
+        if (alerts.length === 0) {
+            container.innerHTML = '<p>No alerts yet.</p>';
+            return;
+        }
+
+        alerts.forEach((alert, index) => {
+            const div = document.createElement('div');
+            div.className = 'alert-card';
+            div.innerHTML = `
+                <p>${alert.message}</p>
+                <p class="date">Sent on: ${alert.timestamp}</p>
+            `;
+            container.appendChild(div);
+
+            // Mark alert as seen
+            alerts[index].seen = true;
+        });
+
+        // Save updated alerts back to localStorage
+        localStorage.setItem('alerts', JSON.stringify(alerts));
+
+        // Update badge on farmer dashboard
+        if (window.opener && window.opener.updateAlertBadge) {
+            window.opener.updateAlertBadge();
+        }
+    }
+
+    loadAlerts();
+  </script>
+</body>
+</html>

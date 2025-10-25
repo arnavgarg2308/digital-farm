@@ -1,131 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pig Feeding Instructions</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9;
-            color: #444;
-            line-height: 1.6;
-            margin: 0;
-            padding: 40px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        h2 {
-            font-size: 1.8em;
-            color: #34495e;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-            margin-top: 40px;
-        }
-        .feeding-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            text-align: left;
-        }
-        th, td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        th {
-            background-color: #f8f9fa;
-            color: #555;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-        tr:hover {
-            background-color: #f1f7f9;
-        }
-        .do-not {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .important {
-            color: #3498db;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pig Feeding & Breeding Schedule</title>
+<style>
+  /* -------------------- Base -------------------- */
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #e0f7f1; /* soft blue-green background */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #00695c; /* teal heading */
+    margin-bottom: 30px;
+  }
+
+  /* -------------------- Collapsible Sections -------------------- */
+  details {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+  }
+
+  details[open] {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  }
+
+  summary {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #004d40; /* dark teal */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  summary::marker {
+    content: "";
+  }
+
+  summary::before {
+    content: "▶️ ";
+    transition: transform 0.3s;
+  }
+
+  details[open] summary::before {
+    transform: rotate(90deg);
+  }
+
+  /* -------------------- Tables -------------------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.95rem;
+  }
+
+  th, td {
+    border: 1px solid #b2dfdb; /* soft border */
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: #26a69a; /* teal header */
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background: #e0f2f1; /* soft alternate row */
+  }
+
+  tr:hover {
+    background: #b2dfdb; /* hover effect */
+  }
+
+  /* -------------------- Notes / Warnings -------------------- */
+  .note {
+    background: #b2dfdb; /* teal highlight */
+    border-left: 4px solid #00897b;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+  }
+
+  /* -------------------- Table Head Sticky -------------------- */
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+</style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🐖 Pig Feeding Instructions</h1>
-        
-        <h2>Grower Pigs (25-75 kg)</h2>
-        <table class="feeding-table">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Feed Type</th>
-                    <th>Quantity (per pig)</th>
-                    <th>Instructions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>7:00 AM</td>
-                    <td>Grower Pellets</td>
-                    <td>1.2 - 1.5 kg</td>
-                    <td>Feed at the same time each day. Ensure troughs are clean.</td>
-                </tr>
-                <tr>
-                    <td>1:00 PM</td>
-                    <td>Grower Pellets</td>
-                    <td>1.2 - 1.5 kg</td>
-                    <td><span class="important">DO:</span> Provide fresh, cool water. <span class="do-not">DO NOT:</span> Feed kitchen scraps or uncooked food.</td>
-                </tr>
-                <tr>
-                    <td>7:00 PM</td>
-                    <td>Grower Pellets</td>
-                    <td>1.2 - 1.5 kg</td>
-                    <td><span class="important">DO:</span> Monitor feed intake. <span class="do-not">DO NOT:</span> Leave uneaten food overnight to prevent spoilage.</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <h2>Breeding Sows</h2>
-        <table class="feeding-table">
-            <thead>
-                <tr>
-                    <th>Stage</th>
-                    <th>Feed Type</th>
-                    <th>Quantity (per sow)</th>
-                    <th>Instructions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Gestation (Pregnancy)</td>
-                    <td>Gestation Feed</td>
-                    <td>2.0 - 2.5 kg</td>
-                    <td><span class="important">DO:</span> Maintain a lean body condition. <span class="do-not">DO NOT:</span> Overfeed to prevent farrowing issues.</td>
-                </tr>
-                <tr>
-                    <td>Lactation (Nursing)</td>
-                    <td>Lactation Feed</td>
-                    <td>6.0 - 8.0 kg</td>
-                    <td><span class="important">DO:</span> Increase feed quantity gradually. <span class="do-not">DO NOT:</span> Make sudden changes to the diet.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<h1>🐷 Pig Feeding & Breeding Schedules</h1>
+
+<!-- Feeding Schedule -->
+<details open>
+  <summary>🍽️ Pig Feeding Schedule</summary>
+  <table>
+    <thead>
+      <tr>
+        <th>Category / Life Stage</th>
+        <th>Age Range</th>
+        <th>Typical Weight</th>
+        <th>Feed Type</th>
+        <th>Daily Feed per Pig</th>
+        <th>Feeding Strategy & Key Goals</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Newborn Pig (Baby Pig)</td>
+        <td>Day 1 – 3</td>
+        <td>1.5 – 2 kg</td>
+        <td>Colostrum (Sow's Milk)</td>
+        <td>Varies (nursing)</td>
+        <td>Critical — must nurse within first 6–12 hours for immunity. Goal: absorb antibodies to survive.</td>
+      </tr>
+      <tr>
+        <td>Suckling Piglet</td>
+        <td>Day 3 – Weaning</td>
+        <td>2 – 6 kg</td>
+        <td>Creep Feed (20–24% Protein)</td>
+        <td>0.25 – 0.75 kg</td>
+        <td>Introduce gradually; support gut health and transition to solid feed.</td>
+      </tr>
+      <tr>
+        <td>Nursery / Weaner Pig</td>
+        <td>Weaning – 10 weeks</td>
+        <td>6 – 25 kg</td>
+        <td>Starter Feed (18–22% Protein)</td>
+        <td>0.5 – 1.0 kg</td>
+        <td>Feed ad libitum; reduce stress and promote growth uniformity.</td>
+      </tr>
+      <tr>
+        <td>Growing Pig</td>
+        <td>10 – 16 weeks</td>
+        <td>25 – 70 kg</td>
+        <td>Grower Feed (16–18% Protein)</td>
+        <td>1.5 – 2.5 kg</td>
+        <td>Maximize lean muscle gain; feed freely.</td>
+      </tr>
+      <tr>
+        <td>Finishing Pig</td>
+        <td>16 – 24 weeks</td>
+        <td>70 – 120 kg</td>
+        <td>Finisher Feed (14–16% Protein)</td>
+        <td>2.5 – 3.5 kg</td>
+        <td>High-energy feed; goal: reach market weight with proper backfat.</td>
+      </tr>
+      <tr>
+        <td>Gilt (Replacement Female)</td>
+        <td>6 – 8 months</td>
+        <td>100 – 140 kg</td>
+        <td>Gilt Developer</td>
+        <td>2.0 – 3.0 kg</td>
+        <td>Restricted feeding; promote bone and reproductive health.</td>
+      </tr>
+      <tr>
+        <td>Gestating Sow</td>
+        <td>Full gestation (114 days)</td>
+        <td>Varies</td>
+        <td>Gestation Feed</td>
+        <td>1.8 – 2.5 kg</td>
+        <td>Restricted feed; maintain condition and fetal growth.</td>
+      </tr>
+      <tr>
+        <td>Lactating Sow</td>
+        <td>Farrowing – Weaning</td>
+        <td>Varies</td>
+        <td>Lactation Feed (16–18% Protein)</td>
+        <td>5.0 – 9.0 kg</td>
+        <td>High intake needed for milk production.</td>
+      </tr>
+      <tr>
+        <td>Sow (Post-Litter Loss)</td>
+        <td>After piglet death</td>
+        <td>Varies</td>
+        <td>Gestation Feed</td>
+        <td>2.0 – 2.5 kg</td>
+        <td>Switch to restricted feed to stop milk production and restore energy.</td>
+      </tr>
+      <tr>
+        <td>Working Boar</td>
+        <td>Adult</td>
+        <td>Varies</td>
+        <td>Boar Feed (14–16% Protein)</td>
+        <td>2.0 – 3.0 kg</td>
+        <td>Maintain libido and sperm quality; avoid overfeeding.</td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+
+<!-- Breeding Schedule -->
+<details>
+  <summary>🐖 Pig Breeding Schedule</summary>
+  <table>
+    <thead>
+      <tr>
+        <th>Female Pig Breed (Dam)</th>
+        <th>Male Pig Breed (Sire)</th>
+        <th>Offspring Breed</th>
+        <th>Weakness(es)</th>
+        <th>Strength(s)</th>
+        <th>Notes / Safety Measures</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Yorkshire</td>
+        <td>Landrace</td>
+        <td>F1 Gilt (York-Landrace)</td>
+        <td>Not ideal for meat; pale skin sunburns easily</td>
+        <td>Superior mothering, large litters, docile</td>
+        <td>Used to produce breeding females for market pigs.</td>
+      </tr>
+      <tr>
+        <td>F1 (York-Landrace)</td>
+        <td>Duroc</td>
+        <td>3-Way Cross (YLD)</td>
+        <td>Higher backfat</td>
+        <td>Excellent meat quality, fast growth, hardy</td>
+        <td>Global standard for market pigs.</td>
+      </tr>
+      <tr>
+        <td>F1 (York-Landrace)</td>
+        <td>Hampshire</td>
+        <td>3-Way Cross (YLH)</td>
+        <td>Low marbling, feisty nature</td>
+        <td>Lean carcass, high feed efficiency</td>
+        <td>Handle gently; easily stressed pigs.</td>
+      </tr>
+      <tr>
+        <td>F1 (York-Landrace)</td>
+        <td>Pietrain</td>
+        <td>3-Way Cross (YLP)</td>
+        <td>High stress, poor meat quality</td>
+        <td>Max muscle, high lean yield</td>
+        <td>Only use Halothane-negative sires (NN).</td>
+      </tr>
+      <tr>
+        <td>F1 (York-Landrace)</td>
+        <td>Berkshire</td>
+        <td>3-Way Cross (YLB)</td>
+        <td>Slower growth</td>
+        <td>Excellent meat flavor</td>
+        <td>Premium pork ideal for small markets.</td>
+      </tr>
+      <tr>
+        <td>Duroc</td>
+        <td>Duroc</td>
+        <td>Purebred Duroc</td>
+        <td>Small litters, less maternal</td>
+        <td>Genetically pure, superior meat</td>
+        <td>Used for creating terminal sires.</td>
+      </tr>
+      <tr>
+        <td>Yorkshire</td>
+        <td>Yorkshire</td>
+        <td>Purebred Yorkshire</td>
+        <td>No hybrid vigor</td>
+        <td>Predictable maternal traits</td>
+        <td>Used for breeding base genetics.</td>
+      </tr>
+      <tr>
+        <td>Berkshire</td>
+        <td>Duroc</td>
+        <td>"Duro-Berk"</td>
+        <td>Slow growth, small litters</td>
+        <td>Excellent marbling and flavor</td>
+        <td>For gourmet or pasture pork markets.</td>
+      </tr>
+      <tr>
+        <td>Tamworth</td>
+        <td>Berkshire</td>
+        <td>Bacon-Marbling Cross</td>
+        <td>Slow growth, smaller litters</td>
+        <td>Hardy, flavorful carcass</td>
+        <td>Ideal for outdoor or forest systems.</td>
+      </tr>
+      <tr>
+        <td>F1 (Any Cross)</td>
+        <td>F1 (Any Cross)</td>
+        <td>F2 Pig</td>
+        <td>Unpredictable, inefficient</td>
+        <td>None</td>
+        <td><b>Warning:</b> Never breed crossbreds together.</td>
+      </tr>
+    </tbody>
+  </table>
+</details>
 
 </body>
 </html>

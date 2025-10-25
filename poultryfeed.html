@@ -1,137 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poultry Feeding Instructions</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9;
-            color: #444;
-            line-height: 1.6;
-            margin: 0;
-            padding: 40px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        h2 {
-            font-size: 1.8em;
-            color: #34495e;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-            margin-top: 40px;
-        }
-        .feeding-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            text-align: left;
-        }
-        th, td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        th {
-            background-color: #f8f9fa;
-            color: #555;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-        tr:hover {
-            background-color: #f1f7f9;
-        }
-        .do-not {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .important {
-            color: #3498db;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poultry Feed & Breeding Schedule</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #ffeef3; /* soft pinkish background */
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #f06292; /* medium pink */
+      color: white;
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    section {
+      background: white;
+      margin: 25px auto;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 1200px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #d81b60;
+      border-left: 5px solid #f48fb1;
+      padding-left: 10px;
+      font-size: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid #f8bbd0;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8bbd0;
+      color: #4a148c;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #fff0f5;
+    }
+
+    tr:hover {
+      background-color: #fde4ec;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #ad1457;
+      background: #fce4ec;
+      border-left: 4px solid #f06292;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🐓 Poultry Feeding Instructions</h1>
-        
-        <h2>Broiler Chickens</h2>
-        <table class="feeding-table">
-            <thead>
-                <tr>
-                    <th>Age (Weeks)</th>
-                    <th>Feed Type</th>
-                    <th>Quantity</th>
-                    <th>Instructions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>0-2 weeks</td>
-                    <td>Chick Starter</td>
-                    <td>Ad-libitum (freely)</td>
-                    <td><span class="important">DO:</span> Use a fine crumble feed. <span class="do-not">DO NOT:</span> Run out of feed or water, as this impacts growth.</td>
-                </tr>
-                <tr>
-                    <td>2-4 weeks</td>
-                    <td>Grower Pellets</td>
-                    <td>Ad-libitum</td>
-                    <td><span class="important">DO:</span> Transition to a grower diet gradually over a few days. <span class="do-not">DO NOT:</span> Feed whole grains at this stage.</td>
-                </tr>
-                <tr>
-                    <td>4+ weeks</td>
-                    <td>Finisher Pellets</td>
-                    <td>Ad-libitum</td>
-                    <td><span class="important">DO:</span> Reduce protein slightly. <span class="do-not">DO NOT:</span> Feed raw or spoiled food.</td>
-                </tr>
-            </tbody>
-        </table>
+  <header>🐔 Poultry Feed & Breeding Schedule</header>
 
-        <h2>Laying Hens</h2>
-        <table class="feeding-table">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Feed Type</th>
-                    <th>Quantity (per hen)</th>
-                    <th>Instructions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Morning</td>
-                    <td>Layer Mash/Pellets</td>
-                    <td>110 - 120 g</td>
-                    <td><span class="important">DO:</span> Provide most of the daily feed in the morning. <span class="do-not">DO NOT:</span> Feed kitchen scraps that are high in salt or sugar.</td>
-                </tr>
-                <tr>
-                    <td>Afternoon</td>
-                    <td>Grit or Oyster Shells</td>
-                    <td>As needed</td>
-                    <td><span class="important">DO:</span> Offer separately to aid digestion and produce strong eggshells.</td>
-                </tr>
-                <tr>
-                    <td>Evening</td>
-                    <td>Scratch Grains</td>
-                    <td>Small amount</td>
-                    <td><span class="important">DO:</span> Feed as a treat to keep them warm overnight. <span class="do-not">DO NOT:</span> Overfeed grains, as it can reduce egg production.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+  <section>
+    <h2>1️⃣ Poultry Feeding Schedule</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category / Life Stage</th>
+          <th>Age Range</th>
+          <th>Feed Name, Primary Grains, & Nutrients</th>
+          <th>Feed Form</th>
+          <th>Strategy & Key Goals</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Commercial Broiler</strong> (e.g., Cornish Cross)</td>
+          <td>0–7 days</td>
+          <td><b>Feed:</b> Pre-Starter (Medicated)<br>Finely ground Corn & Soybean Meal<br>23–24% Protein / 0.9% Ca</td>
+          <td>Crumble</td>
+          <td>Overcome hatching stress and establish gut health. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>7–21 days</td>
+          <td><b>Feed:</b> Broiler Starter (Medicated)<br>Corn & Soybean Meal<br>21–23% Protein / 0.85% Ca</td>
+          <td>Crumble / Mini-Pellet</td>
+          <td>Maximize frame and lean muscle development. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>21–35 days</td>
+          <td><b>Feed:</b> Broiler Grower<br>Higher corn %, lower soy %<br>19–21% Protein / 0.8% Ca</td>
+          <td>Pellet</td>
+          <td>Build muscle efficiently; pellets reduce feed waste. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>35–49 days</td>
+          <td><b>Feed:</b> Broiler Finisher (Unmedicated)<br>18–19% Protein / 0.75% Ca</td>
+          <td>Pellet</td>
+          <td>Maximize final weight. Must be unmedicated during 7–14 days withdrawal period before slaughter.</td>
+        </tr>
+
+        <tr>
+          <td><strong>Broiler Breeder</strong> (Parent Stock)</td>
+          <td>0–20 weeks</td>
+          <td><b>Feed:</b> Pullet Developer (Restricted)<br>Wheat/Barley or Corn-based<br>15–18% Protein</td>
+          <td>Mash / Crumble</td>
+          <td>Achieve proper sexual maturity weight. Feed <b>restricted</b> to prevent obesity.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>20+ weeks</td>
+          <td><b>Feed:</b> Breeder Layer (Restricted)<br>15–17% Protein / 3.5% Ca + Vitamins</td>
+          <td>Mash / Pellet</td>
+          <td>Support high fertility egg production. Keep feed <b>restricted</b> lifelong.</td>
+        </tr>
+
+        <tr>
+          <td><strong>Commercial Layer</strong> (e.g., White Leghorn, Isa Brown)</td>
+          <td>0–6 weeks</td>
+          <td><b>Feed:</b> Chick Starter (Medicated)<br>20–22% Protein / 1.0% Ca</td>
+          <td>Crumble</td>
+          <td>Develop bones & immune system. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>6–16 weeks</td>
+          <td><b>Feed:</b> Pullet Grower<br>15–16% Protein / 0.9% Ca</td>
+          <td>Crumble / Pellet</td>
+          <td>Build strong frame; prevent early lay. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>16–20 weeks</td>
+          <td><b>Feed:</b> Pre-Lay Ration<br>16–17% Protein / 2.0–2.5% Ca</td>
+          <td>Mash / Crumble</td>
+          <td>Build calcium reserves before first egg. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>20–50 weeks</td>
+          <td><b>Feed:</b> Layer Ration (Phase 1)<br>16–18% Protein / 4.0–5.0% Ca</td>
+          <td>Mash / Crumble</td>
+          <td>Maintain high egg production & shell strength.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>50+ weeks</td>
+          <td><b>Feed:</b> Layer Ration (Phase 2)<br>15–16% Protein / 4.5–5.5% Ca</td>
+          <td>Mash / Crumble</td>
+          <td>Maintain shell quality in older hens.</td>
+        </tr>
+
+        <tr>
+          <td><strong>Dual-Purpose / Heritage</strong> (e.g., Orpington, Wyandotte)</td>
+          <td>0–8 weeks</td>
+          <td><b>Feed:</b> Chick Starter<br>20% Protein / 1.0% Ca</td>
+          <td>Crumble</td>
+          <td>Healthy steady growth. Feed ad libitum.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>8–22 weeks</td>
+          <td><b>Feed:</b> Grower Ration (All-Flock)<br>15–16% Protein / 0.9% Ca</td>
+          <td>Pellet / Mash</td>
+          <td>Develop large dual-purpose frame; provide grit.</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>22+ weeks</td>
+          <td><b>Feed:</b> Layer Ration<br>16% Protein / 3.5–4.5% Ca</td>
+          <td>Pellet / Mash</td>
+          <td>Support eggs & body maintenance. Provide grit & oyster shell separately.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>2️⃣ Poultry Breeding Research Chart</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Female Line (Dam)</th>
+          <th>Male Line (Sire)</th>
+          <th>Chick Type (Offspring)</th>
+          <th>Weakness(es)</th>
+          <th>Strength(s)</th>
+          <th>Notes / Safety Measure</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cornish</td>
+          <td>White Plymouth Rock</td>
+          <td>Cornish Cross (Cobb 500, Ross 308)</td>
+          <td>Sterile; severe health issues if kept past 10 weeks.</td>
+          <td>Rapid growth; excellent meat yield.</td>
+          <td>Terminal hybrid. Must purchase new chicks each cycle.</td>
+        </tr>
+        <tr>
+          <td>White Leghorn A</td>
+          <td>White Leghorn B</td>
+          <td>White Leghorn Hybrid</td>
+          <td>Very light body; nervous behavior.</td>
+          <td>300+ white eggs/year; high efficiency.</td>
+          <td>Pure for commercial egg farms. Not for home breeding.</td>
+        </tr>
+        <tr>
+          <td>Rhode Island White</td>
+          <td>Rhode Island Red</td>
+          <td>Red Sex-Link (e.g., Isa Brown)</td>
+          <td>Low meat value; second generation loses color traits.</td>
+          <td>300+ brown eggs/year; docile temperament.</td>
+          <td>Color-sexed chicks (red females, white males).</td>
+        </tr>
+        <tr>
+          <td>Barred Rock</td>
+          <td>New Hampshire Red</td>
+          <td>Black Sex-Link (Black Star)</td>
+          <td>Slower growth, moderate egg yield.</td>
+          <td>Hardy, good foragers, all-round birds.</td>
+          <td>Ideal for self-sufficient homesteads.</td>
+        </tr>
+        <tr>
+          <td>Ameraucana</td>
+          <td>Marans</td>
+          <td>Olive Egger</td>
+          <td>Unpredictable second generation.</td>
+          <td>Beautiful olive-green eggs, hardy hybrid.</td>
+          <td>Maintain pure parent lines to reproduce reliably.</td>
+        </tr>
+        <tr>
+          <td>Bresse</td>
+          <td>Bresse</td>
+          <td>Purebred Bresse</td>
+          <td>Slow growth, high cost.</td>
+          <td>Premium gourmet meat quality.</td>
+          <td>Keep bloodlines pure for quality control.</td>
+        </tr>
+        <tr>
+          <td>Silkie</td>
+          <td>Silkie</td>
+          <td>Purebred Silkie</td>
+          <td>Low productivity, prone to disease.</td>
+          <td>Excellent brooders, unique ornamental value.</td>
+          <td>Use as natural incubators for other breeds’ eggs.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="note">
+    💡 <b>Note:</b> Always provide clean water, biosecurity, and disease prevention measures for all poultry breeds.
+  </div>
 
 </body>
 </html>

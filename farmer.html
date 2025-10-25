@@ -38,14 +38,15 @@
         <h3 data-lang="risk">Risk Assessment</h3>
         <p id="lastScore">—</p>
         <button class="mini" onclick="openFeature('risk'); event.stopPropagation()">
-          <a href="risk.html" target="_blank" data-lang="take">Take assessment</a>
+          <a href="risk.html" target="_blank" class="btn" data-lang="take">Take assessment</a>
+          
         </button>
       </div>
 
       <div class="card">
   <h3>🐄 Analyze Animal Health</h3>
   <p>Upload your animals photo to detect symptoms or diseases</p>
-  <button class="cta" onclick="openFeature('health')">
+  <button class="btn" onclick="openFeature('health')">
     Open Analyzer
   </button>
 </div>
@@ -56,7 +57,7 @@
         <h3 data-lang="training">🐖🐓 Training & Guides</h3>
         <p data-lang="trainingHint">Watch short videos for pig & poultry farming</p>
         <button class="cta">
-          <a href="training.html" target="_blank" style="text-decoration:none; color:black;">Open Training</a>
+          <a href="training.html" target="_blank" class="btn">Open Training</a>
         </button>
       </div>
 
@@ -64,7 +65,7 @@
       <div class="card" onclick="openFeature('schemes')">
         <h3 data-lang="schemes">Government Schemes</h3>
         <p data-lang="govDesc">View latest schemes available for your farm type.</p>
-        <a href="allSchemes.html" class="btn" id="govSchemesBtn" target="_blank" data-lang="view">View Schemes</a>
+        <a href="allSchemes.html" class="btn"  target="_blank" data-lang="view">View Schemes</a>
       </div>
 
       <!-- Loan Application -->
@@ -78,18 +79,24 @@
         <h3 data-lang="session">Book Session</h3>
         <p data-lang="sessionHint">Book paid learning sessions</p>
       </div>
+<!-- Vaccination Schedule -->
+<div class="card">
+  <h3 data-lang="vaccine">Vaccination Schedule</h3>
+  <p id="vaccineChart" data-lang="vaccineChart">25 Sept — Bird Flu</p>
+  <button onclick="window.location.href='vaccination_dashboard.html'" 
+   class="btn"
+>
+     Open Vaccination Portal
+  </button>
+</div>
 
-      <!-- Vaccination Schedule -->
-      <div class="card" onclick="openFeature('vaccine')">
-        <h3 data-lang="vaccine">Vaccination Schedule</h3>
-        <p id="vaccineChart" data-lang="vaccineChart">25 Sept — Bird Flu</p>
-      </div>
 
       <!-- Breeding & Feeding -->
       <div class="card" onclick="openFeature('feed')">
         <h3 data-lang="feed">Breeding & Feeding</h3>
         <p data-lang="feedHint">Feeding schedule and charts</p>
-        <button><a href="feeding.html" target="_blank" data-lang="feedpig">View Chart</a></button>
+        
+         <a href="feeding.html" class="btn"  target="_blank" data-lang="view">View Chart</a>
       </div>
 
       <!-- 🩺 Medical Consultation & Supplies -->
@@ -97,7 +104,7 @@
         <h3 data-lang="medical">🩺 Medical Help</h3>
         <p data-lang="medicalHint">Consult a vet or order medicines & vaccines</p>
         <button class="cta">
-          <a href="medical.html" target="_blank" style="text-decoration:none; color:black;" data-lang="openMedical">Open Medical</a>
+          <a href="medical.html" target="_blank" class="btn" data-lang="openMedical">Open Medical</a>
         </button>
       </div>
 
@@ -107,18 +114,36 @@
         <p data-lang="salesHint">Update product listings</p>
       </div>
 
-      <!-- Alerts -->
-      <div class="card" id="alertsCard">
-        <h3 data-lang="alerts">Alerts</h3>
-        <ul id="alertsList"></ul>
-      </div>
+     
+<!-- Disease Alerts Card -->
+<div class="card">
+  <h3>Disease Alerts</h3>
+  <p>Click to view all disease alerts from Admin</p>
+
+  <!-- Button and badge container -->
+  <div style="position: relative; display: inline-block; margin-top:10px;">
+    <a href="viewAlerts.html" class="btn" id="openAlertsBtn">📢 View Alerts</a>
+    <!-- Notification badge for unseen alerts -->
+    <span id="alertBadge" style="
+        display: none;
+        background: red;
+        color: white;
+        font-size: 0.8rem;
+        padding: 2px 6px;
+        border-radius: 50%;
+        position: absolute;
+        top: -5px;
+        right: -5px;
+    ">0</span>
+  </div>
+</div>
 
       <!-- ==== AI Chatbox (Restored) ==== -->
       <div class="card">
         <h3 data-lang="support">AI Chat + Support</h3>
         <p data-lang="ask">Ask questions & get voice replies</p>
         <button class="cta" onclick="openAIChat()">
-          <a href="ai.html" target="_blank" data-lang="open1">Open Chat</a>
+          <a href="ai.html" target="_blank" class="btn" data-lang="open1">Open Chat</a>
         </button>
       </div>
 
@@ -134,4 +159,3 @@
   </div>
 </body>
 </html>
-

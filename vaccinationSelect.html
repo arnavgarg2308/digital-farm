@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Vaccination Type | Smart Farm Solution</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #1565c0;
+      margin-bottom: 40px;
+      text-align: center;
+      font-size: 2rem;
+    }
+    .btn-container {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      background: #1976d2;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .btn:hover {
+      background: #0d47a1;
+      transform: translateY(-3px);
+    }
+    .btn img {
+      width: 50px;
+      height: 50px;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    .back-link {
+      margin-top: 40px;
+      text-decoration: none;
+      color: #1976d2;
+      font-weight: 600;
+      border: 2px solid #1976d2;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .back-link:hover {
+      background: #1976d2;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐖🐔 Select Your Vaccination Type</h1>
+  <div class="btn-container">
+    <button class="btn" onclick="window.location.href='pigvaccination.html'">
+      <img src="https://img.freepik.com/premium-vector/cute-happy-pig-sitting-cartoon-vector-white-background_1026278-7240.jpg" alt="Pig">
+      Pig Vaccination
+    </button>
+    <button class="btn" onclick="window.location.href='poultryvaccination.html'">
+      <img src="https://img.freepik.com/premium-vector/cute-chicken-vector-cartoon-illustration_1215145-6458.jpg" alt="Poultry">
+      Poultry Vaccination
+    </button>
+  </div>
+  <a href="farmer.html" class="back-link">← Back to Dashboard</a>
+</body>
+</html>

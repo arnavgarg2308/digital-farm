@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vaccination Schedule | Farmer Dashboard</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+body { background-color: #121212; color: #fff; font-family: "Segoe UI", Arial, sans-serif; margin:0; padding:0; }
+.page-header { background: #1e1e1e; color: #fff; padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; }
+.card { background-color: #1c1c1c; color:#fff; border:1px solid #333; border-radius:10px; padding:1.2rem; box-shadow:0 0 10px rgba(255,255,255,0.05); margin-bottom:1rem; }
+table { width:100%; border-collapse:collapse; margin-top:1rem; }
+th, td { border:1px solid #444; padding:0.6rem; text-align:center; color:#fff; }
+thead { background:#2c2c2c; font-weight:700; }
+tbody tr:nth-child(even){ background-color:#222; }
+tbody tr:hover { background-color:#333; }
+strong { color:#4CAF50; }
+.small { background:#333; color:#fff; border:none; padding:0.5rem 1rem; border-radius:5px; cursor:pointer; }
+.small:hover { opacity:0.85; }
+</style>
+</head>
+<body>
+<header class="page-header">
+  <h2>💉 Vaccination Schedule</h2>
+  <div>
+    <button class="small" onclick="goBack()">⬅ Back</button>
+  </div>
+</header>
+
+<main style="padding:1rem;">
+  <!-- OVERVIEW -->
+  <div class="card">
+    <h3>📋 Overview</h3>
+    <div style="margin-top:1rem; line-height:1.8;">
+      <p>🐖 Pig Vaccines: <strong id="pigCount">0</strong></p>
+      <p>🐔 Poultry Vaccines: <strong id="poultryCount">0</strong></p>
+      <p>⏳ Upcoming: <strong id="upcomingCount">0</strong></p>
+      <p>✅ Completed: <strong id="completedCount">0</strong></p>
+    </div>
+    <div style="margin-top:1rem; padding:0.8rem 1rem; background:#2b2b2b; border-left:5px solid #4CAF50; border-radius:6px;">
+      🕐 <strong>Next Due:</strong> <span id="nextVaccine">No upcoming schedule</span>
+    </div>
+  </div>
+
+  <!-- RECORDS TABLE -->
+  <div class="card">
+    <h3>📄 Vaccination Records</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Animal</th>
+          <th>Age/Stage</th>
+          <th>Vaccine</th>
+          <th>Disease</th>
+          <th>Dosage</th>
+          <th>Date</th>
+          <th>Next Due</th>
+          <th>Status</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody id="vaccinationBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const vaccinationBody = document.getElementById('vaccinationBody');
+const pigCountEl = document.getElementById('pigCount');
+const poultryCountEl = document.getElementById('poultryCount');
+const upcomingCountEl = document.getElementById('upcomingCount');
+const completedCountEl = document.getElementById('completedCount');
+const nextVaccineEl = document.getElementById('nextVaccine');
+
+function renderTable() {
+  const allData = JSON.parse(localStorage.getItem('allVaccinationData')) || [];
+
+  // Only Pig and Poultry records
+  const farmerData = allData.filter(item => item.animal === 'Pig' || item.animal === 'Poultry');
+
+  vaccinationBody.innerHTML = '';
+  let pigCount = 0, poultryCount = 0, upcoming = 0, completed = 0;
+  let nextDue = null;
+
+  farmerData.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.animal}</td>
+      <td>${item.ageStage}</td>
+      <td>${item.vaccine}</td>
+      <td>${item.disease}</td>
+      <td>${item.dosage}</td>
+      <td>${item.date}</td>
+      <td>${item.nextDate || '-'}</td>
+      <td style="color:${item.status==='Done'? '#4CAF50':'orange'};">${item.status}</td>
+      <td>${item.remarks||'-'}</td>
+    `;
+    vaccinationBody.appendChild(tr);
+
+    if(item.animal==='Pig') pigCount++;
+    if(item.animal==='Poultry') poultryCount++;
+    if(item.status==='Pending') upcoming++;
+    if(item.status==='Done') completed++;
+    if(item.nextDate && (!nextDue || new Date(item.nextDate) < new Date(nextDue))) nextDue = item.nextDate;
+  });
+
+  pigCountEl.textContent = pigCount;
+  poultryCountEl.textContent = poultryCount;
+  upcomingCountEl.textContent = upcoming;
+  completedCountEl.textContent = completed;
+  nextVaccineEl.textContent = nextDue || 'No upcoming schedule';
+}
+
+function goBack() { window.history.back(); }
+
+// Initial render + auto refresh every 5 seconds to reflect admin updates
+renderTable();
+setInterval(renderTable, 5000);
+</script>
+</body>
+</html>

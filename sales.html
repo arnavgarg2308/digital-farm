@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Farmer — Manage Products</title>
+  <style>
+    :root{
+      --bg:#0b0b0b; --panel:#121212; --muted:#bfbfbf; --accent:#00c853;
+      --card:#161616; --glass: rgba(255,255,255,0.03);
+    }
+    body{ margin:0; font-family:Inter, system-ui, Arial; background:linear-gradient(180deg,#071014,#071116); color:#eee; padding:20px; }
+    .wrap{ max-width:1000px; margin:0 auto; }
+    header{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;}
+    h1{ color:var(--accent); font-size:1.25rem; margin:0;}
+    .card{ background:var(--card); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .grid{ display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
+    @media(max-width:900px){ .grid{ grid-template-columns: 1fr; } }
+
+    /* form */
+    .form-row{ display:flex; gap:10px; margin-bottom:10px; align-items:center; }
+    label{ font-size:0.9rem; color:var(--muted); min-width:90px; }
+    input[type="text"], input[type="number"], textarea, select {
+      width:100%; padding:8px 10px; border-radius:8px; background:var(--glass); border:1px solid #222; color:#fff;
+    }
+    textarea{ min-height:70px; resize:vertical; }
+
+    .btn{ background:var(--accent); color:#032; border:none; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; }
+    .btn.secondary{ background:#2b2b2b; color:#fff; border:1px solid #333; }
+
+    /* product gallery */
+    .products-grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:12px; margin-top:12px; }
+    .product-card{ background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02)); padding:10px; border-radius:10px; border:1px solid #202020; display:flex; flex-direction:column; gap:8px;}
+    .prod-media{ height:150px; background:#0a0a0a; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+    .prod-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumbs{ display:flex; gap:6px; margin-top:6px; justify-content:center; }
+    .thumbs img{ width:40px; height:40px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid transparent; }
+    .thumbs img.active{ border-color:var(--accent); }
+
+    .meta{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .meta-left{ font-weight:700; }
+    .meta-right{ display:flex; gap:8px; }
+
+    .note{ color:var(--muted); font-size:0.9rem; margin-top:8px; }
+
+    .empty{ color:#aaa; text-align:center; padding:30px 10px; }
+
+    /* nice form file preview */
+    .preview-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .preview-row img{ width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #222; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Sell Products — Farmer Dashboard</h1>
+        <div style="color:var(--muted);font-size:0.95rem">Add product, multiple photos, price & stock. Only you see/edit your products here.</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: form + products -->
+      <div>
+        <div class="card">
+          <h3 style="margin-top:0;color:var(--accent)">Add New Product</h3>
+
+          <div class="form-row">
+            <label>Title</label>
+            <input id="p_title" type="text" placeholder="e.g. Fresh Broiler Chicken (kg)">
+          </div>
+          <div class="form-row">
+            <label>Price (₹)</label>
+            <input id="p_price" type="number" min="0" step="0.01" placeholder="e.g. 250">
+          </div>
+          <div class="form-row">
+            <label>Stock (kg)</label>
+            <input id="p_stock" type="number" min="0" step="1" placeholder="e.g. 50">
+          </div>
+          <div class="form-row">
+            <label>Category</label>
+            <input id="p_category" type="text" placeholder="e.g. Poultry">
+          </div>
+          <div style="margin-bottom:8px;">
+            <label style="display:block;margin-bottom:6px;color:var(--muted)">Photos</label>
+            <input id="p_photos" type="file" accept="image/*" multiple>
+            <div id="previewRow" class="preview-row"></div>
+            <div class="note">Tip: select multiple images. First image is main preview.</div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn" onclick="addProduct()">Add Product</button>
+            <button class="btn secondary" onclick="clearForm()">Reset</button>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h3 style="margin-top:0;color:var(--accent)">Your Products</h3>
+          <div id="farmerProductsContainer" class="products-grid"></div>
+          <div id="farmerEmpty" class="empty" style="display:none">No products yet — add one from the form above.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: profile / stats -->
+      <aside class="card" style="height:fit-content">
+        <h3 style="margin-top:0;color:var(--accent)">Profile</h3>
+        <div id="farmerInfo"></div>
+        <hr style="border:none;border-top:1px solid #141414;margin:12px 0">
+        <div>
+          <h4 style="margin:0">Quick Stats</h4>
+          <div id="statCount" style="color:var(--muted);margin-top:8px">Products: 0</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+/*
+  Storage shape:
+  products (global array) = [
+    {
+      id: 'ts123',
+      userId: '1761155882639',
+      title, price, stock, category,
+      images: [dataURL, dataURL, ...],
+      createdAt
+    }
+  ]
+*/
+
+function getCurrentUser(roleFallback) {
+  // tries currentUser_farmer, currentUser, currentUser_<role>
+  const role = roleFallback || 'farmer';
+  let u = JSON.parse(localStorage.getItem(`currentUser_${role}`) || 'null');
+  if (!u) u = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  if (!u) u = JSON.parse(localStorage.getItem(`currentUser_${role}`) || 'null');
+  return u || null;
+}
+
+function loadProductsAll() {
+  return JSON.parse(localStorage.getItem('products') || '[]');
+}
+function saveProductsAll(arr) {
+  localStorage.setItem('products', JSON.stringify(arr));
+}
+
+/* ========== UI: preview selected images ========== */
+const photoInput = document.getElementById('p_photos');
+const previewRow = document.getElementById('previewRow');
+let stagedImages = []; // dataURLs
+
+photoInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    const data = await fileToDataUrl(f);
+    stagedImages.push(data);
+
+    // create preview with delete button
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'relative';
+
+    const img = document.createElement('img');
+    img.src = data;
+    img.style.border = '1px solid #222';
+    wrapper.appendChild(img);
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '×';
+    delBtn.style.position = 'absolute';
+    delBtn.style.top = '2px';
+    delBtn.style.right = '4px';
+    delBtn.style.background = '#e53935';
+    delBtn.style.color = '#fff';
+    delBtn.style.border = 'none';
+    delBtn.style.borderRadius = '50%';
+    delBtn.style.width = '20px';
+    delBtn.style.height = '20px';
+    delBtn.style.cursor = 'pointer';
+    delBtn.onclick = () => {
+      // remove from array & UI
+      stagedImages = stagedImages.filter(x => x !== data);
+      wrapper.remove();
+    };
+    wrapper.appendChild(delBtn);
+
+    previewRow.appendChild(wrapper);
+  }
+
+  // clear the input so next selection adds new files instead of overwriting
+  photoInput.value = '';
+});
+
+
+function fileToDataUrl(file){
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ========== Add product ========== */
+async function addProduct(){
+  const currentUser = getCurrentUser('farmer');
+  if (!currentUser || !currentUser.id) return alert('Please login as Farmer.');
+
+  const title = document.getElementById('p_title').value.trim();
+  const price = Number(document.getElementById('p_price').value) || 0;
+  const stock = Number(document.getElementById('p_stock').value) || 0;
+  const category = document.getElementById('p_category').value.trim();
+
+  // if no stagedImages, try reading input anyway (in case user didn't wait)
+  if (!stagedImages.length && photoInput.files.length) {
+    // quick convert
+    const files = Array.from(photoInput.files);
+    for (const f of files) {
+      if (!f.type.startsWith('image/')) continue;
+      const data = await fileToDataUrl(f);
+      stagedImages.push(data);
+    }
+  }
+
+  if (!title) return alert('Please add a product title.');
+
+  const products = loadProductsAll();
+  const item = {
+    id: Date.now().toString(),
+    userId: currentUser.id,
+    farmerName: currentUser.fullName || currentUser.name || 'Farmer',
+    farmerEmail: currentUser.email || '',
+    title, price, stock, category,
+    images: stagedImages.slice(),
+    createdAt: new Date().toISOString()
+  };
+  products.push(item);
+  saveProductsAll(products);
+
+  // clear form
+  clearForm();
+  renderFarmerProducts();
+  updateStats();
+  alert('✅ Product added.');
+}
+
+function clearForm(){
+  document.getElementById('p_title').value = '';
+  document.getElementById('p_price').value = '';
+  document.getElementById('p_stock').value = '';
+  document.getElementById('p_category').value = '';
+  photoInput.value = '';
+  previewRow.innerHTML = '';
+  stagedImages = [];
+}
+
+/* ========== Render farmer's products ========== */
+function renderFarmerProducts(){
+  const container = document.getElementById('farmerProductsContainer');
+  const emptyBox = document.getElementById('farmerEmpty');
+  container.innerHTML = '';
+
+  const currentUser = getCurrentUser('farmer');
+  if (!currentUser || !currentUser.id) {
+    emptyBox.style.display = 'block';
+    return;
+  }
+  const userId = currentUser.id;
+  const products = loadProductsAll().filter(p => String(p.userId) === String(userId));
+  if (!products.length) {
+    emptyBox.style.display = 'block';
+    return;
+  }
+  emptyBox.style.display = 'none';
+
+  products.slice().reverse().forEach(prod => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+
+    // main image element (first image or placeholder)
+    const media = document.createElement('div'); media.className = 'prod-media';
+    const img = document.createElement('img');
+    img.src = prod.images && prod.images.length ? prod.images[0] : 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="#111" width="100%" height="100%"/></svg>');
+    img.alt = prod.title;
+    media.appendChild(img);
+
+    const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = prod.title;
+    const meta = document.createElement('div'); meta.className='meta';
+    const left = document.createElement('div'); left.className='meta-left'; left.innerHTML = `₹${prod.price} • ${prod.stock}kg`;
+    const right = document.createElement('div'); right.className='meta-right';
+    // edit / delete
+    const delBtn = document.createElement('button'); delBtn.className='btn secondary'; delBtn.textContent='Delete';
+    delBtn.onclick = () => {
+      if(!confirm('Delete this product?')) return;
+      deleteProduct(prod.id);
+    };
+    right.appendChild(delBtn);
+
+    meta.appendChild(left); meta.appendChild(right);
+
+    // thumbnails
+    const thumbs = document.createElement('div'); thumbs.className='thumbs';
+    (prod.images || []).forEach((d, i) => {
+      const t = document.createElement('img'); t.src = d;
+      if (i===0) t.classList.add('active');
+      t.onclick = () => {
+        // swap main image
+        img.src = d;
+        thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+      };
+      thumbs.appendChild(t);
+    });
+
+    // footer details
+    const footer = document.createElement('div');
+    footer.style.display='flex'; footer.style.justifyContent='space-between'; footer.style.alignItems='center';
+    footer.style.fontSize='0.9rem';
+    footer.innerHTML = `<div style="color:var(--muted)">${prod.category || '—'}</div>
+                        <div style="color:var(--muted);font-size:0.85rem">Added: ${new Date(prod.createdAt).toLocaleDateString()}</div>`;
+
+    card.appendChild(media);
+    card.appendChild(title);
+    card.appendChild(meta);
+    if (thumbs.children.length) card.appendChild(thumbs);
+    card.appendChild(footer);
+
+    container.appendChild(card);
+  });
+}
+
+/* ========== delete product (only by owner) ========== */
+function deleteProduct(id){
+  const products = loadProductsAll();
+  const idx = products.findIndex(p => p.id === id);
+  if (idx === -1) return;
+  products.splice(idx,1);
+  saveProductsAll(products);
+  renderFarmerProducts();
+  updateStats();
+}
+
+/* ========== stats & profile ========== */
+function updateStats(){
+  const currentUser = getCurrentUser('farmer');
+  const products = loadProductsAll().filter(p => String(p.userId) === String(currentUser?.id));
+  document.getElementById('statCount').textContent = 'Products: ' + products.length;
+}
+
+function renderProfile(){
+  const currentUser = getCurrentUser('farmer');
+  const box = document.getElementById('farmerInfo');
+  if (!currentUser) {
+    box.innerHTML = '<div style="color:#fa6">Please login as Farmer to manage products.</div>';
+    return;
+  }
+  box.innerHTML = `<div style="font-weight:700">${escapeHtml(currentUser.fullName || currentUser.name || '—')}</div>
+                   <div style="color:var(--muted);font-size:0.95rem">${escapeHtml(currentUser.email || '')}</div>
+                   <div style="color:var(--muted);margin-top:8px">District: ${escapeHtml(currentUser.district || '-')}</div>`;
+}
+
+/* escape helper */
+function escapeHtml(s){ if(!s) return ''; return s.toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+/* open market (buyer page) */
+function openMarket(){ window.open('buyer_market.html','_blank'); }
+
+/* init */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderProfile();
+  renderFarmerProducts();
+  updateStats();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Marketplace — Buyers</title>
+  <style>
+    body{
+      font-family:Inter,system-ui,Arial;
+      background:#0c0c0c;
+      color:#eee;
+      margin:0;
+      padding:20px;
+    }
+    h1{color:#00c853;}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+      gap:14px;
+      margin-top:16px;
+    }
+    .card{
+      background:#161616;
+      padding:12px;
+      border-radius:10px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.3);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .prod-main{
+      width:100%;
+      height:160px;
+      border-radius:8px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#0a0a0a;
+    }
+    .prod-main img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .thumbs{
+      display:flex;
+      gap:6px;
+      margin-top:6px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .thumbs img{
+      width:45px;
+      height:45px;
+      border-radius:6px;
+      object-fit:cover;
+      border:2px solid transparent;
+      cursor:pointer;
+      transition:border .2s;
+    }
+    .thumbs img.active{border-color:#00c853;}
+    button{
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn-cart{
+      background:#00c853;
+      color:#031;
+      width:100%;
+      margin-top:8px;
+    }
+    .btn-cart:disabled{background:#333;color:#999;}
+    h4{margin:8px 0 4px;font-size:1rem;text-align:center;}
+    p{margin:2px 0;text-align:center;}
+  </style>
+</head>
+<body>
+  <h1>🌾 Farmer Market</h1>
+  <p style="color:#aaa;">Browse all farmer products and add them to your cart.</p>
+  <div id="marketGrid" class="grid"></div>
+
+  <script>
+  function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('currentUser_buyer') || 'null');
+  }
+
+  function loadAllProducts() {
+    return JSON.parse(localStorage.getItem('products') || '[]');
+  }
+
+  function loadBuyerCart() {
+    const u = getCurrentUser();
+    if (!u) return [];
+    return JSON.parse(localStorage.getItem('cart_' + u.id) || '[]');
+  }
+
+  function saveBuyerCart(arr) {
+    const u = getCurrentUser();
+    if (!u) return;
+    localStorage.setItem('cart_' + u.id, JSON.stringify(arr));
+  }
+
+  function renderMarket() {
+    const container = document.getElementById('marketGrid');
+    const products = loadAllProducts();
+    const cart = loadBuyerCart();
+    container.innerHTML = '';
+
+    if (!products.length) {
+      container.innerHTML = '<p style="color:#999;">No products available.</p>';
+      return;
+    }
+
+    products.slice().reverse().forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      // main image
+      const mainBox = document.createElement('div');
+      mainBox.className = 'prod-main';
+      const mainImg = document.createElement('img');
+      mainImg.src = (p.images && p.images.length) ? p.images[0] : '';
+      mainBox.appendChild(mainImg);
+
+      // thumbnails (multiple image viewer)
+      const thumbs = document.createElement('div');
+      thumbs.className = 'thumbs';
+      (p.images || []).forEach((img, i) => {
+        const t = document.createElement('img');
+        t.src = img;
+        if (i===0) t.classList.add('active');
+        t.onclick = () => {
+          mainImg.src = img;
+          thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
+          t.classList.add('active');
+        };
+        thumbs.appendChild(t);
+      });
+
+      const name = document.createElement('h4');
+      name.textContent = p.title;
+
+      const price = document.createElement('p');
+      price.textContent = `₹${p.price} • ${p.stock}kg`;
+
+      const by = document.createElement('small');
+      by.style.color = '#aaa';
+      by.innerHTML = `👩‍🌾 ${p.farmerName || 'Farmer'}<br>📧 ${p.farmerEmail || '—'}`;
+
+      const btn = document.createElement('button');
+      btn.className = 'btn-cart';
+      btn.textContent = 'Add to Cart';
+      if (cart.some(x => x.id === p.id)) {
+        btn.textContent = 'Added';
+        btn.disabled = true;
+      }
+
+      btn.onclick = () => {
+        const newCart = loadBuyerCart();
+        // ✅ Store only lightweight data (avoid full base64)
+        newCart.push({
+          id: p.id,
+          title: p.title,
+          price: p.price,
+          stock: p.stock,
+          farmerName: p.farmerName,
+          farmerEmail: p.farmerEmail,
+          thumb: (p.images && p.images[0]) ? p.images[0] : '',
+          addedAt: new Date().toISOString()
+        });
+        saveBuyerCart(newCart);
+        btn.textContent = 'Added';
+        btn.disabled = true;
+        alert('✅ Added to your cart!');
+      };
+
+      card.appendChild(mainBox);
+      if (p.images && p.images.length > 1) card.appendChild(thumbs);
+      card.appendChild(name);
+      card.appendChild(price);
+      card.appendChild(by);
+      card.appendChild(btn);
+      container.appendChild(card);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', renderMarket);
+  </script>
+</body>
+</html>

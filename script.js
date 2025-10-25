@@ -942,7 +942,140 @@ async function updateOrderStatus(id, status) {
   });
   fetchMedicalData();
 }
+async function fetchMedicalData() {
+  const bookingStatus = document.getElementById("bookingStatus")?.value || "all";
+  const orderStatus = document.getElementById("orderStatus")?.value || "all";
+  const searchTerm = document.getElementById("searchInput")?.value.toLowerCase() || "";
 
+  // Vet Bookings
+  const bookingTableBody = document.getElementById("bookingsTable")?.querySelector("tbody");
+  if (bookingTableBody) {
+    let bookings = await fetch(`${BASE_URL}/api/bookings`).then(res => res.json()).catch(()=>[]);
+    bookings = bookings.filter(b => 
+      (bookingStatus==="all" || b.status===bookingStatus) &&
+      (b.petOwner.toLowerCase().includes(searchTerm) || b.petName.toLowerCase().includes(searchTerm) || b.vetName.toLowerCase().includes(searchTerm))
+    );
+    bookingTableBody.innerHTML = bookings.map(b => `<tr>
+      <td>${b.petOwner}</td>
+      <td>${b.petName}</td>
+      <td>${b.vetName}</td>
+      <td>${b.date}</td>
+      <td>${b.status}</td>
+      <td>
+        ${b.status==="pending"?`<button onclick="updateBookingStatus('${b._id}','approved')">Approve</button>`:""}
+        ${b.status!=="completed"?`<button onclick="updateBookingStatus('${b._id}','completed')">Complete</button>`:""}
+      </td>
+    </tr>`).join("");
+  }
+
+  // Medicine Orders
+  const orderTableBody = document.getElementById("ordersTable")?.querySelector("tbody");
+  if (orderTableBody) {
+    let orders = await fetch(`${BASE_URL}/api/orders`).then(res => res.json()).catch(()=>[]);
+    orders = orders.filter(o => 
+      (orderStatus==="all" || o.status===orderStatus) &&
+      (o.petOwner.toLowerCase().includes(searchTerm) || o.medicineName.toLowerCase().includes(searchTerm))
+    );
+    orderTableBody.innerHTML = orders.map(o => `<tr>
+      <td>${o.petOwner}</td>
+      <td>${o.medicineName}</td>
+      <td>${o.quantity}</td>
+      <td>${o.deliveryAddress}</td>
+      <td>${o.orderDate}</td>
+      <td>${o.status}</td>
+      <td>
+        ${o.status==="pending"?`<button onclick="updateOrderStatus('${o._id}','shipped')">Ship</button>`:""}
+        ${o.status!=="delivered"?`<button onclick="updateOrderStatus('${o._id}','delivered')">Deliver</button>`:""}
+      </td>
+    </tr>`).join("");
+  }
+}
+
+async function updateBookingStatus(id, status) {
+  await fetch(`${BASE_URL}/api/bookings/${id}`, { 
+    method:"PUT", 
+    headers:{"Content-Type":"application/json"}, 
+    body:JSON.stringify({status}) 
+  });
+  fetchMedicalData();
+}
+
+async function updateOrderStatus(id, status) {
+  await fetch(`${BASE_URL}/api/orders/${id}`, { 
+    method:"PUT", 
+    headers:{"Content-Type":"application/json"}, 
+    body:JSON.stringify({status}) 
+  });
+  fetchMedicalData();
+}
+// ================== BUYER: SEARCH FARMER DETAILS ==================
+function searchFarmerByEmail() {
+  const email = document.getElementById("farmerEmailSearch").value.trim().toLowerCase();
+  const resultDiv = document.getElementById("farmerResult");
+  resultDiv.innerHTML = "";
+
+  if (!email) {
+    resultDiv.innerHTML = `<p style="color:#f66;">⚠️ Please enter an email address.</p>`;
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  const farmer = users.find(u => u.role === "farmer" && u.email.toLowerCase() === email);
+
+  if (!farmer) {
+    resultDiv.innerHTML = `<p style="color:#f66;">❌ No farmer found with this email.</p>`;
+    return;
+  }
+
+  // ✅ Fetch last assessment and medal
+  const assessments = JSON.parse(localStorage.getItem("sf_assessments") || "[]");
+  const farmerAssess = assessments.filter(a =>
+    a.user === farmer.phone || a.user === farmer.email || a.user === farmer.id
+  );
+  const lastAssess = farmerAssess[farmerAssess.length - 1];
+
+  let medal = localStorage.getItem(`medal_${farmer.id}`) || "None";
+  let medalEmoji = "❌";
+  if (medal === "Gold") medalEmoji = "🥇";
+  else if (medal === "Silver") medalEmoji = "🥈";
+  else if (medal === "Bronze") medalEmoji = "🥉";
+
+  // ✅ Build nice-looking result card
+  resultDiv.innerHTML = `
+    <div style="
+      background:#141416;
+      padding:20px;
+      border-radius:12px;
+      border:1px solid #222;
+      max-width:600px;
+      margin:auto;
+      color:white;
+      box-shadow:0 0 10px rgba(0,0,0,0.5);
+    ">
+      <h3 style="text-align:center;">👨‍🌾 Farmer Profile</h3>
+      <div style="text-align:center;margin-top:10px;">
+        <img src="${farmer.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" 
+             style="width:100px;height:100px;border-radius:50%;border:2px solid #00ff99;">
+      </div>
+      <div style="margin-top:15px;font-size:0.95rem;">
+        <p><strong>Name:</strong> ${farmer.fullName || farmer.name}</p>
+        <p><strong>Email:</strong> ${farmer.email}</p>
+        <p><strong>Phone:</strong> ${farmer.phone || '-'}</p>
+        <p><strong>Farm Name:</strong> ${farmer.farmName || '-'}</p>
+        <p><strong>Farm Area:</strong> ${farmer.farmArea || '-'}</p>
+        <p><strong>District:</strong> ${farmer.district || '-'}</p>
+        <p><strong>Village:</strong> ${farmer.village || '-'}</p>
+        <p><strong>Production Type:</strong> ${farmer.productionType || '-'}</p>
+        <hr style="margin:10px 0;border-color:#333;">
+        <p><strong>🏅 Compliance Medal:</strong> 
+          <span style="font-size:1.4em;">${medalEmoji}</span> 
+          <span style="color:#ccc;">(${medal})</span>
+        </p>
+        
+      </div>
+    </div>
+  `;
+}
 // ================== DOM CONTENT LOAD ==================
 document.addEventListener("DOMContentLoaded", () => {
   const role = localStorage.getItem("currentUserRole");
@@ -1008,47 +1141,49 @@ function sendAlert() {
 }
 // Function to display existing alerts
 function loadExistingAlerts() {
-    const container = document.getElementById('existingAlerts');
-    let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
-    container.innerHTML = '';
+  const container = document.getElementById('existingAlerts');
+  if (!container) return; // ✅ Prevents the error on pages without this section
 
-    if (alerts.length === 0) {
-        container.innerHTML = '<p style="color:#555;">No alerts sent yet.</p>';
-        return;
-    }
+  let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+  container.innerHTML = '';
 
-    alerts.forEach((alert, index) => {
-        const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.justifyContent = 'space-between';
-        div.style.alignItems = 'center';
-        div.style.background = '#f9f9f9';
-        div.style.padding = '8px 12px';
-        div.style.marginTop = '8px';
-        div.style.borderRadius = '8px';
-        div.style.boxShadow = '0 1px 5px rgba(0,0,0,0.05)';
+  if (alerts.length === 0) {
+    container.innerHTML = '<p style="color:#555;">No alerts sent yet.</p>';
+    return;
+  }
 
-        div.innerHTML = `
-            <span>${alert.message} <small style="color:#999;">(${alert.timestamp})</small></span>
-            <button style="
-                background:#e53935; color:#fff; border:none; padding:4px 10px; border-radius:5px; cursor:pointer;
-            ">Delete</button>
-        `;
+  alerts.forEach((alert, index) => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.justifyContent = 'space-between';
+    div.style.alignItems = 'center';
+    div.style.background = '#f9f9f9';
+    div.style.padding = '8px 12px';
+    div.style.marginTop = '8px';
+    div.style.borderRadius = '8px';
+    div.style.boxShadow = '0 1px 5px rgba(0,0,0,0.05)';
 
-        const deleteBtn = div.querySelector('button');
-        deleteBtn.onclick = () => {
-            alerts.splice(index, 1); // Remove alert from array
-            localStorage.setItem('alerts', JSON.stringify(alerts)); // Save updated alerts
-            loadExistingAlerts(); // Refresh list
-            updateAlertBadge(); // Update badge
-        };
+    div.innerHTML = `
+      <span>${alert.message} <small style="color:#999;">(${alert.timestamp})</small></span>
+      <button style="background:#e53935; color:#fff; border:none; padding:4px 10px; border-radius:5px; cursor:pointer;">Delete</button>
+    `;
 
-        container.appendChild(div);
-    });
+    const deleteBtn = div.querySelector('button');
+    deleteBtn.onclick = () => {
+      alerts.splice(index, 1);
+      localStorage.setItem('alerts', JSON.stringify(alerts));
+      loadExistingAlerts();
+      updateAlertBadge();
+    };
+
+    container.appendChild(div);
+  });
 }
 
+
 // Run on page load
-loadExistingAlerts();
+if (document.getElementById('existingAlerts')) loadExistingAlerts();
+
 // ------------------ ADD VACCINATION (ADMIN) ------------------
 function addVaccinationRecord() {
   const farmerId = document.getElementById('farmerId').value.trim();
@@ -1123,3 +1258,123 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFarmerVaccinationTable();
   }
 });
+/* ========================== FARMER: ADD PRODUCT ========================== */
+function addProduct() {
+  const role = localStorage.getItem("currentUserRole");
+  if (role !== "farmer") return alert("Please login as Farmer.");
+
+  const farmer = JSON.parse(localStorage.getItem("currentUser_farmer") || "{}");
+  if (!farmer.id) return alert("Farmer not logged in.");
+
+  const name = document.getElementById("productName")?.value.trim();
+  const weight = document.getElementById("productWeight")?.value.trim();
+  const price = document.getElementById("productPrice")?.value.trim();
+  const desc = document.getElementById("productDesc")?.value.trim();
+  const imgInput = document.getElementById("productImage");
+
+  if (!name || !price || !imgInput?.files?.length) {
+    alert("Please fill all fields and select an image!");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const imgData = event.target.result;
+
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    const newProduct = {
+      id: Date.now(),
+      farmerId: farmer.id,
+      farmerName: farmer.fullName || farmer.name,
+      farmerEmail: farmer.email,
+      name,
+      weight,
+      price,
+      desc,
+      image: imgData,
+      createdAt: new Date().toLocaleString(),
+    };
+
+    products.push(newProduct);
+    localStorage.setItem("products", JSON.stringify(products));
+    alert("✅ Product added successfully!");
+    document.getElementById("productForm").reset();
+    renderFarmerProducts();
+  };
+  reader.readAsDataURL(imgInput.files[0]);
+}
+
+/* ========================== FARMER: VIEW OWN PRODUCTS ========================== */
+function renderFarmerProducts() {
+  const role = localStorage.getItem("currentUserRole");
+  const farmer = JSON.parse(localStorage.getItem(`currentUser_${role}`) || "{}");
+  const container = document.getElementById("farmerProducts");
+  if (!container) return;
+
+  const all = JSON.parse(localStorage.getItem("products") || "[]");
+  const myProducts = all.filter(p => p.farmerId === farmer.id);
+
+  container.innerHTML = myProducts.length
+    ? myProducts.map(p => `
+      <div class="product-card">
+        <img src="${p.image}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;">
+        <h4>${p.name}</h4>
+        <p>${p.desc || "No description"}</p>
+        <p><strong>${p.weight}</strong> • ₹${p.price}</p>
+        <small>Added: ${p.createdAt}</small>
+      </div>`).join("")
+    : `<p style="color:#aaa">No products added yet.</p>`;
+}
+
+/* ========================== BUYER: VIEW & ADD TO CART ========================== */
+function renderBuyerProducts() {
+  const container = document.getElementById("buyerProducts");
+  if (!container) return;
+  const all = JSON.parse(localStorage.getItem("products") || "[]");
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  if (all.length === 0) {
+    container.innerHTML = "<p>No farm products listed yet.</p>";
+    return;
+  }
+
+  container.innerHTML = all.map(p => `
+    <div class="product-card">
+      <img src="${p.image}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;">
+      <h4>${p.name}</h4>
+      <p>${p.desc || "No description"}</p>
+      <p><strong>${p.weight}</strong> • ₹${p.price}</p>
+      <p style="font-size:0.9em;color:#777;">
+        👨‍🌾 ${p.farmerName}<br>
+        📧 ${p.farmerEmail}
+      </p>
+      <button onclick="addToCart(${p.id})">🛒 Add to Cart</button>
+    </div>`).join("");
+}
+
+/* ========================== ADD TO CART ========================== */
+function addToCart(productId) {
+  const products = JSON.parse(localStorage.getItem("products") || "[]");
+  const product = products.find(p => p.id === productId);
+  if (!product) return alert("Product not found!");
+
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  if (cart.some(c => c.id === productId)) {
+    alert("Product already in cart!");
+    return;
+  }
+
+  cart.push(product);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert(`✅ ${product.name} added to cart!`);
+}
+
+/* ========================== DOM LOAD INITIALIZERS ========================== */
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("farmerProducts")) renderFarmerProducts();
+  if (document.getElementById("buyerProducts")) renderBuyerProducts();
+});
+// ✅ Prevent error on pages without alert section
+if (typeof loadExistingAlerts === "function" && document.getElementById('existingAlerts')) {
+  loadExistingAlerts();
+}

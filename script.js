@@ -540,6 +540,7 @@ if (!currentUser) {
 function renderProfileDetails(user) {
   const details = document.getElementById("profileDetails");
   if (!details) return;
+
   let html = `
     <p><strong>Name:</strong> ${user.fullName || user.name || "-"}</p>
     <p><strong>Email:</strong> ${user.email}</p>
@@ -553,14 +554,43 @@ function renderProfileDetails(user) {
       <p><strong>Area:</strong> ${user.farmArea || "-"}</p>
       <p><strong>District:</strong> ${user.district || "-"}</p>
     `;
+
+    // 🏅 Fetch the farmer's medal and last assessment score
+    const medal = localStorage.getItem(`medal_${user.id}`) || "None";
+    const assessments = JSON.parse(localStorage.getItem("sf_assessments") || "[]");
+    const userAssess = assessments.filter(a =>
+      a.user === user.phone || a.user === user.email || a.user === user.id
+    );
+    const lastAssess = userAssess[userAssess.length - 1];
+
+    // 🥇 Convert medal to emoji
+    let medalEmoji = "❌";
+    if (medal === "Gold") medalEmoji = "🥇";
+    else if (medal === "Silver") medalEmoji = "🥈";
+    else if (medal === "Bronze") medalEmoji = "🥉";
+
+    html += `
+      <p><strong>Compliance Medal:</strong> 
+        <span style="font-size:1.6em;">${medalEmoji}</span> 
+        <span style="color:#ccc;">(${medal})</span>
+      </p>
+    `;
+
+    // 📊 Add farmer score info (if any)
+    if (lastAssess) {
+      html += `
+        <p><strong>Last Assessment Score:</strong> ${Math.round(lastAssess.score * 100)}%</p>
+        <p><strong>Risk Level:</strong> ${lastAssess.level}</p>
+      `;
+    } 
   } else if (user.role === "buyer") {
     html += `<p><strong>Company:</strong> ${user.company || "-"}</p>`;
   } else if (user.role === "admin") {
     html += `<p><strong>Organization:</strong> ${user.organization || "-"}</p>`;
   }
-  details.innerHTML = html;
-}
 
+  details.innerHTML = html;
+} 
 /* ----- Edit mode ----- */
 function editProfile() {
   const role = localStorage.getItem("currentUserRole");

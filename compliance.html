@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compliance Tracker | Smart Farm Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="compliance.js"></script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f3f8f6;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #007a3d;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+    }
+    header button {
+      background: white;
+      border: none;
+      color: #007a3d;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    header button:hover { background: #e3f8ec; }
+
+    .summary {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .summary div {
+      text-align: center;
+    }
+    .summary h3 { color: #007a3d; margin: 0; }
+
+    #filters {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      background: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    #filters input, #filters select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgb(177, 67, 8);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(243, 10, 10, 0.08);
+    }
+    th {
+      background: #007a3d;
+      color: white;
+      padding: 10px;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #1041e3;
+      text-align: center;
+    }
+    tr:nth-child(even) { background: #06210a; }
+
+    .medal {
+      font-size: 1.4em;
+    }
+    .gold { color: gold; }
+    .silver { color: silver; }
+    .bronze { color: #cd7f32; }
+
+    .progress-bar {
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #eee;
+      margin-top: 5px;
+    }
+    .progress-inner {
+      height: 100%;
+      background: linear-gradient(90deg,#00b373,#00e676);
+    }
+
+    .high { color: red; font-weight: bold; }
+    .medium { color: orange; }
+    .low { color: green; }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h2>🏅 Compliance Tracker</h2>
+    <button onclick="window.location.href='admin.html'">← Back to Dashboard</button>
+  </header>
+
+  <section class="summary" id="summary">
+    <div>
+      <h3>High Risk</h3>
+      <p id="highCount">0</p>
+    </div>
+    <div>
+      <h3>Medium Risk</h3>
+      <p id="mediumCount">0</p>
+    </div>
+    <div>
+      <h3>Low Risk</h3>
+      <p id="lowCount">0</p>
+    </div>
+    <div>
+      <h3>Average Score</h3>
+      <p id="avgScore">0%</p>
+    </div>
+  </section>
+
+  <div id="filters">
+    <input type="text" id="searchInput" placeholder="🔍 Search farmer name..." oninput="applyFilters()">
+    <select id="categoryFilter" onchange="applyFilters()">
+      <option value="all">All Categories</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+  </div>
+
+  <table id="complianceTable">
+    <thead>
+      <tr>
+        <th>Farmer</th>
+        <th>Score</th>
+        <th>Category</th>
+        <th>Medal</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</body>
+</html>

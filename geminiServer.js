@@ -1,16 +1,17 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
-import bodyParser from "body-parser";
-
 const app = express();
 const PORT = 3000;
+app.use((req, res, next) => {
+  req.setTimeout(0);   // disable timeouts
+  next();
+});
 app.use(cors({ origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
     methods: ["GET", "POST","PUT"],
     allowedHeaders: ["Content-Type"] }));
-app.use(express.json());
-app.use(bodyParser.json());
-
+app.use(express.json({ limit: "200mb" }));
+app.use(express.urlencoded({ limit: "200mb", extended: true }));
 app.post("/chat", async (req, res) => {
   try {
     const { query } = req.body;
@@ -70,6 +71,10 @@ app.post("/chat", async (req, res) => {
   }
 });
 app.post("/analyze", async (req, res) => {
+  console.log("Image data size (chars):", (req.body.image || req.body.imageBase64 || "").length);
+  console.log("📸 Incoming analyze request...");
+  console.log("Request size:", Buffer.byteLength(JSON.stringify(req.body)) / (1024 * 1024), "MB");
+
   try {
     // accept both "image" and "imageBase64" just in case
     const { image, imageBase64 } = req.body;
@@ -81,7 +86,7 @@ app.post("/analyze", async (req, res) => {
     }
 
     const apiKey = "AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A"; // replace with your key
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A`;
 
     const body = {
       contents: [
@@ -143,65 +148,75 @@ app.get('/api/bookings', (req, res) => {
   res.json(bookings);
 });
 
-// Add new booking
-app.post('/api/bookings', (req, res) => {
-  const { petOwner, petName, vetName, date } = req.body;
-  const newBooking = {
-    _id: generateId(),
-    userId,
-    petOwner,
-    petName,
-    vetName,
-    date,
-    status: 'pending'
-  };
-  bookings.push(newBooking);
-  res.json({ success: true, booking: newBooking });
+app.post("/api/bookings", (req, res) => {
+  try {
+    const { petOwner, petName, vetName, date, userId } = req.body;
+    const newBooking = {
+      _id: generateId(),
+      userId: userId || null,
+      petOwner,
+      petName,
+      vetName,
+      date,
+      status: "pending",
+    };
+    bookings.push(newBooking);
+    console.log("✅ Booking created:", newBooking);
+    res.json({ success: true, booking: newBooking });
+  } catch (err) {
+    console.error("❌ Booking creation error:", err);
+    res.status(500).json({ error: "Failed to create booking" });
+  }
 });
 
 // Update booking status
-app.put('/api/bookings/:id', (req, res) => {
+app.put("/api/bookings/:id", (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-  const booking = bookings.find(b => b._id === id);
-  if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  const booking = bookings.find((b) => b._id === id);
+  if (!booking) return res.status(404).json({ error: "Booking not found" });
   booking.status = status;
+  console.log(`✅ Booking ${id} → ${status}`);
   res.json({ success: true, booking });
 });
 
-// ------------------ ORDERS API ------------------
-
-// Get all orders
-app.get('/api/orders', (req, res) => {
-  res.json(orders);
-});
+// GET all orders
+app.get("/api/orders", (req, res) => res.json(orders));
 
 // Add new order
-app.post('/api/orders', (req, res) => {
-  const { petOwner, medicineName, quantity, deliveryAddress } = req.body;
-  const newOrder = {
-    _id: generateId(),
-    userId,
-    petOwner,
-    medicineName,
-    quantity,
-    deliveryAddress,
-    orderDate: new Date().toISOString().split('T')[0],
-    status: 'pending'
-  };
-  orders.push(newOrder);
-  res.json({ success: true, order: newOrder });
+app.post("/api/orders", (req, res) => {
+  try {
+    const { petOwner, medicineName, quantity, deliveryAddress, userId } = req.body;
+    const newOrder = {
+      _id: generateId(),
+      userId: userId || null,
+      petOwner,
+      medicineName,
+      quantity,
+      deliveryAddress,
+      orderDate: new Date().toISOString().split("T")[0],
+      status: "pending",
+    };
+    orders.push(newOrder);
+    console.log("✅ Order created:", newOrder);
+    res.json({ success: true, order: newOrder });
+  } catch (err) {
+    console.error("❌ Order creation error:", err);
+    res.status(500).json({ error: "Failed to create order" });
+  }
 });
 
 // Update order status
-app.put('/api/orders/:id', (req, res) => {
+app.put("/api/orders/:id", (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-  const order = orders.find(o => o._id === id);
-  if (!order) return res.status(404).json({ error: 'Order not found' });
+  const order = orders.find((o) => o._id === id);
+  if (!order) return res.status(404).json({ error: "Order not found" });
   order.status = status;
+  console.log(`✅ Order ${id} → ${status}`);
   res.json({ success: true, order });
 });
+
 
 // ------------------ START SERVER ------------------
 app.listen(PORT, () => {

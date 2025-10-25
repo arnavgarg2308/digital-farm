@@ -29,17 +29,31 @@
 
     let base64Image = "";
 
-    input.addEventListener("change", () => {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        base64Image = e.target.result.split(",")[1];
-        preview.src = e.target.result;
-        preview.style.display = "block";
-      };
-      reader.readAsDataURL(file);
-    });
+   input.addEventListener("change", () => {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.src = e.target.result;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const MAX = 800; // shrink large images
+      let w = img.width, h = img.height;
+      if (w > h && w > MAX) { h *= MAX / w; w = MAX; }
+      else if (h > MAX) { w *= MAX / h; h = MAX; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      base64Image = canvas.toDataURL("image/jpeg", 0.8).split(",")[1];
+      preview.src = canvas.toDataURL("image/jpeg", 0.8);
+      preview.style.display = "block";
+     console.log("📸 Image base64 length:", base64Image.length / 1024 / 1024, "MB");
+};
+  };
+  reader.readAsDataURL(file);
+});
 
     analyzeBtn.addEventListener("click", async () => {
       if (!base64Image) return alert("Please upload an image first!");
@@ -48,7 +62,7 @@
         const res = await fetch("http://localhost:3000/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: base64Image })
+          body: JSON.stringify({ imageBase64: base64Image })
         });
         const data = await res.json();
         result.textContent = data.reply || "No analysis result.";

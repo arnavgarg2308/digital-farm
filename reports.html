@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reports - Admin</title>
+<style>
+  body {
+    background:#0b0b0c; color:white; font-family:Inter,system-ui,Arial;
+    margin:0; padding:20px;
+  }
+  h1 { color:#00ff99; margin-bottom:10px; }
+  table {
+    width:100%; border-collapse:collapse; margin-top:20px; color:#fff; text-align:center;
+  }
+  th, td {
+    border:1px solid #333; padding:8px;
+  }
+  th {
+    background:#00ff99; color:black;
+  }
+  .high { color:red; font-weight:bold; }
+  .medium { color:orange; font-weight:bold; }
+  .low { color:lightgreen; font-weight:bold; }
+  button {
+    background:#00ff99; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;
+  }
+  button:hover { background:#00cc77; }
+  .back { margin-bottom:20px; background:#222; color:#00ff99; }
+  .searchBox {
+    margin-top:10px;
+    margin-bottom:10px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .searchBox input {
+    padding:6px 10px;
+    border-radius:6px;
+    border:1px solid #333;
+    background:#1a1a1c;
+    color:white;
+    width:250px;
+  }
+</style>
+</head>
+<body>
+
+<button class="back" onclick="window.location.href='admin.html'">← Back to Dashboard</button>
+<h1>Farmers Risk Assessment Reports</h1>
+
+<div class="searchBox">
+  <input type="text" id="searchInput" placeholder="🔍 Search by name or email">
+  <button onclick="renderReports()">Search</button>
+  <button onclick="clearSearch()">Clear</button>
+</div>
+
+<table id="reportsTable">
+  <thead>
+    <tr>
+      <th>Farmer Name</th>
+      <th>Email</th>
+      <th>District</th>
+      <th>Score</th>
+      <th>Level</th>
+      <th>Date</th>
+      <th>Export CSV</th>
+    </tr>
+  </thead>
+  <tbody id="reportsBody"></tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", renderReports);
+
+function renderReports() {
+  const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+  const tbody = document.getElementById('reportsBody');
+  tbody.innerHTML = '';
+
+  const farmers = users.filter(u => u.role === 'farmer' && 
+    (!searchTerm || u.name.toLowerCase().includes(searchTerm) || u.email.toLowerCase().includes(searchTerm))
+  );
+
+  if (!farmers.length) {
+    tbody.innerHTML = `<tr><td colspan="7">No farmer data found</td></tr>`;
+    return;
+  }
+
+  farmers.forEach(u => {
+    const farmerAssessments = assessments.filter(a => a.userId == u.id);
+    if (farmerAssessments.length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.name}</td>
+        <td>${u.email}</td>
+        <td>${u.district || '-'}</td>
+        <td colspan="4">No assessments yet</td>
+      `;
+      tbody.appendChild(tr);
+    } else {
+      farmerAssessments.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>${u.district || '-'}</td>
+          <td>${a.score}%</td>
+          <td class="${a.level.toLowerCase()}">${a.level}</td>
+          <td>${new Date(a.createdAt).toLocaleString()}</td>
+          <td><button onclick="exportFarmerCSV(${u.id})">Export</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  });
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  renderReports();
+}
+
+// Export CSV for one farmer
+function exportFarmerCSV(userId) {
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+  const u = users.find(x => x.id == userId);
+  if (!u) return alert('Farmer not found');
+
+  const farmerAssessments = assessments.filter(a => a.userId == userId);
+  if (!farmerAssessments.length) return alert('No assessments for this farmer');
+
+  let csv = `Farmer,Email,District,Score,Level,Date\n`;
+  farmerAssessments.forEach(a => {
+    csv += `${u.name},${u.email},${u.district || '-'},${a.score},${a.level},${new Date(a.createdAt).toLocaleString()}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${u.name}_assessments.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>

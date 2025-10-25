@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Categories | Farmer Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #1e1e1e;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #2e7d32;
+    }
+
+    header h2 {
+      color: #8bc34a;
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    .back-btn {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      background-color: #388e3c;
+    }
+
+    main {
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .farm-section {
+      margin-bottom: 50px;
+    }
+
+    .farm-section h2 {
+      border-left: 4px solid #8bc34a;
+      padding-left: 10px;
+      color: #8bc34a;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+    }
+
+    .card h3 {
+      color: #8bc34a;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      color: #ccc;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .apply-btn {
+      background-color: #2e7d32;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .apply-btn:hover {
+      background-color: #388e3c;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>💰 Loan Categories</h2>
+    <button class="back-btn" onclick="window.location.href='farmer.html'">← Back</button>
+  </header>
+
+  <main>
+
+    <!-- Pig Farm Loans -->
+    <section class="farm-section">
+      <h2>🐖 Pig Farm Loan Options</h2>
+      <div class="grid">
+
+        <div class="card">
+          <h3>Feed Loan</h3>
+          <p>Get financial help for high-quality pig feed and nutrition. Loan range ₹10,000 – ₹2,00,000 at 6.5% annual interest.</p>
+          <a href="loan_application.html" class="apply-btn">Apply for Loan</a>
+        </div>
+
+        <div class="card">
+          <h3>Equipment Loan</h3>
+          <p>For purchasing feeders, drinkers, and farm tools. Loan range ₹25,000 – ₹3,00,000 at 7% annual interest.</p>
+          <a href="loan_application.html" class="apply-btn">Apply for Loan</a>
+        </div>
+
+        <div class="card">
+          <h3>Shed / Farm Infrastructure Loan</h3>
+          <p>Build or renovate pig sheds and infrastructure. Loan range ₹50,000 – ₹5,00,000 at 6.8% annual interest.</p>
+          <a href="loan_application.html" class="apply-btn">Apply for Loan</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Poultry Farm Loans -->
+    <section class="farm-section">
+      <h2>🐔 Poultry Farm Loan Options</h2>
+      <div class="grid">
+
+        <div class="card">
+          <h3>Feed & Nutrition Loan</h3>
+          <p>Support poultry feed supply and supplements. Loan range ₹15,000 – ₹1,50,000 at 6.2% interest.</p>
+          <a href="loan_application.html" class="apply-btn">Apply for Loan</a>
+        </div>
+
+        <div class="card">
+          <h3>Equipment & Hatchery Loan</h3>
+          <p>For incubators, cages, brooders, and hatchery setup. Loan range ₹40,000 – ₹4,00,000 at 7.1% interest.</p>
+          <a href="loan_application.html" class="apply-btn">Apply for Loan</a>
+        </div>
+
+        <div class="card">
+          <h3>Farm Expansion Loan</h3>
+          <p>Expand poultry capacity or add new sheds. Loan range ₹75,000 – ₹6,00,000 at 6.9% interest.</p>
+          <a href="loan_application.html" class="apply-btn">Apply for Loan</a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>

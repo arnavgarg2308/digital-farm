@@ -1373,8 +1373,173 @@ function addToCart(productId) {
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("farmerProducts")) renderFarmerProducts();
   if (document.getElementById("buyerProducts")) renderBuyerProducts();
+  if (document.getElementById("farmerPublishedSessions")) renderFarmerPublishedSessions(); // ✅ added line
 });
+
 // ✅ Prevent error on pages without alert section
 if (typeof loadExistingAlerts === "function" && document.getElementById('existingAlerts')) {
   loadExistingAlerts();
+}
+// ---------- Sessions & Bookings (publish + book) ----------
+/* storage keys:
+   publishedSessions  -> array of session objects
+   sessionBookings    -> array of booking objects
+*/
+
+// helper to get logged-in farmer (any role-based check is up to you)
+function getLoggedInFarmer() {
+  const role = localStorage.getItem('currentUserRole');
+  if (!role) return null;
+  return JSON.parse(localStorage.getItem(`currentUser_${role}`) || 'null');
+}
+
+// optional helper to get medal emoji/text (reuses your logic)
+function getFarmerMedal(farmer) {
+  if (!farmer || !farmer.id) return { medal: 'None', emoji: '❌' };
+  const medal = localStorage.getItem(`medal_${farmer.id}`) || 'None';
+  let medalEmoji = '❌';
+  if (medal === 'Gold') medalEmoji = '🥇';
+  else if (medal === 'Silver') medalEmoji = '🥈';
+  else if (medal === 'Bronze') medalEmoji = '🥉';
+  return {medal, emoji: medalEmoji};
+}
+
+// optional: expose for debugging
+window.getPublishedSessions = function() {
+  return JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+};
+window.getSessionBookings = function() {
+  return JSON.parse(localStorage.getItem('sessionBookings') || '[]');
+};
+
+// Convenience: a function to create a session programmatically (if needed)
+function publishSessionFromObject(sessionObj) {
+  const sessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+  sessions.unshift(sessionObj);
+  localStorage.setItem('publishedSessions', JSON.stringify(sessions));
+}
+
+// Called by publish-session.html form — but safe to call from anywhere
+function publishSession(formData) {
+  // formData is an object with the fields: title, description, price, hours, specialization, experience, dateTime
+  const farmer = getLoggedInFarmer();
+  if (!farmer || !farmer.id) throw new Error('No farmer logged in.');
+
+  const { medal } = getFarmerMedal(farmer);
+
+  const session = {
+    id: Date.now().toString(),
+    hostId: farmer.id,
+    hostName: farmer.fullName || farmer.name,
+    hostAvatar: farmer.avatar || '',
+    hostMedal: medal,
+    title: formData.title,
+    description: formData.description,
+    price: Number(formData.price) || 0,
+    hours: Number(formData.hours) || 0,
+    specialization: formData.specialization || '',
+    experience: formData.experience || '',
+    dateTime: formData.dateTime || null,
+    createdAt: new Date().toISOString()
+  };
+
+  const sessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+  sessions.unshift(session);
+  localStorage.setItem('publishedSessions', JSON.stringify(sessions));
+  return session;
+}
+
+// booking function used by sessions.html
+function bookSessionById(sessionId) {
+  const farmer = getLoggedInFarmer();
+  if (!farmer || !farmer.id) { alert('Please login as a farmer to book.'); return; }
+
+  const sessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+  const s = sessions.find(x => x.id === sessionId);
+  if (!s) { alert('Session not found'); return; }
+
+  const bookings = JSON.parse(localStorage.getItem('sessionBookings') || '[]');
+  if (bookings.some(b => b.sessionId === sessionId && b.bookedById === farmer.id)) {
+    alert('You already booked this session.');
+    return;
+  }
+
+    const booking = {
+    id: Date.now().toString(),
+    sessionId,
+    hostId: s.hostId,                 // ✅ added line — link to session’s host
+    hostName: s.hostName,             // ✅ added line — store host name
+    bookedById: farmer.id,
+    bookedByName: farmer.fullName || farmer.name,
+    bookedAt: new Date().toLocaleString(),
+    status: 'booked'
+  };
+
+  
+  bookings.push(booking);
+  localStorage.setItem('sessionBookings', JSON.stringify(bookings));
+  alert('Booking successful ✅');
+  return booking;
+}
+
+// cancel booking
+function cancelSessionBooking(bookingId) {
+  let bookings = JSON.parse(localStorage.getItem('sessionBookings') || '[]');
+  bookings = bookings.filter(b => b.id !== bookingId);
+  localStorage.setItem('sessionBookings', JSON.stringify(bookings));
+  return true;
+}
+// ========================== Farmer Published Sessions Viewer ==========================
+function renderFarmerPublishedSessions() {
+  const farmer = getLoggedInFarmer();
+  if (!farmer || !farmer.id) {
+    document.getElementById('farmerPublishedSessions').innerHTML = "<p>Please log in as a farmer.</p>";
+    return;
+  }
+
+  const allSessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+  const mySessions = allSessions.filter(s => s.hostId === farmer.id);
+
+  const allBookings = JSON.parse(localStorage.getItem('sessionBookings') || '[]');
+
+  if (mySessions.length === 0) {
+    document.getElementById('farmerPublishedSessions').innerHTML = "<p>No sessions published yet.</p>";
+    return;
+  }
+
+  let html = `<h2>Your Published Sessions</h2>`;
+  mySessions.forEach(session => {
+    const bookings = allBookings.filter(b => b.sessionId === session.id);
+    html += `
+      <div class="session-card" style="border:1px solid #ccc; padding:12px; margin-bottom:15px; border-radius:8px;">
+        <h3>${session.title}</h3>
+        <p><strong>Description:</strong> ${session.description}</p>
+        <p><strong>Date & Time:</strong> ${session.dateTime || 'N/A'}</p>
+        <p><strong>Price:</strong> ₹${session.price}</p>
+        <p><strong>Duration:</strong> ${session.hours} hours</p>
+        <p><strong>Specialization:</strong> ${session.specialization}</p>
+        <p><strong>Experience:</strong> ${session.experience}</p>
+        <hr>
+        <h4>Bookings for this session:</h4>
+    `;
+
+    if (bookings.length === 0) {
+      html += `<p>No bookings yet.</p>`;
+    } else {
+      html += `<ul>`;
+      bookings.forEach(b => {
+        html += `
+          <li>
+            <strong>${b.bookedByName}</strong> — booked on ${b.bookedAt} 
+            <span style="color:green;">(${b.status})</span>
+          </li>
+        `;
+      });
+      html += `</ul>`;
+    }
+
+    html += `</div>`;
+  });
+
+  document.getElementById('farmerPublishedSessions').innerHTML = html;
 }

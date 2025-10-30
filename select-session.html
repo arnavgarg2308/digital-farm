@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Farmer Session Options</title>
+  <style>
+    :root {
+      --soft-green: #b7f2d0;
+      --soft-blue: #b2e6f5;
+      --text-dark: #043c3c;
+      --btn-green: #00a86b;
+      --btn-blue: #0077b6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", system-ui, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, var(--soft-green), var(--soft-blue));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 40px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      padding: 60px 80px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+      max-width: 900px;
+      width: 90%;
+    }
+
+    .option {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      text-align: center;
+      padding: 40px 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+
+    .option h2 {
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      font-size: 1.6rem;
+    }
+
+    .option p {
+      color: #333;
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .btn.publish {
+      background: var(--btn-green);
+    }
+
+    .btn.publish:hover {
+      background: #008f5a;
+    }
+
+    .btn.book {
+      background: var(--btn-blue);
+    }
+
+    .btn.book:hover {
+      background: #005f91;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        gap: 24px;
+        padding: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="option" onclick="window.location.href='publish-session.html'">
+      <h2>📢 Publish a Session</h2>
+      <p>Offer your own expert session to help other farmers improve their techniques, productivity, and success.</p>
+      <a href="publish-session.html" class="btn publish">Publish Session</a>
+    </div>
+
+    <div class="option" onclick="window.location.href='book-session.html'">
+      <h2>🎯 Book a Session</h2>
+      <p>Browse through experienced farmers and book a personalized session that fits your goals and learning needs.</p>
+      <a href="sessions.html" class="btn book">Book Session</a>
+    </div>
+  </div>
+</body>
+</html>

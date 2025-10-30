@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sessions — Smart Farm</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .wrap {
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 18px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+  }
+  h1 { color: #2d6a4f; }
+  .session-card {
+    border: 1px solid #e6f3ec;
+    padding: 14px;
+    border-radius: 10px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+    transition: 0.2s ease;
+  }
+  .session-card:hover {
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .session-card img {
+    width: 84px;
+    height: 84px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  .session-info { flex: 1; }
+  .meta { color: #666; font-size: 0.9rem; margin-top: 6px; }
+  .btn {
+    background: #2d6a4f;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn.secondary {
+    background: #eee;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  .btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="farmer.html" style="text-decoration:none;color:#2d6a4f;font-weight:600">← Back</a>
+    <h1>Available Sessions</h1>
+    <div style="margin-bottom:10px">
+      <a href="publish-session.html" class="btn">Publish a Session</a>
+    </div>
+
+    <div id="sessionsList"></div>
+
+    <h2 style="margin-top:18px">My Bookings</h2>
+    <div id="myBookings"></div>
+  </div>
+
+<script src="script.js"></script>
+<script>
+(function(){
+  const BASE_SESSIONS_KEY = 'publishedSessions';
+  const BOOKINGS_KEY = 'sessionBookings';
+  const role = localStorage.getItem('currentUserRole');
+  const me = JSON.parse(localStorage.getItem(`currentUser_${role}`) || '{}');
+
+  function renderSessions() {
+    const container = document.getElementById('sessionsList');
+    container.innerHTML = '';
+    const sessions = JSON.parse(localStorage.getItem(BASE_SESSIONS_KEY) || '[]');
+    if (!sessions.length) {
+      container.innerHTML = '<p style="color:#777">No sessions published yet.</p>';
+      return;
+    }
+
+    sessions.forEach(s => {
+      const bookedCount = (JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]')).filter(b => b.sessionId === s.id).length;
+      const div = document.createElement('div');
+      div.className = 'session-card';
+
+      const isOwner = me && me.id === s.hostId;
+
+      // Build the correct button HTML safely (avoid escaping issues)
+      let bookBtnHtml = '';
+      if (isOwner) {
+        bookBtnHtml = '<button class="btn secondary" disabled>You published this</button>';
+      } else {
+        // note: we use single quotes around the interpolated id so it's valid HTML attribute content
+        bookBtnHtml = `<button class="btn" onclick="bookSession('${s.id}')">Book Session</button>`;
+      }
+
+      div.innerHTML = `
+        <img src="${s.hostAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" alt="host">
+        <div class="session-info">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0">${s.title}</h3>
+              <div class="meta">
+                by <strong>${s.hostName}</strong> • ${s.hostMedal || 'None'}
+                ${s.hostMedal === 'Gold' ? '🥇' : s.hostMedal === 'Silver' ? '🥈' : s.hostMedal === 'Bronze' ? '🥉' : ''}
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:700">₹${s.price}</div>
+              <div style="color:#666;font-size:0.9rem">${s.hours} hrs</div>
+            </div>
+          </div>
+          <p style="color:#444;margin-top:8px">${s.description}</p>
+          <div style="margin-top:8px" class="meta">
+            <span>Specialization: ${s.specialization || '-'}</span> •
+            <span>Experience: ${s.experience || '-'}</span>
+            ${s.dateTime ? `<div style="margin-top:6px;color:#666">Scheduled: ${new Date(s.dateTime).toLocaleString()}</div>` : ''}
+          </div>
+          <div style="margin-top:10px">
+            ${bookBtnHtml}
+            <button class="btn secondary" onclick="viewSessionDetails('${s.id}')">View Details</button>
+            <small style="margin-left:10px;color:#666">${bookedCount} booked</small>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(div);
+    });
+  }
+
+  function renderMyBookings() {
+    const container = document.getElementById('myBookings');
+    container.innerHTML = '';
+    if (!me || !me.id) {
+      container.innerHTML = '<p style="color:#777">Login as farmer to see bookings.</p>';
+      return;
+    }
+    const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]').filter(b => b.bookedById === me.id);
+    if (!bookings.length) {
+      container.innerHTML = '<p style="color:#777">You have no bookings yet.</p>';
+      return;
+    }
+
+    bookings.forEach(b => {
+const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]').filter(b => b.hostId === me.id);
+
+      const div = document.createElement('div');
+      div.className = 'session-card';
+      div.innerHTML = `
+        <img src="${s.hostAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" alt="host">
+        <div class="session-info">
+          <h3 style="margin:0">${s.title || '—'}</h3>
+          <div class="meta">Host: <strong>${s.hostName || '—'}</strong> • Booked on ${b.bookedAt}</div>
+          <div style="margin-top:8px">${s.description || ''}</div>
+          <div style="margin-top:10px">
+            <button class="btn secondary" onclick="cancelBooking('${b.id}')">Cancel</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  // ===================== Global Functions =====================
+
+  window.bookSession = function(sessionId) {
+    if (!me || !me.id) {
+      alert('Please login as Farmer to book.');
+      return;
+    }
+
+    const sessions = JSON.parse(localStorage.getItem(BASE_SESSIONS_KEY) || '[]');
+    const s = sessions.find(x => x.id === sessionId);
+    if (!s) {
+      alert('Session not found.');
+      return;
+    }
+
+    if (me.id === s.hostId) {
+      alert("You cannot book your own session.");
+      return;
+    }
+
+    const confirmMsg = `Book "${s.title}" by ${s.hostName} for ₹${s.price}?`;
+    if (!confirm(confirmMsg)) return;
+
+    const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]');
+
+    if (bookings.some(b => b.sessionId === sessionId && b.bookedById === me.id)) {
+      alert('You have already booked this session.');
+      return;
+    }
+
+    const newBooking = {
+      id: Date.now().toString(),
+      sessionId,
+      bookedById: me.id,
+      bookedByName: me.fullName || me.name,
+      bookedAt: new Date().toLocaleString(),
+      status: 'booked',
+      hostId: s.hostId,      // So the host can view who booked
+      hostName: s.hostName   // Stored for reference
+    };
+
+    bookings.push(newBooking);
+    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+    alert('Booking successful ✅');
+    renderSessions();
+    renderMyBookings();
+  };
+
+  window.cancelBooking = function(bookingId) {
+    if (!confirm('Cancel this booking?')) return;
+    let bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]');
+    bookings = bookings.filter(b => b.id !== bookingId);
+    localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+    renderSessions();
+    renderMyBookings();
+  };
+
+  window.viewSessionDetails = function(sessionId) {
+    const sessions = JSON.parse(localStorage.getItem(BASE_SESSIONS_KEY) || '[]');
+    const s = sessions.find(x => x.id === sessionId);
+    if (!s) return alert('Not found');
+    alert(`${s.title}\n\nHost: ${s.hostName}\nMedal: ${s.hostMedal}\nPrice: ₹${s.price}\nHours: ${s.hours}\n\n${s.description}`);
+  };
+
+  // ===================== Initial Render =====================
+  renderSessions();
+  renderMyBookings();
+  window.addEventListener('storage', () => { renderSessions(); renderMyBookings(); });
+})();
+</script>
+</body>
+</html>

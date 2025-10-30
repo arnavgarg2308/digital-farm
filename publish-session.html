@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Publish Session — Smart Farm</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: "Segoe UI", sans-serif;
+    background: #f7f8fa;
+    margin: 0;
+    padding: 0;
+  }
+  .page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 10px;
+  }
+  .publish-section {
+    flex: 1;
+    min-width: 360px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    padding: 20px;
+  }
+  .sessions-section {
+    flex: 1;
+    min-width: 360px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  h1{margin:0 0 12px;color:#2d6a4f}
+  label{display:block;margin-top:10px;font-weight:600;color:#555;}
+  input, textarea, select { width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-top:6px; }
+  .row{display:flex; gap:12px}
+  .row > * { flex:1 }
+  .btn { margin-top:12px; padding:10px 14px; border:none; border-radius:8px; background:#2d6a4f; color:#fff; cursor:pointer;}
+  .btn-delete { background:#d9534f; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:0.85rem;}
+  .btn-delete:hover { background:#c9302c; }
+  .session-preview { margin-top:18px; padding:12px; border-radius:10px; background:#f6fffa; border:1px solid #dff6e9; }
+
+  /* published sessions list */
+  .session-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #fdfdfd;
+    position: relative;
+  }
+  .session-item h3 {
+    margin: 0 0 6px;
+    color: #2d6a4f;
+  }
+  .session-meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .booked-users {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #333;
+    background: #f6fffa;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .booked-users strong { color: #2d6a4f; }
+  .no-bookings {
+    color: #999;
+    font-size: 0.85rem;
+  }
+  .delete-container {
+    text-align: right;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Left: Publish form -->
+  <div class="publish-section">
+    <a href="farmer.html" style="text-decoration:none;color:#2d6a4f;font-weight:600">← Back</a>
+    <h1>Publish Training Session</h1>
+
+    <div id="publisherInfo" style="display:flex;gap:12px;align-items:center"></div>
+
+    <form id="publishForm">
+      <label>Session Title</label>
+      <input id="sessionTitle" required placeholder="e.g. Backyard Poultry: Egg Hygiene">
+
+      <label>Description</label>
+      <textarea id="sessionDescription" rows="4" required placeholder="Brief about the session"></textarea>
+
+      <div class="row">
+        <div>
+          <label>Price (INR)</label>
+          <input id="sessionPrice" type="number" min="0" required placeholder="e.g. 200">
+        </div>
+        <div>
+          <label>Duration (hours)</label>
+          <input id="sessionHours" type="number" min="0.5" step="0.5" required placeholder="e.g. 2">
+        </div>
+      </div>
+
+      <label>Specialization (tags)</label>
+      <input id="sessionSpec" placeholder="e.g. Poultry, Vaccination, Breeding">
+
+      <label>Experience summary</label>
+      <input id="sessionExp" placeholder="e.g. 10 years raising layer birds">
+
+      <label>Session Date & Time (optional)</label>
+      <input id="sessionDateTime" type="datetime-local">
+
+      <button class="btn" type="submit">Publish Session</button>
+    </form>
+
+    <div id="publishMsg" style="margin-top:10px;color:green;"></div>
+    <div class="session-preview" id="previewBox" style="display:none"></div>
+  </div>
+
+  <!-- Right: Published sessions -->
+  <div class="sessions-section">
+    <h1>Your Published Sessions</h1>
+    <div id="publishedList"></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const role = localStorage.getItem('currentUserRole');
+  const farmer = JSON.parse(localStorage.getItem(`currentUser_${role}`) || '{}');
+  if (!farmer || role !== 'farmer' || !farmer.id) {
+    document.querySelector('.publish-section').innerHTML = '<div style="color:#d33;padding:20px">Please login as a farmer to publish sessions.</div>';
+    return;
+  }
+
+  const assessments = JSON.parse(localStorage.getItem("sf_assessments") || "[]");
+  let medal = localStorage.getItem(`medal_${farmer.id}`) || "None";
+  let medalEmoji = "❌";
+  if (medal === "Gold") medalEmoji = "🥇";
+  else if (medal === "Silver") medalEmoji = "🥈";
+  else if (medal === "Bronze") medalEmoji = "🥉";
+
+  document.getElementById('publisherInfo').innerHTML = `
+    <img src="${farmer.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #2d6a4f">
+    <div>
+      <div style="font-weight:700">${farmer.fullName || farmer.name}</div>
+      <div style="color:#666;font-size:0.9rem">${farmer.farmName || ''}</div>
+      <div style="margin-top:6px">🏅 <strong>${medal}</strong> <span style="font-size:1.2rem;margin-left:6px">${medalEmoji}</span></div>
+    </div>
+  `;
+
+  // Render all sessions + delete feature
+  function renderPublished() {
+    const sessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+    const bookings = JSON.parse(localStorage.getItem('sessionBookings') || '[]');
+    const mySessions = sessions.filter(s => s.hostId === farmer.id);
+    const listBox = document.getElementById('publishedList');
+    listBox.innerHTML = '';
+
+    if (mySessions.length === 0) {
+      listBox.innerHTML = '<div style="color:#999;">No sessions published yet.</div>';
+      return;
+    }
+
+    mySessions.forEach(s => {
+      const booked = bookings.filter(b => b.sessionId === s.id);
+      let bookingsHTML = '';
+      if (booked.length > 0) {
+        bookingsHTML = `
+          <div class="booked-users">
+            <strong>Bookings:</strong><br>
+            ${booked.map(b => `${b.bookedByName} — <span style="color:gray">${b.bookedAt}</span>`).join('<br>')}
+          </div>`;
+      } else {
+        bookingsHTML = `<div class="no-bookings">No bookings yet</div>`;
+      }
+
+      listBox.innerHTML += `
+        <div class="session-item" id="session-${s.id}">
+          <h3>${s.title}</h3>
+          <div class="session-meta">₹${s.price} • ${s.hours} hr • ${s.specialization || 'N/A'}</div>
+          <div class="session-meta" style="font-size:0.85rem;color:#777">Published: ${new Date(s.createdAt).toLocaleString()}</div>
+          ${bookingsHTML}
+          <div class="delete-container">
+            <button class="btn-delete" onclick="deleteSession('${s.id}')">🗑️ Delete</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  // Delete function
+  window.deleteSession = function(sessionId) {
+    if (!confirm('Are you sure you want to delete this session?')) return;
+    const sessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+    const updated = sessions.filter(s => s.id !== sessionId);
+    localStorage.setItem('publishedSessions', JSON.stringify(updated));
+    renderPublished();
+  }
+
+  // Preview builder
+  function buildPreview() {
+    const t = document.getElementById('sessionTitle').value.trim();
+    const d = document.getElementById('sessionDescription').value.trim();
+    const p = document.getElementById('sessionPrice').value;
+    const h = document.getElementById('sessionHours').value;
+    const s = document.getElementById('sessionSpec').value;
+    const e = document.getElementById('sessionExp').value;
+    const dt = document.getElementById('sessionDateTime').value;
+    if (!t) { document.getElementById('previewBox').style.display='none'; return; }
+    document.getElementById('previewBox').style.display='block';
+    document.getElementById('previewBox').innerHTML = `
+      <h3 style="margin:0 0 6px">${t}</h3>
+      <div style="color:#666">${d}</div>
+      <p style="margin:8px 0"><strong>Price:</strong> ₹${p || '0'} • <strong>Hours:</strong> ${h || '-'} • <strong>Spec:</strong> ${s || '-'}</p>
+      <p style="margin:0;color:#444"><strong>Host:</strong> ${farmer.fullName || farmer.name} ${medalEmoji} (${medal})</p>
+      ${dt ? `<div style="margin-top:6px;color:#666"><strong>Scheduled:</strong> ${new Date(dt).toLocaleString()}</div>` : ''}
+    `;
+  }
+
+  ['sessionTitle','sessionDescription','sessionPrice','sessionHours','sessionSpec','sessionExp','sessionDateTime']
+    .forEach(id=> document.getElementById(id).addEventListener('input', buildPreview));
+
+  document.getElementById('publishForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const session = {
+      id: Date.now().toString(),
+      hostId: farmer.id,
+      hostName: farmer.fullName || farmer.name,
+      hostAvatar: farmer.avatar || '',
+      hostMedal: medal,
+      title: document.getElementById('sessionTitle').value.trim(),
+      description: document.getElementById('sessionDescription').value.trim(),
+      price: Number(document.getElementById('sessionPrice').value) || 0,
+      hours: Number(document.getElementById('sessionHours').value) || 0,
+      specialization: document.getElementById('sessionSpec').value.trim(),
+      experience: document.getElementById('sessionExp').value.trim(),
+      dateTime: document.getElementById('sessionDateTime').value || null,
+      createdAt: new Date().toISOString()
+    };
+
+    const sessions = JSON.parse(localStorage.getItem('publishedSessions') || '[]');
+    sessions.unshift(session);
+    localStorage.setItem('publishedSessions', JSON.stringify(sessions));
+
+    document.getElementById('publishMsg').textContent = 'Session published ✅';
+    document.getElementById('publishForm').reset();
+    document.getElementById('previewBox').style.display='none';
+    renderPublished();
+  });
+
+  // Initial render
+  renderPublished();
+
+})();
+</script>
+</body>
+</html>

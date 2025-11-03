@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Buyer Payments</title>
+<style>
+body {
+  background:#0d0d0d; color:#eee; font-family:Inter,system-ui;
+  padding:20px;
+}
+h1 { color:#00c853; }
+.payment-item {
+  background:#161616; margin-bottom:10px; padding:10px;
+  border-radius:8px; display:flex; align-items:center; gap:10px;
+}
+.payment-item img {
+  width:80px; height:80px; object-fit:cover; border-radius:8px;
+}
+.btn {
+  padding:6px 10px; border:none; border-radius:6px;
+  cursor:pointer; font-weight:600;
+}
+.pay { background:#00c853; color:#031; }
+.remove { background:#e53935; color:#fff; }
+.pending { color:#ffca28; font-weight:600; }
+.paid { color:#00e676; font-weight:600; }
+</style>
+</head>
+<body>
+<h1>💰 Payment Section</h1>
+<div id="paymentList"></div>
+<div id="emptyBox" style="color:#aaa;">No bookings yet.</div>
+
+<script>
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('currentUser_buyer') || 'null');
+}
+
+function loadOrders() {
+  const user = getCurrentUser();
+  if (!user) return [];
+  return JSON.parse(localStorage.getItem('buyerOrders_' + user.id) || '[]');
+}
+
+function saveOrders(arr) {
+  const user = getCurrentUser();
+  if (!user) return;
+  localStorage.setItem('buyerOrders_' + user.id, JSON.stringify(arr));
+}
+
+function renderPayments() {
+  const box = document.getElementById('paymentList');
+  const empty = document.getElementById('emptyBox');
+  const orders = loadOrders();
+
+  box.innerHTML = '';
+  if (!orders.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  orders.forEach((o,i)=>{
+    const div = document.createElement('div');
+    div.className = 'payment-item';
+    div.innerHTML = `
+      <img src="${o.images?.[0] || ''}">
+      <div style="flex:1">
+        <div style="font-weight:700">${o.title}</div>
+        <div style="color:#aaa;font-size:0.9rem">₹${o.price} • ${o.stock}kg</div>
+        <div>Status: 
+          <span class="${o.status==='Paid' ? 'paid':'pending'}">${o.status || 'Pending'}</span>
+        </div>
+      </div>
+      ${o.status !== 'Paid' ? 
+        `<button class="btn pay" onclick="payNow(${i})">Pay Now</button>` : ''}
+      <button class="btn remove" onclick="removeOrder(${i})">Remove</button>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function payNow(i){
+  const orders = loadOrders();
+  orders[i].status = 'Paid';
+  saveOrders(orders);
+  alert('✅ Payment successful for ₹' + orders[i].price);
+  renderPayments();
+}
+
+function removeOrder(i){
+  if(!confirm('Remove this order?')) return;
+  const orders = loadOrders();
+  orders.splice(i,1);
+  saveOrders(orders);
+  renderPayments();
+}
+
+document.addEventListener('DOMContentLoaded', renderPayments);
+</script>
+</body>
+</html>

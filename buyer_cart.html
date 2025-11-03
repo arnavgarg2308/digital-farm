@@ -2,57 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Your Cart</title>
+<title>Marketplace — Buyer Cart</title>
 <style>
 body{background:#0c0c0c;color:#eee;font-family:Inter,system-ui;padding:20px;}
 h1{color:#00c853;}
-.cart-item{background:#161616;margin-bottom:10px;padding:10px;border-radius:8px;display:flex;gap:10px;align-items:center;}
-.cart-item img{width:80px;height:80px;object-fit:cover;border-radius:8px;}
-.btn{padding:6px 10px;border:none;border-radius:6px;cursor:pointer;}
+.cart-item{background:#161616;margin:6px 0;padding:10px;border-radius:8px;display:flex;gap:10px;align-items:center;}
+.cart-item img{width:70px;height:70px;object-fit:cover;border-radius:8px;}
+.btn{padding:6px 10px;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
 .remove{background:#e53935;color:#fff;}
-.place{background:#00c853;color:#031;padding:8px 14px;font-weight:700;}
+.place{background:#00c853;color:#031;padding:8px 14px;font-weight:700;border:none;border-radius:8px;cursor:pointer;}
 </style>
 </head>
 <body>
-<h1>Your Cart</h1>
-<div id="cartList"></div>
-<div id="emptyBox" style="color:#aaa;">No items yet.</div>
-<div style="margin-top:20px;">
-  <button class="place" onclick="placeOrder()">📦 Place Order</button>
-</div>
+
+<h1>🛒 Your Cart</h1>
+
+<section>
+  <div id="cartList"></div>
+  <div id="emptyCart" style="color:#aaa;">No items in cart.</div>
+  <div style="margin-top:20px;">
+    <button class="place" onclick="bookOrder()">📦 Book Order</button>
+  </div>
+</section>
 
 <script>
+/* ===== Helpers ===== */
 function getCurrentUser() {
-  return JSON.parse(localStorage.getItem('currentUser_buyer') || 'null');
+  return JSON.parse(localStorage.getItem('currentUser_buyer') || '{"id":"demoBuyer1","name":"Demo Buyer"}');
 }
 function loadCart() {
-  const u = getCurrentUser();
-  if (!u) return [];
-  return JSON.parse(localStorage.getItem('cart_' + u.id) || '[]');
+  const u=getCurrentUser();
+  return JSON.parse(localStorage.getItem('cart_'+u.id)||'[]');
 }
-function saveCart(arr) {
-  const u = getCurrentUser();
-  if (!u) return;
-  localStorage.setItem('cart_' + u.id, JSON.stringify(arr));
+function saveCart(arr){
+  const u=getCurrentUser();
+  localStorage.setItem('cart_'+u.id,JSON.stringify(arr));
 }
 
-function renderCart() {
-  const box = document.getElementById('cartList');
-  const empty = document.getElementById('emptyBox');
-  const cart = loadCart();
-  box.innerHTML = '';
-  if (!cart.length) { empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
+/* ===== Render Cart ===== */
+function renderCart(){
+  const box=document.getElementById('cartList');
+  const empty=document.getElementById('emptyCart');
+  const cart=loadCart();
+  box.innerHTML='';
+  if(!cart.length){empty.style.display='block';return;}
+  empty.style.display='none';
 
   cart.forEach((p,i)=>{
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <img src="${p.images?.[0] || ''}">
+    const div=document.createElement('div');
+    div.className='cart-item';
+    div.innerHTML=`
+      <img src="${p.thumb || p.images?.[0] || ''}">
       <div style="flex:1">
         <div style="font-weight:700">${p.title}</div>
         <div style="color:#aaa;font-size:0.9rem">₹${p.price} • ${p.stock}kg</div>
-        <small style="color:#777">By ${p.farmerName}</small>
+        <small style="color:#777">By ${p.farmerName || 'Farmer'}</small>
       </div>
       <button class="btn remove" onclick="removeItem(${i})">Remove</button>
     `;
@@ -61,30 +65,56 @@ function renderCart() {
 }
 
 function removeItem(i){
-  const cart = loadCart();
+  const cart=loadCart();
   cart.splice(i,1);
   saveCart(cart);
   renderCart();
 }
 
-function placeOrder(){
+/* ===== Book Order ===== */
+function bookOrder(){
   const u = getCurrentUser();
-  if (!u) return alert('Please login as Buyer.');
   const cart = loadCart();
-  if (!cart.length) return alert('Your cart is empty.');
+  if (!cart.length) return alert('🛒 Cart is empty!');
 
-  // store under buyerOrders_<buyerId>
-  const orders = JSON.parse(localStorage.getItem('buyerOrders_' + u.id) || '[]');
-  const newOrders = cart.map(p=>({...p, status:'Pending', orderId: Date.now()+Math.random()}));
-  orders.push(...newOrders);
-  localStorage.setItem('buyerOrders_' + u.id, JSON.stringify(orders));
+  cart.forEach(p => {
+    // If product doesn't have farmerId, try to get it from product list
+    let farmerId = p.farmerId;
+    if (!farmerId) {
+      const allProducts = JSON.parse(localStorage.getItem('products') || '[]');
+      const found = allProducts.find(prod => prod.id === p.id);
+      if (found) farmerId = found.farmerId;
+    }
+    if (!farmerId) {
+      console.warn('Missing farmerId for', p.title);
+      return;
+    }
 
-  saveCart([]); // clear cart
+    const farmerReqKey = 'farmerRequests_' + farmerId;
+    const farmerReqs = JSON.parse(localStorage.getItem(farmerReqKey) || '[]');
+
+    const order = {
+      ...p,
+      farmerId,
+      status:'Pending',
+      confirmed:false,
+      orderId: Date.now() + Math.random(),
+      buyerId:u.id,
+      buyerName:u.name
+    };
+
+    farmerReqs.push(order);
+    localStorage.setItem(farmerReqKey, JSON.stringify(farmerReqs));
+  });
+
+  // clear cart after sending requests
+  saveCart([]);
   renderCart();
-  alert('✅ Order placed successfully!');
+  alert('📩 Booking request sent to farmer! Wait for confirmation before payment.');
 }
 
-document.addEventListener('DOMContentLoaded', renderCart);
+/* ===== Init ===== */
+document.addEventListener('DOMContentLoaded',renderCart);
 </script>
 </body>
 </html>

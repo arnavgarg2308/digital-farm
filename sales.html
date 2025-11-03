@@ -226,15 +226,17 @@ async function addProduct(){
   if (!title) return alert('Please add a product title.');
 
   const products = loadProductsAll();
-  const item = {
-    id: Date.now().toString(),
-    userId: currentUser.id,
-    farmerName: currentUser.fullName || currentUser.name || 'Farmer',
-    farmerEmail: currentUser.email || '',
-    title, price, stock, category,
-    images: stagedImages.slice(),
-    createdAt: new Date().toISOString()
-  };
+ const item = {
+  id: Date.now().toString(),
+  farmerId: currentUser.id,   // ✅ changed from userId
+  farmerName: currentUser.fullName || currentUser.name || 'Farmer',
+  farmerEmail: currentUser.email || '',
+  title, price, stock, category,
+  images: stagedImages.slice(),
+  createdAt: new Date().toISOString()
+};
+
+
   products.push(item);
   saveProductsAll(products);
 
@@ -267,7 +269,8 @@ function renderFarmerProducts(){
     return;
   }
   const userId = currentUser.id;
-  const products = loadProductsAll().filter(p => String(p.userId) === String(userId));
+  const products = loadProductsAll().filter(p => String(p.farmerId) === String(userId));
+
   if (!products.length) {
     emptyBox.style.display = 'block';
     return;
@@ -344,7 +347,8 @@ function deleteProduct(id){
 /* ========== stats & profile ========== */
 function updateStats(){
   const currentUser = getCurrentUser('farmer');
-  const products = loadProductsAll().filter(p => String(p.userId) === String(currentUser?.id));
+  const products = loadProductsAll().filter(p => String(p.farmerId) === String(currentUser?.id));
+
   document.getElementById('statCount').textContent = 'Products: ' + products.length;
 }
 

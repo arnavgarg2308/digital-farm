@@ -2,7 +2,7 @@ const chatBody = document.getElementById("chatBody");
 const aiInput = document.getElementById("aiInput");
 const sendBtn = document.getElementById("sendBtn");
 const micBtn = document.getElementById("micBtn");
-
+const BASE_URL = "https://digitalfarming-backend.onrender.com";
 function appendMessage(sender, text) {
   const msg = document.createElement("div");
   msg.className = `msg ${sender}`;
@@ -32,11 +32,12 @@ async function handleSend(text) {
   const thinkingMsgElement = createThinkingBubble();
 
   try {
-    const res = await fetch("http://127.0.0.1:3000/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-    });
+    const res = await fetch(`${BASE_URL}/chat`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ query }),
+});
+
 
     thinkingMsgElement.remove();
 

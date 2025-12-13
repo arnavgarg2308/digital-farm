@@ -516,7 +516,7 @@ if (!currentUser) {
   const avatarSrc = currentUser.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
   container.innerHTML = `
-    <div style="background:#141416;padding:20px;border-radius:12px;border:1px solid #222;">
+    <div style="background:white;margin-top:100px; padding:20px;border-radius:12px;border:1px solid white;">
       <div style="text-align:center;">
         <img src="${avatarSrc}" id="profileAvatar" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid #333;">
         <br>

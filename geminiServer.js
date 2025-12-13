@@ -2,12 +2,13 @@ import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.use((req, res, next) => {
   req.setTimeout(0);   // disable timeouts
   next();
 });
-app.use(cors({ origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
+app.use(cors({ origin: "*"
+,
     methods: ["GET", "POST","PUT"],
     allowedHeaders: ["Content-Type"] }));
 app.use(express.json({ limit: "200mb" }));
@@ -25,11 +26,11 @@ app.post("/chat", async (req, res) => {
       ? `उत्तर हिंदी में दो: ${query}`
       : `Answer in English: ${query}`;
 
-    const apiKey = "AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A";
-    const model = "models/gemini-2.5-flash";
+   const apiKey = process.env.GEMINI_API_KEY;
+    const model = "models/gemini-2.5-flash-lite";
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A`;
-    console.log("🌍 Sending request to Gemini:", url);
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+console.log("🌍 Sending request to Gemini:", url);
 
     const bodyData = {
       contents: [{ role: "user", parts: [{ text: langInstruction }] }],
@@ -85,8 +86,8 @@ app.post("/analyze", async (req, res) => {
       return res.status(400).json({ error: "Missing image data" });
     }
 
-    const apiKey = "AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A"; // replace with your key
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyASq5OP_wpbZ9wPCgQMwTde8NP_V3St74A`;
+    const apiKey = process.env.GEMINI_API_KEY;
+const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
 
     const body = {
       contents: [
@@ -220,5 +221,5 @@ app.put("/api/orders/:id", (req, res) => {
 
 // ------------------ START SERVER ------------------
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:3000`);
+  console.log(`Server running on port ${PORT}`);
 });

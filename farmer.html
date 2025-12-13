@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Farmer Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="fstyle.css" />
   <script src="script.js" defer></script>
   <script src="support.js" defer></script>
 </head>
@@ -32,36 +32,52 @@
 
   <main>
     <section class="grid">
-
-      <!-- Risk Assessment -->
-      <div class="card" onclick="openFeature('risk')">
-        <h3 data-lang="risk">Risk Assessment</h3>
-        <p id="lastScore">—</p>
-        <button class="mini" onclick="openFeature('risk'); event.stopPropagation()">
-          <a href="risk.html" target="_blank" class="btn" data-lang="take">Take assessment</a>
-          
-        </button>
-      </div>
-
-      <div class="card">
+  <div class="card">
   <h3>🐄 Analyze Animal Health</h3>
   <p>Upload your animals photo to detect symptoms or diseases</p>
   <button class="btn" onclick="openFeature('health')">
     Open Analyzer
   </button>
 </div>
-
-
-      <!-- Training & Guides -->
+<!-- 🩺 Medical Consultation & Supplies -->
       <div class="card">
-        <h3 data-lang="training">🐖🐓 Training & Guides</h3>
-        <p data-lang="trainingHint">Watch short videos for pig & poultry farming</p>
+        <h3 data-lang="medical">🩺 Medical Help</h3>
+        <p data-lang="medicalHint">Consult a vet or order medicines & vaccines</p>
         <button class="cta">
-          <a href="training.html" target="_blank" class="btn">Open Training</a>
+          <a href="medical.html" target="_blank" class="btn" data-lang="openMedical">Open Medical</a>
         </button>
       </div>
+ <!-- ==== AI Chatbox (Restored) ==== -->
+      <div class="card">
+        <h3 data-lang="support">AI Chat + Support</h3>
+        <p data-lang="ask">Ask questions & get voice replies</p>
+        <button class="cta" onclick="openAIChat()">
+          <a href="ai.html" target="_blank" class="btn" data-lang="open1">Open Chat</a>
+        </button>
+      </div>
+     
+      <!-- Sales / Products -->
+      <div class="card" onclick="openFeature('sales')">
+        <h3 data-lang="sales">Sales / Products</h3>
+        <p data-lang="salesHint">Update product listings</p>
+        <button class ="btn" onclick="window.location.href='sales.html'">🧺 Add Product</button>
 
-      <!-- Government Schemes -->
+      </div>
+
+     <div class="card">
+  <h3>📦 Booking Requests</h3>
+  <p>View and manage all buyer booking requests</p>
+  <button class="btn" onclick="window.location.href='bookingrequests.html'">
+    Open Bookings
+  </button>
+</div>
+ <!-- Book Session -->
+      <div class="card" onclick="openFeature('session')">
+        <h3 data-lang="session">Book Session</h3>
+        <p data-lang="sessionHint">Book paid learning sessions</p>
+        <a href="select-session.html" class="btn"  target="_blank" data-lang="view">sessions</a>
+      </div> 
+<!-- Government Schemes -->
       <div class="card" onclick="openFeature('schemes')">
         <h3 data-lang="schemes">Government Schemes</h3>
         <p data-lang="govDesc">View latest schemes available for your farm type.</p>
@@ -79,12 +95,16 @@
 
 </div>
 
-     <!-- Book Session -->
-      <div class="card" onclick="openFeature('session')">
-        <h3 data-lang="session">Book Session</h3>
-        <p data-lang="sessionHint">Book paid learning sessions</p>
-        <a href="select-session.html" class="btn"  target="_blank" data-lang="view">sessions</a>
+      <!-- Training & Guides -->
+      <div class="card">
+        <h3 data-lang="training">🐖🐓 Training & Guides</h3>
+        <p data-lang="trainingHint">Watch short videos for pig & poultry farming</p>
+        <button class="cta">
+          <a href="training.html" target="_blank" class="btn">Open Training</a>
+        </button>
       </div>
+
+    
 <!-- Vaccination Schedule -->
 <div class="card">
   <h3 data-lang="vaccine">Vaccination Schedule</h3>
@@ -105,30 +125,16 @@
          <a href="feeding.html" class="btn"  target="_blank" data-lang="view">View Chart</a>
       </div>
 
-      <!-- 🩺 Medical Consultation & Supplies -->
-      <div class="card">
-        <h3 data-lang="medical">🩺 Medical Help</h3>
-        <p data-lang="medicalHint">Consult a vet or order medicines & vaccines</p>
-        <button class="cta">
-          <a href="medical.html" target="_blank" class="btn" data-lang="openMedical">Open Medical</a>
+      <!-- Risk Assessment -->
+      <div class="card" onclick="openFeature('risk')">
+        <h3 data-lang="risk">Risk Assessment</h3>
+        <p id="lastScore">—</p>
+        <button class="mini" onclick="openFeature('risk'); event.stopPropagation()">
+          <a href="risk.html" target="_blank" class="btn" data-lang="take">Take assessment</a>
+          
         </button>
       </div>
-
-      <!-- Sales / Products -->
-      <div class="card" onclick="openFeature('sales')">
-        <h3 data-lang="sales">Sales / Products</h3>
-        <p data-lang="salesHint">Update product listings</p>
-        <button class ="btn" onclick="window.location.href='sales.html'">🧺 Add Product</button>
-
-      </div>
-
-     <div class="card">
-  <h3>📦 Booking Requests</h3>
-  <p>View and manage all buyer booking requests</p>
-  <button class="btn" onclick="window.location.href='bookingrequests.html'">
-    Open Bookings
-  </button>
-</div>
+      
 
 <!-- Disease Alerts Card -->
 <div class="card">
@@ -153,14 +159,7 @@
   </div>
 </div>
 
-      <!-- ==== AI Chatbox (Restored) ==== -->
-      <div class="card">
-        <h3 data-lang="support">AI Chat + Support</h3>
-        <p data-lang="ask">Ask questions & get voice replies</p>
-        <button class="cta" onclick="openAIChat()">
-          <a href="ai.html" target="_blank" class="btn" data-lang="open1">Open Chat</a>
-        </button>
-      </div>
+     
 
     </section>
   </main>

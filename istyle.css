@@ -1,0 +1,177 @@
+/* --- General Reset --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body {
+  height: 100vh;
+ background-image: url('https://wallpaperaccess.com/full/340231.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Add a soft overlay for readability --- */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(200, 240, 210, 0.6); /* soft green-blue overlay */
+  backdrop-filter: blur(3px);
+  z-index: 0;
+}
+
+/* --- Center Container --- */
+.center-page {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+  padding: 2rem;
+  color: #0ce5ab;
+}
+
+.center-page h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #12d889;
+  margin-bottom: 0.5rem;
+}
+
+.center-page p {
+  font-size: 1.2rem;
+  color: #1ce598;
+}
+
+/* --- Role Cards --- */
+.role-row {
+  padding-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin: 3rem auto;
+  flex-wrap: wrap;
+  width: 90%;
+}
+
+/* Base card styling */
+.role-btn {
+  position: relative;
+  flex: 1 1 250px;
+  height: 300px;
+  width: 400px;
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Background blur overlay */
+.role-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(3px) brightness(0.9);
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+/* Light overlay for readability */
+.role-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 80, 40, 0.25);
+  z-index: 1;
+}
+
+/* Text styling */
+.role-btn span,
+.role-btn {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Individual backgrounds */
+.role-btn[href*="farmer"]::before {
+  background-image: url('https://wallpapers.com/images/featured/farmer-background-9g13j407zo8u5wf3.jpg');
+}
+
+.role-btn[href*="admin"]::before {
+  background-image: url('https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=800&q=80');
+}
+
+.role-btn[href*="buyer"]::before {
+  background-image: url('https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=800&q=80');
+}
+
+/* Hover effect */
+.role-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: #eaffd6;
+}
+
+
+/* --- Language Dropdown --- */
+.lang-row {
+  margin-top: 2rem;
+}
+
+.globe {
+  font-size: 1.5rem;
+  margin-right: 8px;
+}
+
+select {
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #aef0d3;
+  color: #024b1b;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.hint {
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: #030101;
+  opacity: 0.9;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .role-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .role-btn {
+    font-size: 1.3rem;
+    padding: 2rem 1rem;
+  }
+}

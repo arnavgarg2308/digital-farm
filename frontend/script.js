@@ -770,7 +770,7 @@ function openFeature(feature) {
   }
 }
 // ================== BASE URL ==================
-const BASE_URL = "https://digitalfarming-backend.onrender.com";
+const BASE_URL = "https://digitalfarming.onrender.com";
 
 // 🩺 BOOK VET APPOINTMENT
 async function bookVetAppointment(vet) {

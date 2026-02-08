@@ -2,7 +2,7 @@ const chatBody = document.getElementById("chatBody");
 const aiInput = document.getElementById("aiInput");
 const sendBtn = document.getElementById("sendBtn");
 const micBtn = document.getElementById("micBtn");
-const BASE_URL = "https://digitalfarming.onrender.com";
+const BASE_URL = "https://digitalfarming-1.onrender.com";
 function appendMessage(sender, text) {
   const msg = document.createElement("div");
   msg.className = `msg ${sender}`;

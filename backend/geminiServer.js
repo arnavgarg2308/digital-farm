@@ -7,7 +7,7 @@ app.use((req, res, next) => {
   req.setTimeout(0);   // disable timeouts
   next();
 });
-app.use(cors({ origin: "*"
+app.use(cors({ origin: "https://digital-farm-roan.vercel.app"
 ,
     methods: ["GET", "POST","PUT"],
     allowedHeaders: ["Content-Type"] }));

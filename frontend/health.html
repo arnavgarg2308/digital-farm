@@ -59,7 +59,7 @@
       if (!base64Image) return alert("Please upload an image first!");
       result.textContent = "Analyzing...";
       try {
-        const res = await fetch("https://digitalfarming-1.onrender.com", {
+        const res = await fetch("https://digitalfarming-1.onrender.com/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ imageBase64: base64Image })
